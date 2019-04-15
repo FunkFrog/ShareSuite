@@ -14,6 +14,8 @@ namespace ShareSuite
             if (ShareSuite.WrapDisablePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
+                    if (!NetworkServer.active) return;
+                    // Set interactables budget to 200 * config player count (normal calculation)
                     AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
                         .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
@@ -22,6 +24,8 @@ namespace ShareSuite
             if (ShareSuite.WrapDisableBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
+                    if (!NetworkServer.active) return;
+                    // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
                     var c = new ILCursor(il).Goto(99); //146?
                     c.Remove();
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit);
@@ -32,6 +36,7 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
+                if (!NetworkServer.active) return;
                 // Give original player the item
                 orig(self, body, inventory);
 
@@ -63,13 +68,17 @@ namespace ShareSuite
             {
                 On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
                 {
+                    if (!NetworkServer.active) return;
+                    // extraGold is the normal reward * player count - normal reward (so 4 players would get 4x normal gold)
                     var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
                     foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                     {
+                        // Add money to players w/ scalar
                         playerCharacterMasterController.master.GiveMoney(
                             (uint) Mathf.Floor(extraGold * ShareSuite.MoneyScalar));
                     }
 
+                    // give the normal amount of money and perform other onkill actions
                     orig(self, info);
                 };
             }
@@ -79,6 +88,7 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
+                if (!NetworkServer.active) return;
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -177,6 +187,7 @@ namespace ShareSuite
         {
             On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
             {
+                if (!NetworkServer.active) return;
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
                 Debug.Log("Cost type: " + costType);
                 // If this is a multi-player lobby and the fix is enabled and it's not a lunar item, don't drop an item
