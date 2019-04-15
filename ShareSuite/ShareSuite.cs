@@ -104,7 +104,6 @@ namespace ShareSuite
                 "BossLootCredit",
                 "If boss loot scaling via this mod is enabled, the amount of items the teleporter will drop by default.",
                 1).Value;
-            
         }
     }
 }

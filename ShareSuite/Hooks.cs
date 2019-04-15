@@ -144,8 +144,6 @@ namespace ShareSuite
                             return;
                         }
                     }
-
-                    return;
                 }
 
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
