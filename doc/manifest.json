@@ -1,6 +1,6 @@
 {
     "name": "ShareSuite",
-    "version_number": "1.1.0",
+    "version_number": "1.2.0",
     "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
     "description": "[OFFICIAL MERGE OF Loot4All AND SharedItems] Share items / money (and, soon, equipment) between all living members of your party - Completely configurable - Now with modifiable balance scaling!",
     "dependencies": [

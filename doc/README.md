@@ -17,11 +17,15 @@ Compatible with [DropInMultiplayer](https://thunderstore.io/package/Morris1927/D
 
 - Any item pickups (non-gland and non-lunar by default) are given to all living members of your party.
 
+- Most of the mod automatically diables itself while playing in singleplayer.
+
 - Compatible with 3D Printers and Cauldrons - each player may consume their own items to earn an item from the cauldron. These items are given directly to the purchaser so that it does not affect other players' items.
 
-- Toggleable scaling of boss loot and interactables spawning for balance
+- Toggleable pooled money - off by default.
 
-- Configuration options for enabling/disabling sharing specific item types (white, green, red, lunar, boss)
+- Toggleable scaling of boss loot and interactables spawning for balance.
+
+- Configuration options for enabling/disabling sharing specific item types (white, green, red, lunar, boss).
 
 - Config file (RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg) allows you to change ANYTHING about the mod!
 
@@ -30,7 +34,6 @@ Compatible with [DropInMultiplayer](https://thunderstore.io/package/Morris1927/D
 ### TO-DO
 
 - Shared Equipment
-- Give the amount of money that each player would recieve (e.g. 4x the amount of money if 4 players in the lobby) to the shared pool of money when Share Money is on
 - In-Game commands for changing config options, as well as a config option to completely disable the mod
 - Config option for disabling specific items from being shared
 
@@ -111,8 +114,12 @@ Please change the Disable Player Scaling setting and Disable Boss Loot Scaling t
 ---
 ### Changelog
 
+1.2.0: When shared money is on, everyone recieves a proportionate amount of money relative to amount of players in lobby (also I'm sorry for the 5th release tonight).
+
+1.1.1: Fix of logic concerning 3D printers and Cauldrons.
+
 1.1.0: Addition of config option for sharing/not sharing Queen's Glands.
 
 1.0.1: Update of the README.md with a new to-do entry and a new FAQ, as well as a slight modification of the manifest.
 
-1.0.0: Initial release
+1.0.0: Initial release.
