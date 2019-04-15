@@ -9,23 +9,6 @@ namespace ShareSuite
 {
     public static class Hooks
     {
-        public static void ModifyGoldReward()
-        {
-            if (ShareSuite.WrapMoneyIsShared)
-            {
-                On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
-                {
-                    var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
-                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
-                    {
-                        playerCharacterMasterController.master.GiveMoney((uint) extraGold);
-                    }
-
-                    orig(self, info);
-                };
-            }
-        }
-        
         public static void DisableInteractablesScaling()
         {
             if (ShareSuite.WrapDisablePlayerScalingEnabled)
@@ -74,6 +57,24 @@ namespace ShareSuite
             };
         }
 
+        public static void ModifyGoldReward()
+        {
+            if (ShareSuite.WrapMoneyIsShared)
+            {
+                On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
+                {
+                    var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
+                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                    {
+                        playerCharacterMasterController.master.GiveMoney(
+                            (uint) Mathf.Floor(extraGold * ShareSuite.MoneyScalar));
+                    }
+
+                    orig(self, info);
+                };
+            }
+        }
+
         public static void OnShopPurchase()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
@@ -120,9 +121,11 @@ namespace ShareSuite
                             }
 
                             var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
-                            var amount = (uint) ((double) teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f *
+                                                 ShareSuite.MoneyScalar);
                             var purchaseDiff =
-                                amount -  (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+                                amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
+                                                 0.5f);
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
@@ -240,7 +243,7 @@ namespace ShareSuite
         {
             return index == ItemIndex.Knurl;
         }
-        
+
         public static bool IsQueensGland(ItemIndex index)
         {
             return index == ItemIndex.BeetleGland;

@@ -6,6 +6,7 @@ namespace ShareSuite
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapMoneyIsShared { get; private set; }
+        public static int MoneyScalar { get; private set; }
         public static bool WrapWhiteItemsShared{ get; private set; }
         public static bool WrapGreenItemsShared { get; private set; }
         public static bool WrapRedItemsShared { get; private set; }
@@ -37,6 +38,12 @@ namespace ShareSuite
                 "MoneyShared",
                 "Toggles money sharing.",
                 false).Value;
+            
+            MoneyScalar = Config.Wrap(
+                "Settings",
+                "MoneyScalar",
+                "Modifies percent of gold earned when money sharing is on.",
+                100).Value / 100;
             
             WrapWhiteItemsShared = Config.Wrap(
                 "Settings",
