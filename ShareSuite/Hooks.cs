@@ -9,22 +9,39 @@ namespace ShareSuite
 {
     public static class Hooks
     {
+        public static void ModifyGoldReward()
+        {
+            if (ShareSuite.WrapMoneyIsShared)
+            {
+                On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
+                {
+                    var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
+                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                    {
+                        playerCharacterMasterController.master.GiveMoney((uint) extraGold);
+                    }
+
+                    orig(self, info);
+                };
+            }
+        }
+        
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.Wrap_DisablePlayerScalingEnabled)
+            if (ShareSuite.WrapDisablePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
                     AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
-                        .SetValue(self, 200 * ShareSuite.Wrap_InteractablesCredit);
+                        .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
-            if (ShareSuite.Wrap_DisableBossLootScalingEnabled)
+            if (ShareSuite.WrapDisableBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
                     var c = new ILCursor(il).Goto(99); //146?
                     c.Remove();
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.Wrap_BossLootCredit);
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit);
                 };
         }
 
@@ -67,16 +84,14 @@ namespace ShareSuite
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
-                if (ShareSuite.Wrap_MoneyIsShared)
+                if (ShareSuite.WrapMoneyIsShared)
                 {
                     //TODO add comments on what this does
-                    Debug.Log("Purchase started, money is shared");
                     switch (self.costType)
                     {
                         case CostType.Money:
                         {
                             orig(self, activator);
-                            Debug.Log("Cost type is Money");
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
                                 if (playerCharacterMasterController.master.alive &&
@@ -115,13 +130,13 @@ namespace ShareSuite
                                 {
                                     if (playerCharacterMasterController.master.GetBody() != characterBody)
                                     {
-                                        playerCharacterMasterController.master.money += amount;
+                                        playerCharacterMasterController.master.GiveMoney(amount);
                                         Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
                                                       .GetDisplayName() + " money");
                                     }
                                     else
                                     {
-                                        playerCharacterMasterController.master.money += purchaseDiff;
+                                        playerCharacterMasterController.master.GiveMoney(purchaseDiff);
                                     }
                                 }
                             }
@@ -129,10 +144,12 @@ namespace ShareSuite
                             return;
                         }
                     }
+
+                    return;
                 }
 
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
-                if (!IsMultiplayer() || !ShareSuite.Wrap_PrinterCauldronFixEnabled)
+                if (!IsMultiplayer() || !ShareSuite.WrapPrinterCauldronFixEnabled)
                 {
                     orig(self, activator);
                     return;
@@ -162,14 +179,13 @@ namespace ShareSuite
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
                 Debug.Log("Cost type: " + costType);
                 // If this is a multi-player lobby and the fix is enabled and it's not a lunar item, don't drop an item
-                if (IsValidPickup(self.CurrentPickupIndex())
-                    || !IsMultiplayer()
-                    || !ShareSuite.Wrap_PrinterCauldronFixEnabled
+                if (!IsMultiplayer()
+                    || !IsValidPickup(self.CurrentPickupIndex())
+                    || !ShareSuite.WrapPrinterCauldronFixEnabled
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostType.Money)
                 {
                     // Else drop the item
-                    Debug.Log("Performed normal action");
                     orig(self);
                 }
             };
@@ -178,12 +194,12 @@ namespace ShareSuite
         private static bool IsValidPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
-            return IsWhiteItem(item) && ShareSuite.Wrap_WhiteItemsShared
-                   || IsGreenItem(item) && ShareSuite.Wrap_GreenItemsShared
-                   || IsRedItem(item) && ShareSuite.Wrap_RedItemsShared
-                   || IsLunarItem(item) && ShareSuite.Wrap_LunarItemsShared
-                   || IsBossItem(item) && ShareSuite.Wrap_BossItemsShared
-                   || IsQueensGland(item) && ShareSuite.Wrap_QueensGlandsShared;
+            return IsWhiteItem(item) && ShareSuite.WrapWhiteItemsShared
+                   || IsGreenItem(item) && ShareSuite.WrapGreenItemsShared
+                   || IsRedItem(item) && ShareSuite.WrapRedItemsShared
+                   || IsLunarItem(item) && ShareSuite.WrapLunarItemsShared
+                   || IsBossItem(item) && ShareSuite.WrapBossItemsShared
+                   || IsQueensGland(item) && ShareSuite.WrapQueensGlandsShared;
         }
 
         private static bool IsMultiplayer()
