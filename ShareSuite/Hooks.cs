@@ -1,0 +1,240 @@
+using Harmony;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using RoR2;
+using UnityEngine;
+using UnityEngine.Networking;
+
+namespace ShareSuite
+{
+    public static class Hooks
+    {
+        public static void DisableInteractablesScaling()
+        {
+            if (ShareSuite.Wrap_DisablePlayerScalingEnabled)
+                On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
+                {
+                    AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
+                        .SetValue(self, 200 * ShareSuite.Wrap_InteractablesCredit);
+                    orig(self);
+                };
+
+            if (ShareSuite.Wrap_DisableBossLootScalingEnabled)
+                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+                {
+                    var c = new ILCursor(il).Goto(99); //146?
+                    c.Remove();
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.Wrap_BossLootCredit);
+                };
+        }
+
+        public static void OnGrantItem()
+        {
+            On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
+            {
+                // Give original player the item
+                orig(self, body, inventory);
+
+                // Do nothing else if single-player or 
+                if (!IsMultiplayer()) return;
+                if (!NetworkServer.active) return;
+
+                // Item to share
+                var item = self.pickupIndex.itemIndex;
+
+                // Iterate over all player characters in game
+                if (IsValidPickup(self.pickupIndex))
+                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                    {
+                        // Ensure character is not original player that picked up item
+                        if (playerCharacterMasterController.master.GetBody().Equals(body)) continue;
+                        // Ensure character is alive
+                        if (!playerCharacterMasterController.master.alive) continue;
+
+                        // Give character the item
+                        playerCharacterMasterController.master.inventory.GiveItem(item);
+                    }
+            };
+        }
+
+        public static void OnShopPurchase()
+        {
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                // Return if you can't afford the item
+                if (!self.CanBeAffordedByInteractor(activator)) return;
+
+                var characterBody = activator.GetComponent<CharacterBody>();
+                var inventory = characterBody.inventory;
+
+                if (ShareSuite.Wrap_MoneyIsShared)
+                {
+                    //TODO add comments on what this does
+                    Debug.Log("Purchase started, money is shared");
+                    switch (self.costType)
+                    {
+                        case CostType.Money:
+                        {
+                            orig(self, activator);
+                            Debug.Log("Cost type is Money");
+                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                            {
+                                if (playerCharacterMasterController.master.alive &&
+                                    playerCharacterMasterController.master.GetBody() != characterBody)
+                                {
+                                    playerCharacterMasterController.master.money -= (uint) self.cost;
+                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
+                                                  .GetDisplayName() + " money");
+                                }
+                            }
+
+                            return;
+                        }
+
+                        case CostType.PercentHealth:
+                        {
+                            orig(self, activator);
+                            var teamMaxHealth = 0;
+                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                            {
+                                var charMaxHealth = playerCharacterMasterController.master.GetBody().maxHealth;
+                                if (charMaxHealth > teamMaxHealth)
+                                {
+                                    teamMaxHealth = (int) charMaxHealth;
+                                }
+                            }
+
+                            var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
+                            var amount = (uint) ((double) teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+                            var purchaseDiff =
+                                amount -  (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+
+                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                            {
+                                if (playerCharacterMasterController.master.alive)
+                                {
+                                    if (playerCharacterMasterController.master.GetBody() != characterBody)
+                                    {
+                                        playerCharacterMasterController.master.money += amount;
+                                        Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
+                                                      .GetDisplayName() + " money");
+                                    }
+                                    else
+                                    {
+                                        playerCharacterMasterController.master.money += purchaseDiff;
+                                    }
+                                }
+                            }
+
+                            return;
+                        }
+                    }
+                }
+
+                // If this is not a multi-player server or the fix is disabled, do the normal drop action
+                if (!IsMultiplayer() || !ShareSuite.Wrap_PrinterCauldronFixEnabled)
+                {
+                    orig(self, activator);
+                    return;
+                }
+
+                var shop = self.GetComponent<ShopTerminalBehavior>();
+
+                // If the cost type is an item, give the user the item directly and send the pickup message
+                if (self.costType == CostType.WhiteItem
+                    || self.costType == CostType.GreenItem
+                    || self.costType == CostType.RedItem)
+                {
+                    var item = shop.CurrentPickupIndex().itemIndex;
+                    inventory.GiveItem(item);
+                    Chat.AddPickupMessage(characterBody, ItemCatalog.GetItemDef(item).nameToken, GetItemColor(item),
+                        (uint) characterBody.inventory.GetItemCount(item));
+                }
+
+                orig(self, activator);
+            };
+        }
+
+        public static void OnPurchaseDrop()
+        {
+            On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
+            {
+                var costType = self.GetComponent<PurchaseInteraction>().costType;
+                Debug.Log("Cost type: " + costType);
+                // If this is a multi-player lobby and the fix is enabled and it's not a lunar item, don't drop an item
+                if (IsValidPickup(self.CurrentPickupIndex())
+                    || !IsMultiplayer()
+                    || !ShareSuite.Wrap_PrinterCauldronFixEnabled
+                    || self.itemTier == ItemTier.Lunar
+                    || costType == CostType.Money)
+                {
+                    // Else drop the item
+                    Debug.Log("Performed normal action");
+                    orig(self);
+                }
+            };
+        }
+
+        private static bool IsValidPickup(PickupIndex pickup)
+        {
+            var item = pickup.itemIndex;
+            return IsWhiteItem(item) && ShareSuite.Wrap_WhiteItemsShared
+                   || IsGreenItem(item) && ShareSuite.Wrap_GreenItemsShared
+                   || IsRedItem(item) && ShareSuite.Wrap_RedItemsShared
+                   || IsLunarItem(item) && ShareSuite.Wrap_LunarItemsShared
+                   || IsBossItem(item) && ShareSuite.Wrap_BossItemsShared
+                   || IsQueensGland(item) && ShareSuite.Wrap_QueensGlandsShared;
+        }
+
+        private static bool IsMultiplayer()
+        {
+            // Check if there are more then 1 players in the lobby
+            return PlayerCharacterMasterController.instances.Count > 1;
+        }
+
+        public static Color32 GetItemColor(ItemIndex index)
+        {
+            if (IsWhiteItem(index))
+                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier1Item);
+            if (IsGreenItem(index))
+                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier2Item);
+            if (IsRedItem(index))
+                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier3Item);
+            if (IsLunarItem(index))
+                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.LunarItem);
+            if (IsBossItem(index))
+                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.BossItem);
+            return Color.white;
+        }
+
+        public static bool IsWhiteItem(ItemIndex index)
+        {
+            return ItemCatalog.tier1ItemList.Contains(index);
+        }
+
+        public static bool IsGreenItem(ItemIndex index)
+        {
+            return ItemCatalog.tier2ItemList.Contains(index);
+        }
+
+        public static bool IsRedItem(ItemIndex index)
+        {
+            return ItemCatalog.tier3ItemList.Contains(index);
+        }
+
+        public static bool IsBossItem(ItemIndex index)
+        {
+            return index == ItemIndex.Knurl;
+        }
+        
+        public static bool IsQueensGland(ItemIndex index)
+        {
+            return index == ItemIndex.BeetleGland;
+        }
+
+        public static bool IsLunarItem(ItemIndex index)
+        {
+            return ItemCatalog.lunarItemList.Contains(index);
+        }
+    }
+}
