@@ -11,20 +11,18 @@ namespace ShareSuite
     {
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.WrapDisablePlayerScalingEnabled)
+            if (ShareSuite.WrapOverridePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
-                    if (!NetworkServer.active) return;
                     // Set interactables budget to 200 * config player count (normal calculation)
                     AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
                         .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
-            if (ShareSuite.WrapDisableBossLootScalingEnabled)
+            if (ShareSuite.WrapOverrideBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
-                    if (!NetworkServer.active) return;
                     // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
                     var c = new ILCursor(il).Goto(99); //146?
                     c.Remove();
@@ -139,18 +137,16 @@ namespace ShareSuite
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
-                                if (playerCharacterMasterController.master.alive)
+                                if (!playerCharacterMasterController.master.alive) continue;
+                                if (playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
-                                    if (playerCharacterMasterController.master.GetBody() != characterBody)
-                                    {
-                                        playerCharacterMasterController.master.GiveMoney(amount);
-                                        Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
-                                                      .GetDisplayName() + " money");
-                                    }
-                                    else
-                                    {
-                                        playerCharacterMasterController.master.GiveMoney(purchaseDiff);
-                                    }
+                                    playerCharacterMasterController.master.GiveMoney(amount);
+                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
+                                                  .GetDisplayName() + " money");
+                                }
+                                else
+                                {
+                                    playerCharacterMasterController.master.GiveMoney(purchaseDiff);
                                 }
                             }
 
