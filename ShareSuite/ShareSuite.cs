@@ -2,7 +2,7 @@
 
 namespace ShareSuite
 {
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.2.2")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.2.4")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapMoneyIsShared { get; private set; }
@@ -18,6 +18,7 @@ namespace ShareSuite
         public static int  WrapInteractablesCredit { get; private set; }
         public static bool WrapOverrideBossLootScalingEnabled { get; private set; }
         public static int WrapBossLootCredit { get; private set; }
+        public static bool WrapDeadPlayersGetItems { get; private set; }
 
         public ShareSuite()
         {
@@ -110,6 +111,12 @@ namespace ShareSuite
                 "Balance",
                 "QueensGlandsShared",
                 "Toggles item sharing for specifically the Queen's Gland (reduces possible lag).",
+                false).Value;
+            
+            WrapDeadPlayersGetItems = Config.Wrap(
+                "Balance",
+                "DeadPlayersGetItems",
+                "Toggles item sharing for dead players.",
                 false).Value;
         }
     }

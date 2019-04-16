@@ -1,3 +1,4 @@
+using System.Linq;
 using Harmony;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -34,7 +35,6 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
-                if (!NetworkServer.active) return;
                 // Give original player the item
                 orig(self, body, inventory);
 
@@ -47,15 +47,19 @@ namespace ShareSuite
 
                 // Iterate over all player characters in game
                 if (IsValidPickup(self.pickupIndex))
-                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                    Debug.Log("Is valid pickup");
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                     {
+                        Debug.Log("Checking " + player.GetBody().GetDisplayName());
                         // Ensure character is not original player that picked up item
-                        if (playerCharacterMasterController.master.GetBody().Equals(body)) continue;
+                        if (player.GetBody().Equals(body)) continue;
+                        Debug.Log("Player is not the one who picked up the first item.");
                         // Ensure character is alive
-                        if (!playerCharacterMasterController.master.alive) continue;
-
+                        if (!player.alive && !ShareSuite.WrapDeadPlayersGetItems) continue;
+                        Debug.Log("Player is alive.");
                         // Give character the item
-                        playerCharacterMasterController.master.inventory.GiveItem(item);
+                        player.inventory.GiveItem(item);
+                        Debug.Log("Gave player " + item);
                     }
             };
         }
@@ -86,7 +90,6 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (!NetworkServer.active) return;
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -107,8 +110,6 @@ namespace ShareSuite
                                     playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
                                     playerCharacterMasterController.master.money -= (uint) self.cost;
-                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
-                                                  .GetDisplayName() + " money");
                                 }
                             }
 
@@ -141,8 +142,6 @@ namespace ShareSuite
                                 if (playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
                                     playerCharacterMasterController.master.GiveMoney(amount);
-                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
-                                                  .GetDisplayName() + " money");
                                 }
                                 else
                                 {
