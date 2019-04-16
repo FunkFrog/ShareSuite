@@ -1,33 +1,36 @@
-using System.Linq;
 using Harmony;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Reflection;
 
 namespace ShareSuite
 {
     public static class Hooks
     {
+        static MethodInfo sendPickupMessage = typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static);
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.WrapOverridePlayerScalingEnabled)
+            if (ShareSuite.WrapDisablePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
+                    if (!NetworkServer.active) return;
                     // Set interactables budget to 200 * config player count (normal calculation)
                     AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
                         .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
-            if (ShareSuite.WrapOverrideBossLootScalingEnabled)
+            if (ShareSuite.WrapDisableBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
+                    if (!NetworkServer.active) return;
                     // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
-                    var c = new ILCursor(il).Goto(99); //146?
+                    var c = new ILCursor(il).Goto(99);
                     c.Remove();
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit);
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); //doesnt work, must be replaced with reference
                 };
         }
 
@@ -35,6 +38,7 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
+                if (!NetworkServer.active) return;
                 // Give original player the item
                 orig(self, body, inventory);
 
@@ -47,19 +51,15 @@ namespace ShareSuite
 
                 // Iterate over all player characters in game
                 if (IsValidPickup(self.pickupIndex))
-                    Debug.Log("Is valid pickup");
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                     {
-                        Debug.Log("Checking " + player.GetBody().GetDisplayName());
                         // Ensure character is not original player that picked up item
-                        if (player.GetBody().Equals(body)) continue;
-                        Debug.Log("Player is not the one who picked up the first item.");
+                        if (playerCharacterMasterController.master.GetBody().Equals(body)) continue;
                         // Ensure character is alive
-                        if (!player.alive && !ShareSuite.WrapDeadPlayersGetItems) continue;
-                        Debug.Log("Player is alive.");
+                        if (!playerCharacterMasterController.master.alive) continue;
+
                         // Give character the item
-                        player.inventory.GiveItem(item);
-                        Debug.Log("Gave player " + item);
+                        playerCharacterMasterController.master.inventory.GiveItem(item);
                     }
             };
         }
@@ -77,7 +77,7 @@ namespace ShareSuite
                     {
                         // Add money to players w/ scalar
                         playerCharacterMasterController.master.GiveMoney(
-                            (uint) Mathf.Floor(extraGold * ShareSuite.MoneyScalar));
+                            (uint) Mathf.Floor(extraGold * ShareSuite.WrapMoneyScalar));
                     }
 
                     // give the normal amount of money and perform other onkill actions
@@ -90,6 +90,7 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
+                if (!NetworkServer.active) return;
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -110,6 +111,8 @@ namespace ShareSuite
                                     playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
                                     playerCharacterMasterController.master.money -= (uint) self.cost;
+                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
+                                                  .GetDisplayName() + " money");
                                 }
                             }
 
@@ -131,21 +134,25 @@ namespace ShareSuite
 
                             var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f *
-                                                 ShareSuite.MoneyScalar);
+                                                 ShareSuite.WrapMoneyScalar);
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
                                                  0.5f);
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
-                                if (!playerCharacterMasterController.master.alive) continue;
-                                if (playerCharacterMasterController.master.GetBody() != characterBody)
+                                if (playerCharacterMasterController.master.alive)
                                 {
-                                    playerCharacterMasterController.master.GiveMoney(amount);
-                                }
-                                else
-                                {
-                                    playerCharacterMasterController.master.GiveMoney(purchaseDiff);
+                                    if (playerCharacterMasterController.master.GetBody() != characterBody)
+                                    {
+                                        playerCharacterMasterController.master.GiveMoney(amount);
+                                        Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
+                                                      .GetDisplayName() + " money");
+                                    }
+                                    else
+                                    {
+                                        playerCharacterMasterController.master.GiveMoney(purchaseDiff);
+                                    }
                                 }
                             }
 
@@ -170,8 +177,7 @@ namespace ShareSuite
                 {
                     var item = shop.CurrentPickupIndex().itemIndex;
                     inventory.GiveItem(item);
-                    Chat.AddPickupMessage(characterBody, ItemCatalog.GetItemDef(item).nameToken, GetItemColor(item),
-                        (uint) characterBody.inventory.GetItemCount(item));
+                    sendPickupMessage.Invoke(null, new object[] { inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex() });
                 }
 
                 orig(self, activator);
@@ -204,7 +210,7 @@ namespace ShareSuite
             return IsWhiteItem(item) && ShareSuite.WrapWhiteItemsShared
                    || IsGreenItem(item) && ShareSuite.WrapGreenItemsShared
                    || IsRedItem(item) && ShareSuite.WrapRedItemsShared
-                   || IsLunarItem(item) && ShareSuite.WrapLunarItemsShared
+                   || pickup.IsLunar() && ShareSuite.WrapLunarItemsShared
                    || IsBossItem(item) && ShareSuite.WrapBossItemsShared
                    || IsQueensGland(item) && ShareSuite.WrapQueensGlandsShared;
         }
@@ -213,21 +219,6 @@ namespace ShareSuite
         {
             // Check if there are more then 1 players in the lobby
             return PlayerCharacterMasterController.instances.Count > 1;
-        }
-
-        public static Color32 GetItemColor(ItemIndex index)
-        {
-            if (IsWhiteItem(index))
-                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier1Item);
-            if (IsGreenItem(index))
-                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier2Item);
-            if (IsRedItem(index))
-                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.Tier3Item);
-            if (IsLunarItem(index))
-                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.LunarItem);
-            if (IsBossItem(index))
-                return ColorCatalog.GetColor(ColorCatalog.ColorIndex.BossItem);
-            return Color.white;
         }
 
         public static bool IsWhiteItem(ItemIndex index)
@@ -255,9 +246,5 @@ namespace ShareSuite
             return index == ItemIndex.BeetleGland;
         }
 
-        public static bool IsLunarItem(ItemIndex index)
-        {
-            return ItemCatalog.lunarItemList.Contains(index);
-        }
     }
 }
