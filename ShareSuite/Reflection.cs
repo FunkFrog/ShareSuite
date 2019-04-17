@@ -30,14 +30,14 @@ namespace ShareSuite
         {
             instance.GetType()
                 .GetField(fieldName, _defaultFlags | BindingFlags.Instance)
-                .SetValue(instance, value);
+                ?.SetValue(instance, value);
         }
 
         public static void SetFieldValue<TClass>(string fieldName, object value)
         {
             typeof(TClass)
                 .GetField(fieldName, _defaultFlags | BindingFlags.Static)
-                .SetValue(null, value);
+                ?.SetValue(null, value);
         }
 
         #endregion
@@ -80,14 +80,14 @@ namespace ShareSuite
         {
             return (TReturn) instance.GetType()
                 .GetMethod(methodName, _defaultFlags | BindingFlags.Instance)
-                .Invoke(instance, methodParams);
+                ?.Invoke(instance, methodParams);
         }
 
         public static TReturn InvokeMethod<TClass, TReturn>(string methodName, params object[] methodParams)
         {
             return (TReturn) typeof(TClass)
                 .GetMethod(methodName, _defaultFlags | BindingFlags.Static)
-                .Invoke(null, methodParams);
+                ?.Invoke(null, methodParams);
         }
 
         public static void InvokeMethod(this object instance, string methodName, params object[] methodParams)
