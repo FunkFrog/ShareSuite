@@ -41,6 +41,7 @@ namespace ShareSuite
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
                 };
         }
+        
 
         public static void OnGrantItem()
         {
@@ -79,18 +80,33 @@ namespace ShareSuite
                     }
 
                     if (!NetworkServer.active) return;
-                    // extraGold is the normal reward * player count - normal reward (so 4 players would get 4x normal gold)
-                    var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
-                    {
-                        // Add money to players w/ scalar
-                        player.GiveMoney(
-                            (uint) Mathf.Floor(extraGold * ShareSuite.WrapMoneyScalar));
-                    }
+                    GiveAllScaledMoney(self.goldReward);
 
-                    // give the normal amount of money and perform other onkill actions
                     orig(self, info);
                 };
+
+                On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
+                {
+                    if (!ShareSuite.WrapModIsEnabled)
+                    {
+                        orig(self, activator);
+                        return;
+                    }
+                    
+                    if (!NetworkServer.active) return;
+                    GiveAllScaledMoney(self.goldReward);
+
+                    orig(self, activator);
+                };
+            }
+        }
+
+        public static void GiveAllScaledMoney(float goldReward)
+        {
+            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+            {
+                player.GiveMoney(
+                    (uint) Mathf.Floor(goldReward * ShareSuite.WrapMoneyScalar - goldReward));
             }
         }
 
