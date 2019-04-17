@@ -165,7 +165,7 @@ namespace ShareSuite
                             "").Value);
         }
 
-        public int[] ConfigToIntArray(string configline)
+        private int[] ConfigToIntArray(string configline)
         {
             var valueStrings = configline.Split(',');
             var x = 0;
@@ -174,7 +174,7 @@ namespace ShareSuite
 
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
-        private static void CCModIsEnabled(ConCommandArgs args)
+        private static void CcModIsEnabled(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapModIsEnabled))
                 Debug.Log("Invalid arguments.");
@@ -185,7 +185,7 @@ namespace ShareSuite
         // MoneyIsShared
         [ConCommand(commandName = "ss_MoneyIsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether money is shared or not.")]
-        private static void CCMoneyIsShared(ConCommandArgs args)
+        private static void CcMoneyIsShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapMoneyIsShared))
                 Debug.Log("Invalid arguments.");
@@ -196,7 +196,7 @@ namespace ShareSuite
         // MoneyScalar
         [ConCommand(commandName = "ss_MoneyScalar", flags = ConVarFlags.None,
             helpText = "Modifies percent of gold earned when money sharing is on.")]
-        private static void CCMoneyScalar(ConCommandArgs args)
+        private static void CcMoneyScalar(ConCommandArgs args)
         {
             if (args.Count != 1 || !int.TryParse(args[0], out WrapMoneyScalar))
                 Debug.Log("Invalid arguments.");
@@ -207,7 +207,7 @@ namespace ShareSuite
         // WhiteItemsShared
         [ConCommand(commandName = "ss_WhiteItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether white items are shared or not.")]
-        private static void CCWhiteShared(ConCommandArgs args)
+        private static void CcWhiteShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapWhiteItemsShared))
                 Debug.Log("Invalid arguments.");
@@ -218,7 +218,7 @@ namespace ShareSuite
         // GreenItemsShared
         [ConCommand(commandName = "ss_GreenItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether green items are shared or not.")]
-        private static void CCGreenShared(ConCommandArgs args)
+        private static void CcGreenShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapGreenItemsShared))
                 Debug.Log("Invalid arguments.");
@@ -229,7 +229,7 @@ namespace ShareSuite
         // RedItemsShared
         [ConCommand(commandName = "ss_RedItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether red items are shared or not.")]
-        private static void CCRedShared(ConCommandArgs args)
+        private static void CcRedShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapRedItemsShared))
                 Debug.Log("Invalid arguments.");
@@ -240,7 +240,7 @@ namespace ShareSuite
         // LunarItemsShared
         [ConCommand(commandName = "ss_LunarItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether lunar items are shared or not.")]
-        private static void CCLunarShared(ConCommandArgs args)
+        private static void CcLunarShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapLunarItemsShared))
                 Debug.Log("Invalid arguments.");
@@ -251,7 +251,7 @@ namespace ShareSuite
         // BossItemsShared
         [ConCommand(commandName = "ss_BossItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether boss items are shared or not.")]
-        private static void CCBossShared(ConCommandArgs args)
+        private static void CcBossShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapBossItemsShared))
                 Debug.Log("Invalid arguments.");
@@ -262,7 +262,7 @@ namespace ShareSuite
         // QueensGlandsShared
         [ConCommand(commandName = "ss_QueensGlandsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether Queens Glands are shared or not.")]
-        private static void CCQueenShared(ConCommandArgs args)
+        private static void CcQueenShared(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapQueensGlandsShared))
                 Debug.Log("Invalid arguments.");
@@ -273,7 +273,7 @@ namespace ShareSuite
         // PrinterCauldronFix
         [ConCommand(commandName = "ss_PrinterCauldronFix", flags = ConVarFlags.None,
             helpText = "Modifies whether printers and cauldrons should not duplicate items.")]
-        private static void CCPrinterCauldronFix(ConCommandArgs args)
+        private static void CcPrinterCauldronFix(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapPrinterCauldronFixEnabled))
                 Debug.Log("Invalid arguments.");
@@ -284,7 +284,7 @@ namespace ShareSuite
         // DisablePlayerScaling
         [ConCommand(commandName = "ss_OverridePlayerScaling", flags = ConVarFlags.None,
             helpText = "Modifies whether interactable count should scale based on player count.")]
-        private static void CCDisablePlayerScaling(ConCommandArgs args)
+        private static void CcDisablePlayerScaling(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapOverridePlayerScalingEnabled))
                 Debug.Log("Invalid arguments.");
@@ -295,7 +295,7 @@ namespace ShareSuite
         // InteractablesCredit
         [ConCommand(commandName = "ss_InteractablesCredit", flags = ConVarFlags.None,
             helpText = "Modifies amount of interactables when player scaling is overridden.")]
-        private static void CCInteractablesCredit(ConCommandArgs args)
+        private static void CcInteractablesCredit(ConCommandArgs args)
         {
             if (args.Count != 1 || !int.TryParse(args[0], out WrapInteractablesCredit))
                 Debug.Log("Invalid arguments.");
@@ -306,7 +306,7 @@ namespace ShareSuite
         // DisableBossLootScaling
         [ConCommand(commandName = "ss_OverrideBossLootScaling", flags = ConVarFlags.None,
             helpText = "Modifies whether boss loot should scale based on player count.")]
-        private static void CCBossLoot(ConCommandArgs args)
+        private static void CcBossLoot(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapOverrideBossLootScalingEnabled))
                 Debug.Log("Invalid arguments.");
@@ -328,7 +328,7 @@ namespace ShareSuite
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
             helpText = "Modifies whether boss loot should scale based on player count.")]
-        private static void CCDeadPlayersGetItems(ConCommandArgs args)
+        private static void CcDeadPlayersGetItems(ConCommandArgs args)
         {
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapDeadPlayersGetItems))
                 Debug.Log("Invalid arguments.");
