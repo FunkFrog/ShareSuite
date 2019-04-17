@@ -28,6 +28,13 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ---
 
+### Installation guide
+
+- Copy the SharedSuite.dll file to your BepInEx plugins folder.
+- Enjoy your items / money
+
+---
+
 ### Configuration
 1. Make sure you run the game with the mod installed to generate the config file
 2. Navigate to "\Risk of Rain 2\BepInEx\config"
@@ -35,6 +42,7 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 4. Edit the 'true' or 'false' values for settings as you see fit!
 
 #### Default Settings
+- Mod Enabled : True
 - Dupe Fix : True
 - Disable Player Scaling : True
 - Interactables Credit : 1
@@ -107,12 +115,6 @@ Open up the console window. All commands starts with **ss** and will autocomplet
 - [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/)
 - [TooManyFriends](https://thunderstore.io/package/wildbook/TooManyFriends/)
 - [DropInMultiplayer](https://thunderstore.io/package/Morris1927/DropinMultiplayer/)
-
----
-### Installation guide
-
-- Copy the SharedSuite.dll file to your BepInEx plugins folder.
-- Enjoy your items / money
 
 ---
 ### Changelog
