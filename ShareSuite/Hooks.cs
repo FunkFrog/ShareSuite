@@ -48,46 +48,23 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
-                if (!ShareSuite.WrapModIsEnabled)
-                {
-                    orig(self, body, inventory);
-                    return;
-                }
-
-                // Give original player the item
-                orig(self, body, inventory);
-
-                // Do nothing else if single-player or 
-                if (!IsMultiplayer())
-                    return;
-
-                if (!NetworkServer.active)
-                    return;
-
-
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
-                // Iterate over all player characters in game
-                if (ShareSuite.WrapItemBlacklist.Contains((int)item) || (!IsValidPickup(self.pickupIndex)))
-                    return;
-
+                if (!ShareSuite.WrapItemBlacklist.Contains((int)item)
+                && (NetworkServer.active)
+                && (IsValidPickup(self.pickupIndex))
+                && (IsMultiplayer())
+                && (ShareSuite.WrapModIsEnabled))
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {
                     // Ensure character is not original player that picked up item
-                    if (player.inventory == inventory)
-                        continue;
-
-                            if (!(bool) player.GetBody())
-                    {
-                        if (!player.alive && ShareSuite.WrapDeadPlayersGetItems)
+                    if (player.inventory != inventory)
+                        if (player.alive || ShareSuite.WrapDeadPlayersGetItems)
                             player.inventory.GiveItem(item);
-                        continue;
-                    }
-
-                    // Give character the item
-                    player.inventory.GiveItem(item);
                 }
+
+                orig(self, body, inventory);
             };
         }
 
