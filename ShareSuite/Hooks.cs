@@ -69,21 +69,22 @@ namespace ShareSuite
                 var item = self.pickupIndex.itemIndex;
 
                 // Iterate over all player characters in game
-                if (!ShareSuite.WrapItemBlacklist.Contains((int) item))
-                if (IsValidPickup(self.pickupIndex))
+                if (ShareSuite.WrapItemBlacklist.Contains((int)item) || (!IsValidPickup(self.pickupIndex)))
+                    return;
+
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {
-                    if (!(bool) player.GetBody())
+                    // Ensure character is not original player that picked up item
+                    if (player.inventory == inventory)
+                        continue;
+
+                            if (!(bool) player.GetBody())
                     {
                         if (!player.alive && ShareSuite.WrapDeadPlayersGetItems)
                             player.inventory.GiveItem(item);
                         continue;
                     }
 
-                    // Ensure character is not original player that picked up item
-                    if (player.GetBody().Equals(body))
-                        continue;
-                    
                     // Give character the item
                     player.inventory.GiveItem(item);
                 }
