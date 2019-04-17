@@ -35,12 +35,12 @@ namespace ShareSuite
             if (ShareSuite.WrapOverrideBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
-                    return; // Disabled until fixed for 2.0.0
+                    // return; F: Disabled until fixed for 2.0.0 T: no it works lol just not via ingame config
                     if (!ShareSuite.WrapModIsEnabled) return;
                     // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
                     var c = new ILCursor(il).Goto(99);
                     c.Remove();
-                    c.Emit(OpCodes.Ldc_I4, 5); // only works when it's a value
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
                 };
         }
 
@@ -69,6 +69,7 @@ namespace ShareSuite
                 var item = self.pickupIndex.itemIndex;
 
                 // Iterate over all player characters in game
+                if (!ShareSuite.WrapItemBlacklist.Contains((int) item))
                 if (IsValidPickup(self.pickupIndex))
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {

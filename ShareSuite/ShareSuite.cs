@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace ShareSuite
 {
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.3.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapModIsEnabled;
@@ -26,6 +27,7 @@ namespace ShareSuite
         public static bool WrapOverrideBossLootScalingEnabled;
         public static int WrapBossLootCredit;
         public static bool WrapDeadPlayersGetItems;
+        public static int[] WrapItemBlacklist;
 
         public ShareSuite()
         {
@@ -156,6 +158,27 @@ namespace ShareSuite
                 "DeadPlayersGetItems",
                 "Toggles item sharing for dead players.",
                 false).Value;
+
+            WrapItemBlacklist = ConfigToIntArray(Config.Wrap(
+                            "Settings",
+                            "ItemBlacklist",
+                            "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
+                            "").Value);
+        }
+
+        public int[] ConfigToIntArray(string configline)
+        {
+            List<int> output = new List<int>();
+            string[] valueStrings = configline.Split(',');
+            int x = 0;
+            foreach (string item in valueStrings)
+            {
+                if (Int32.TryParse(item, out x))
+                {
+                    output.Add(x);
+                }
+            }
+            return output.ToArray();
         }
 
         // ModIsEnabled

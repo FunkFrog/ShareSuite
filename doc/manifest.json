@@ -1,8 +1,8 @@
 {
     "name": "ShareSuite",
-    "version_number": "1.2.0",
+    "version_number": "1.4.0",
     "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
-    "description": "[OFFICIAL MERGE OF Loot4All AND SharedItems] Share items / money (and, soon, equipment) between all living members of your party - Completely configurable - Now with modifiable balance scaling!",
+    "description": "Share gear between all living members of your party - Completely customisable.",
     "dependencies": [
         "bbepis-BepInExPack-1.3.1"
     ]

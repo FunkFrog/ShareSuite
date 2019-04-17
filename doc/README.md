@@ -5,30 +5,19 @@ This mod has been developed out of frustration of the item distribution in Risk 
 
 Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot and chest sniping. This mod aims to fix that!
 
-Compatible with [DropInMultiplayer](https://thunderstore.io/package/Morris1927/DropinMultiplayer/), [Multitudes*](https://thunderstore.io/package/wildbook/Multitudes/), and [TooManyFriends](https://thunderstore.io/package/wildbook/TooManyFriends/)!
-
-\* Multitudes is compatible if DisablePlayerScaling and DisableBossLootScaling are set to FALSE in the config file!
-
 ---
 
 ## Features
 
-##### EVERYTHING IS CONFIGURABLE!
-
 - Any item pickups (non-gland and non-lunar by default) are given to all living members of your party.
 
-- Most of the mod automatically diables itself while playing in singleplayer.
-
 - Compatible with 3D Printers and Cauldrons - each player may consume their own items to earn an item from the cauldron. These items are given directly to the purchaser so that it does not affect other players' items.
-
-- Toggleable pooled money - off by default.
 
 - Toggleable scaling of boss loot and interactables spawning for balance.
 
 - Configuration options for enabling/disabling sharing specific item types (white, green, red, lunar, boss).
 
-- Config file (RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg) allows you to change ANYTHING about the mod!
-
+- Config file (RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg) allows you to personalise the mod.
 ---
 
 ### TO-DO
@@ -48,7 +37,7 @@ Compatible with [DropInMultiplayer](https://thunderstore.io/package/Morris1927/D
 #### Default Settings
 - Dupe Fix : True
 - Disable Player Scaling : True
-- Interactibles Credit : 1
+- Interactables Credit : 1
 - Disable Boss Loot Scaling : True
 - Boss Loot Credit : 1
 - Money Shared : False
@@ -58,6 +47,7 @@ Compatible with [DropInMultiplayer](https://thunderstore.io/package/Morris1927/D
 - Lunar Items are Shared : False
 - Boss Items are Shared : True
 - Queens Glands are Shared : False
+- Blacklist should be empty.
 
 ---
 ### FAQ
@@ -102,8 +92,21 @@ Please combine with  [TooManyFriends](https://thunderstore.io/package/wildbook/T
 Please change the Disable Player Scaling setting and Disable Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.
 
 ---
+*How do I configure the mod while the game is running?*
+
+Open up the console window. All commands starts with **ss** and will autocomplete.
+
+---
 
 **Please feel free to contact us for suggestions/feedback/questions on discord (FunkFrog#0864 or Sipondo#5150).**
+
+---
+### Tested compatibility
+
+- [RolltheRain](https://thunderstore.io/package/Sipondo/RolltheRain/)
+- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/)
+- [TooManyFriends](https://thunderstore.io/package/wildbook/TooManyFriends/)
+- [DropInMultiplayer](https://thunderstore.io/package/Morris1927/DropinMultiplayer/)
 
 ---
 ### Installation guide
@@ -114,7 +117,11 @@ Please change the Disable Player Scaling setting and Disable Boss Loot Scaling t
 ---
 ### Changelog
 
-1.2.0: When shared money is on, everyone recieves a proportionate amount of money relative to amount of players in lobby (also I'm sorry for the 5th release tonight).
+1.4.0: Introduced item blacklisting
+
+1.3.0: Introduced ingame config commands
+
+1.2.0: Shared money alpha.
 
 1.1.1: Fix of logic concerning 3D printers and Cauldrons.
 
@@ -122,4 +129,4 @@ Please change the Disable Player Scaling setting and Disable Boss Loot Scaling t
 
 1.0.1: Update of the README.md with a new to-do entry and a new FAQ, as well as a slight modification of the manifest.
 
-1.0.0: Initial release.
+1.0.0: Initial release, merged Loot4All and FunkFrog Shared Items.
