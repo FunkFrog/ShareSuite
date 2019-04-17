@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Reflection;
-using Harmony;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
@@ -27,8 +26,7 @@ namespace ShareSuite
                     }
 
                     // Set interactables budget to 200 * config player count (normal calculation)
-                    AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
-                        .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
+                    Reflection.SetFieldValue<SceneDirector>("interactableCredit", 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
