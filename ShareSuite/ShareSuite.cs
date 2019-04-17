@@ -152,6 +152,14 @@ namespace ShareSuite
                 "Toggles override of the scalar of boss loot drops to your configured balance.",
                 true).Value;
 
+             // Add config options for all settings
+            WrapBossLootCredit = Config.Wrap(
+                "Settings",
+                "BossLootCredit",
+                "Specifies the amount of boss items dropped when boss drop override is true.",
+                1).Value;
+
+
             WrapDeadPlayersGetItems = Config.Wrap(
                 "Balance",
                 "DeadPlayersGetItems",
