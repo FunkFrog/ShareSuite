@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ShareSuite
 {
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.1")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapModIsEnabled;

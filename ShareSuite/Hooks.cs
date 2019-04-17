@@ -26,7 +26,7 @@ namespace ShareSuite
                     }
 
                     // Set interactables budget to 200 * config player count (normal calculation)
-                    Reflection.SetFieldValue<SceneDirector>("interactableCredit", 200 * ShareSuite.WrapInteractablesCredit);
+                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
