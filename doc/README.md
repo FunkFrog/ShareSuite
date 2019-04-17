@@ -82,7 +82,7 @@ This can be configured with the Boss Loot Credit config setting.
 ---
 *How do blood shrines work when share money is on?*
 
-The user who uses the shrine loses the normal health percentage, but the calculations for how much gold they recieve is done based on the max health of the member with the highest max health on your team.
+The user who uses the shrine loses the normal health percentage, but the calculations for how much gold they receive is done based on the max health of the member with the highest max health on your team.
 
 ---
 *I want to play this with my friends. Do they also need to install this mod?*
