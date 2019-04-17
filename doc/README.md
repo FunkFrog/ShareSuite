@@ -119,7 +119,7 @@ Open up the console window. All commands starts with **ss** and will autocomplet
 ---
 ### Changelog
 
-1.4.0: Introduced item blacklisting
+1.4.0: Introduced item blacklisting, made item sharing behave like Loot4All again.
 
 1.3.0: Introduced ingame config commands
 
