@@ -18,6 +18,7 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 - Configuration options for enabling/disabling sharing specific item types (white, green, red, lunar, boss).
 
 - Config file (RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg) allows you to personalise the mod.
+
 ---
 
 ### TO-DO
@@ -118,6 +119,8 @@ Open up the console window. All commands starts with **ss** and will autocomplet
 
 ---
 ### Changelog
+
+1.4.1: README.md fix.
 
 1.4.0: Introduced item blacklisting, made item sharing behave like Loot4All again.
 
