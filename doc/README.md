@@ -28,7 +28,7 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ---
 
-### Installation guide
+### Installation Guide
 
 - Copy the SharedSuite.dll file to your BepInEx plugins folder.
 - Enjoy your items / money
