@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
@@ -168,17 +167,9 @@ namespace ShareSuite
 
         public int[] ConfigToIntArray(string configline)
         {
-            List<int> output = new List<int>();
-            string[] valueStrings = configline.Split(',');
-            int x = 0;
-            foreach (string item in valueStrings)
-            {
-                if (Int32.TryParse(item, out x))
-                {
-                    output.Add(x);
-                }
-            }
-            return output.ToArray();
+            var valueStrings = configline.Split(',');
+            var x = 0;
+            return (from item in valueStrings where Int32.TryParse(item, out x) select x).ToArray();
         }
 
         // ModIsEnabled
