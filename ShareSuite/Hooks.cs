@@ -1,36 +1,46 @@
+using System.Linq;
+using System.Reflection;
 using Harmony;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Reflection;
 
 namespace ShareSuite
 {
     public static class Hooks
     {
-        static MethodInfo sendPickupMessage = typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static);
+        static MethodInfo sendPickupMessage =
+            typeof(GenericPickupController).GetMethod("SendPickupMessage",
+                BindingFlags.NonPublic | BindingFlags.Static);
+
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.WrapDisablePlayerScalingEnabled)
+            if (ShareSuite.WrapOverridePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
-                    if (!NetworkServer.active) return;
+                    if (!ShareSuite.WrapModIsEnabled)
+                    {
+                        orig(self);
+                        return;
+                    }
+
                     // Set interactables budget to 200 * config player count (normal calculation)
                     AccessTools.Field(AccessTools.TypeByName("RoR2.SceneDirector"), "interactableCredit")
                         .SetValue(self, 200 * ShareSuite.WrapInteractablesCredit);
                     orig(self);
                 };
 
-            if (ShareSuite.WrapDisableBossLootScalingEnabled)
+            if (ShareSuite.WrapOverrideBossLootScalingEnabled)
                 IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
-                    if (!NetworkServer.active) return;
+                    return; // Disabled until fixed for 2.0.0
+                    if (!ShareSuite.WrapModIsEnabled) return;
                     // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
                     var c = new ILCursor(il).Goto(99);
                     c.Remove();
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); //doesnt work, must be replaced with reference
+                    c.Emit(OpCodes.Ldc_I4, 5); // only works when it's a value
                 };
         }
 
@@ -38,29 +48,44 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
-                if (!NetworkServer.active) return;
+                if (!ShareSuite.WrapModIsEnabled)
+                {
+                    orig(self, body, inventory);
+                    return;
+                }
+
                 // Give original player the item
                 orig(self, body, inventory);
 
                 // Do nothing else if single-player or 
-                if (!IsMultiplayer()) return;
-                if (!NetworkServer.active) return;
+                if (!IsMultiplayer())
+                    return;
+
+                if (!NetworkServer.active)
+                    return;
+
 
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
                 // Iterate over all player characters in game
                 if (IsValidPickup(self.pickupIndex))
-                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                {
+                    if (!(bool) player.GetBody())
                     {
-                        // Ensure character is not original player that picked up item
-                        if (playerCharacterMasterController.master.GetBody().Equals(body)) continue;
-                        // Ensure character is alive
-                        if (!playerCharacterMasterController.master.alive) continue;
-
-                        // Give character the item
-                        playerCharacterMasterController.master.inventory.GiveItem(item);
+                        if (!player.alive && ShareSuite.WrapDeadPlayersGetItems)
+                            player.inventory.GiveItem(item);
+                        continue;
                     }
+
+                    // Ensure character is not original player that picked up item
+                    if (player.GetBody().Equals(body))
+                        continue;
+                    
+                    // Give character the item
+                    player.inventory.GiveItem(item);
+                }
             };
         }
 
@@ -70,13 +95,19 @@ namespace ShareSuite
             {
                 On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
                 {
+                    if (!ShareSuite.WrapModIsEnabled)
+                    {
+                        orig(self, info);
+                        return;
+                    }
+
                     if (!NetworkServer.active) return;
                     // extraGold is the normal reward * player count - normal reward (so 4 players would get 4x normal gold)
                     var extraGold = self.goldReward * PlayerCharacterMasterController.instances.Count - self.goldReward;
-                    foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                     {
                         // Add money to players w/ scalar
-                        playerCharacterMasterController.master.GiveMoney(
+                        player.GiveMoney(
                             (uint) Mathf.Floor(extraGold * ShareSuite.WrapMoneyScalar));
                     }
 
@@ -90,7 +121,12 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (!NetworkServer.active) return;
+                if (!ShareSuite.WrapModIsEnabled)
+                {
+                    orig(self, activator);
+                    return;
+                }
+
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -111,8 +147,6 @@ namespace ShareSuite
                                     playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
                                     playerCharacterMasterController.master.money -= (uint) self.cost;
-                                    Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
-                                                  .GetDisplayName() + " money");
                                 }
                             }
 
@@ -141,18 +175,14 @@ namespace ShareSuite
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
-                                if (playerCharacterMasterController.master.alive)
+                                if (!playerCharacterMasterController.master.alive) continue;
+                                if (playerCharacterMasterController.master.GetBody() != characterBody)
                                 {
-                                    if (playerCharacterMasterController.master.GetBody() != characterBody)
-                                    {
-                                        playerCharacterMasterController.master.GiveMoney(amount);
-                                        Debug.Log("Gave " + playerCharacterMasterController.master.GetBody()
-                                                      .GetDisplayName() + " money");
-                                    }
-                                    else
-                                    {
-                                        playerCharacterMasterController.master.GiveMoney(purchaseDiff);
-                                    }
+                                    playerCharacterMasterController.master.GiveMoney(amount);
+                                }
+                                else
+                                {
+                                    playerCharacterMasterController.master.GiveMoney(purchaseDiff);
                                 }
                             }
 
@@ -177,7 +207,8 @@ namespace ShareSuite
                 {
                     var item = shop.CurrentPickupIndex().itemIndex;
                     inventory.GiveItem(item);
-                    sendPickupMessage.Invoke(null, new object[] { inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex() });
+                    sendPickupMessage.Invoke(null,
+                        new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
                 }
 
                 orig(self, activator);
@@ -188,6 +219,12 @@ namespace ShareSuite
         {
             On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
             {
+                if (!ShareSuite.WrapModIsEnabled)
+                {
+                    orig(self);
+                    return;
+                }
+
                 if (!NetworkServer.active) return;
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
                 Debug.Log("Cost type: " + costType);
@@ -245,6 +282,5 @@ namespace ShareSuite
         {
             return index == ItemIndex.BeetleGland;
         }
-
     }
 }
