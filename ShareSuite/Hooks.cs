@@ -49,18 +49,18 @@ namespace ShareSuite
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
-                if (!ShareSuite.WrapItemBlacklist.Contains((int)item)
-                && (NetworkServer.active)
-                && (IsValidPickup(self.pickupIndex))
-                && (IsMultiplayer())
-                && (ShareSuite.WrapModIsEnabled))
-                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
-                {
-                    // Ensure character is not original player that picked up item
-                    if (player.inventory != inventory)
+                if (!ShareSuite.WrapItemBlacklist.Contains((int) item)
+                    && NetworkServer.active
+                    && IsValidPickup(self.pickupIndex)
+                    && IsMultiplayer()
+                    && ShareSuite.WrapModIsEnabled)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                    {
+                        // Ensure character is not original player that picked up item
+                        if (player.inventory == inventory) continue;
                         if (player.alive || ShareSuite.WrapDeadPlayersGetItems)
                             player.inventory.GiveItem(item);
-                }
+                    }
 
                 orig(self, body, inventory);
             };

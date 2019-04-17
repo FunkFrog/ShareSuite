@@ -169,7 +169,7 @@ namespace ShareSuite
         {
             var valueStrings = configline.Split(',');
             var x = 0;
-            return (from item in valueStrings where Int32.TryParse(item, out x) select x).ToArray();
+            return (from item in valueStrings where int.TryParse(item, out x) select x).ToArray();
         }
 
         // ModIsEnabled
