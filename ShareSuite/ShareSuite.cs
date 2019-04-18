@@ -1,32 +1,48 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
+using BepInEx.Configuration;
 using RoR2;
 using UnityEngine;
 
 namespace ShareSuite
 {
+    [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.1")]
     public class ShareSuite : BaseUnityPlugin
     {
-        public static bool WrapModIsEnabled;
-        public static bool WrapMoneyIsShared;
-        public static int WrapMoneyScalar;
-        public static bool WrapWhiteItemsShared;
-        public static bool WrapGreenItemsShared;
-        public static bool WrapRedItemsShared;
-        public static bool WrapLunarItemsShared;
-        public static bool WrapBossItemsShared;
-        public static bool WrapQueensGlandsShared;
-        public static bool WrapPrinterCauldronFixEnabled;
-        public static bool WrapOverridePlayerScalingEnabled;
-        public static int WrapInteractablesCredit;
-        public static bool WrapOverrideBossLootScalingEnabled;
-        public static int WrapBossLootCredit;
-        public static bool WrapDeadPlayersGetItems;
-        public static int[] WrapItemBlacklist;
+        public static ConfigWrapper<bool> WrapModIsEnabled;
+        public static ConfigWrapper<bool> WrapMoneyIsShared;
+        public static ConfigWrapper<int> WrapMoneyScalar;
+        public static ConfigWrapper<bool> WrapWhiteItemsShared;
+        public static ConfigWrapper<bool> WrapGreenItemsShared;
+        public static ConfigWrapper<bool> WrapRedItemsShared;
+        public static ConfigWrapper<bool> WrapLunarItemsShared;
+        public static ConfigWrapper<bool> WrapBossItemsShared;
+        public static ConfigWrapper<bool> WrapQueensGlandsShared;
+        public static ConfigWrapper<bool> WrapPrinterCauldronFixEnabled;
+        public static ConfigWrapper<bool> WrapOverridePlayerScalingEnabled;
+        public static ConfigWrapper<int> WrapInteractablesCredit;
+        public static ConfigWrapper<bool> WrapOverrideBossLootScalingEnabled;
+        public static ConfigWrapper<int> WrapBossLootCredit;
+        public static ConfigWrapper<bool> WrapDeadPlayersGetItems;
+        public static ConfigWrapper<string> WrapItemBlacklist;
+
+        public static HashSet<int> GetItemBlackList()
+        {
+            var blacklist = new HashSet<int>();
+            var rawPieces = WrapItemBlacklist.Value.Split(',');
+            foreach(string piece in rawPieces)
+            {
+                if(int.TryParse(piece, out int itemNum)){
+                    blacklist.Add(itemNum);
+                }
+            }
+            return blacklist;
+        }
 
         public ShareSuite()
         {
@@ -34,6 +50,7 @@ namespace ShareSuite
             On.RoR2.Console.Awake += (orig, self) =>
             {
                 CommandHelper.RegisterCommands(self);
+                FrogtownInterface.Init(Config);
                 orig(self);
             };
             // Register all the hooks
@@ -76,115 +93,142 @@ namespace ShareSuite
                 "Settings",
                 "ModEnabled",
                 "Toggles mod.",
-                true).Value;
+                true);
 
             // Add config options for all settings
             WrapMoneyIsShared = Config.Wrap(
                 "Settings",
                 "MoneyShared",
                 "Toggles money sharing.",
-                false).Value;
+                false);
 
             WrapMoneyScalar = Config.Wrap(
                 "Settings",
                 "MoneyScalar",
                 "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1).Value;
+                1);
 
             WrapWhiteItemsShared = Config.Wrap(
                 "Settings",
                 "WhiteItemsShared",
                 "Toggles item sharing for common items.",
-                true).Value;
+                true);
 
             WrapGreenItemsShared = Config.Wrap(
                 "Settings",
                 "GreenItemsShared",
                 "Toggles item sharing for rare items.",
-                true).Value;
+                true);
 
             WrapRedItemsShared = Config.Wrap(
                 "Settings",
                 "RedItemsShared",
                 "Toggles item sharing for legendary items.",
-                true).Value;
+                true);
 
             WrapLunarItemsShared = Config.Wrap(
                 "Settings",
                 "LunarItemsShared",
                 "Toggles item sharing for Lunar items.",
-                false).Value;
+                false);
 
             WrapBossItemsShared = Config.Wrap(
                 "Settings",
                 "BossItemsShared",
                 "Toggles item sharing for boss items.",
-                true).Value;
+                true);
 
             WrapQueensGlandsShared = Config.Wrap(
                 "Balance",
                 "QueensGlandsShared",
                 "Toggles item sharing for specifically the Queen's Gland (reduces possible lag).",
-                false).Value;
+                false);
 
             WrapPrinterCauldronFixEnabled = Config.Wrap(
                 "Balance",
                 "PrinterCauldronFix",
                 "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
                 " dropping it on the ground.",
-                true).Value;
+                true);
 
             WrapOverridePlayerScalingEnabled = Config.Wrap(
                 "Balance",
                 "DisablePlayerScaling",
                 "Toggles override of the scalar of interactables (chests, shrines, etc) that spawn in the world to your configured credit.",
-                true).Value;
+                true);
 
             WrapInteractablesCredit = Config.Wrap(
                 "Balance",
                 "InteractablesCredit",
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns.",
-                1).Value;
+                1);
 
             WrapOverrideBossLootScalingEnabled = Config.Wrap(
                 "Balance",
                 "DisableBossLootScaling",
                 "Toggles override of the scalar of boss loot drops to your configured balance.",
-                true).Value;
+                true);
 
              // Add config options for all settings
             WrapBossLootCredit = Config.Wrap(
                 "Settings",
                 "BossLootCredit",
                 "Specifies the amount of boss items dropped when boss drop override is true.",
-                1).Value;
+                1);
 
 
             WrapDeadPlayersGetItems = Config.Wrap(
                 "Balance",
                 "DeadPlayersGetItems",
                 "Toggles item sharing for dead players.",
-                false).Value;
+                false);
 
-            WrapItemBlacklist = ConfigToIntArray(Config.Wrap(
-                            "Settings",
-                            "ItemBlacklist",
-                            "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
-                            "").Value);
+            WrapItemBlacklist = Config.Wrap(
+                "Settings",
+                "ItemBlacklist",
+                "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
+                "");
         }
 
-        private int[] ConfigToIntArray(string configline)
+        private static int[] ConfigToIntArray(string configline)
         {
             var valueStrings = configline.Split(',');
             var x = 0;
             return (from item in valueStrings where int.TryParse(item, out x) select x).ToArray();
         }
 
+        private static bool TryParseIntoConfig<T>(string rawValue, ConfigWrapper<T> wrapper)
+        {
+            ConfigWrapper<bool> boolWrapper = wrapper as ConfigWrapper<bool>;
+            if (boolWrapper != null)
+            {
+                if (bool.TryParse(rawValue, out bool result))
+                {
+                    boolWrapper.Value = result;
+                    return true;
+                }
+                return false;
+            }
+            
+            ConfigWrapper<int> intWrapper = wrapper as ConfigWrapper<int>;
+            if (intWrapper != null)
+            {
+                if (int.TryParse(rawValue, out int result))
+                {
+                    intWrapper.Value = result;
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
         private static void CcModIsEnabled(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapModIsEnabled))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapModIsEnabled))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Mod status set to {WrapModIsEnabled}.");
@@ -195,7 +239,7 @@ namespace ShareSuite
             helpText = "Modifies whether money is shared or not.")]
         private static void CcMoneyIsShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapMoneyIsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapMoneyIsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Money sharing set to {WrapMoneyIsShared}.");
@@ -206,7 +250,7 @@ namespace ShareSuite
             helpText = "Modifies percent of gold earned when money sharing is on.")]
         private static void CcMoneyScalar(ConCommandArgs args)
         {
-            if (args.Count != 1 || !int.TryParse(args[0], out WrapMoneyScalar))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapMoneyScalar))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Money multiplier set to {WrapMoneyScalar}.");
@@ -217,7 +261,7 @@ namespace ShareSuite
             helpText = "Modifies whether white items are shared or not.")]
         private static void CcWhiteShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapWhiteItemsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapWhiteItemsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"White item sharing set to {WrapWhiteItemsShared}.");
@@ -228,7 +272,7 @@ namespace ShareSuite
             helpText = "Modifies whether green items are shared or not.")]
         private static void CcGreenShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapGreenItemsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapGreenItemsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Green item sharing set to {WrapGreenItemsShared}.");
@@ -239,7 +283,7 @@ namespace ShareSuite
             helpText = "Modifies whether red items are shared or not.")]
         private static void CcRedShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapRedItemsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapRedItemsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Red item sharing set to {WrapRedItemsShared}.");
@@ -250,7 +294,7 @@ namespace ShareSuite
             helpText = "Modifies whether lunar items are shared or not.")]
         private static void CcLunarShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapLunarItemsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapLunarItemsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Lunar item sharing set to {WrapLunarItemsShared}.");
@@ -261,7 +305,7 @@ namespace ShareSuite
             helpText = "Modifies whether boss items are shared or not.")]
         private static void CcBossShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapBossItemsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapBossItemsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss item sharing set to {WrapBossItemsShared}.");
@@ -272,7 +316,7 @@ namespace ShareSuite
             helpText = "Modifies whether Queens Glands are shared or not.")]
         private static void CcQueenShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapQueensGlandsShared))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapQueensGlandsShared))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Queens Gland sharing set to {WrapQueensGlandsShared}.");
@@ -283,7 +327,7 @@ namespace ShareSuite
             helpText = "Modifies whether printers and cauldrons should not duplicate items.")]
         private static void CcPrinterCauldronFix(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapPrinterCauldronFixEnabled))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapPrinterCauldronFixEnabled))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Printer and cauldron fix set to {WrapPrinterCauldronFixEnabled}.");
@@ -294,7 +338,7 @@ namespace ShareSuite
             helpText = "Modifies whether interactable count should scale based on player count.")]
         private static void CcDisablePlayerScaling(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapOverridePlayerScalingEnabled))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapOverridePlayerScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Player scaling disable set to {WrapOverridePlayerScalingEnabled}.");
@@ -305,7 +349,7 @@ namespace ShareSuite
             helpText = "Modifies amount of interactables when player scaling is overridden.")]
         private static void CcInteractablesCredit(ConCommandArgs args)
         {
-            if (args.Count != 1 || !int.TryParse(args[0], out WrapInteractablesCredit))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapInteractablesCredit))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Interactables credit set to {WrapInteractablesCredit}.");
@@ -316,7 +360,7 @@ namespace ShareSuite
             helpText = "Modifies whether boss loot should scale based on player count.")]
         private static void CcBossLoot(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapOverrideBossLootScalingEnabled))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapOverrideBossLootScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled}.");
@@ -327,7 +371,7 @@ namespace ShareSuite
             helpText = "Modifies amount of boss item drops.")]
         private static void CCBossLootCredit(ConCommandArgs args)
         {
-            if (args.Count != 1 || !int.TryParse(args[0], out WrapBossLootCredit))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapBossLootCredit))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot credit set to {WrapBossLootCredit}.");
@@ -338,7 +382,7 @@ namespace ShareSuite
             helpText = "Modifies whether boss loot should scale based on player count.")]
         private static void CcDeadPlayersGetItems(ConCommandArgs args)
         {
-            if (args.Count != 1 || !bool.TryParse(args[0], out WrapDeadPlayersGetItems))
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapDeadPlayersGetItems))
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot scaling disable set to {WrapDeadPlayersGetItems}.");
