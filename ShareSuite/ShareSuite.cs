@@ -8,6 +8,8 @@ using BepInEx.Configuration;
 using RoR2;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Local
+
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
@@ -59,6 +61,8 @@ namespace ShareSuite
             Hooks.OnPurchaseDrop();
             Hooks.DisableInteractablesScaling();
             Hooks.ModifyGoldReward();
+            Hooks.SplitTpMoney();
+            Hooks.FixBoss();
         }
 
         public class CommandHelper
@@ -169,13 +173,11 @@ namespace ShareSuite
                 "Toggles override of the scalar of boss loot drops to your configured balance.",
                 true);
 
-             // Add config options for all settings
             WrapBossLootCredit = Config.Wrap(
                 "Settings",
                 "BossLootCredit",
                 "Specifies the amount of boss items dropped when boss drop override is true.",
                 1);
-
 
             WrapDeadPlayersGetItems = Config.Wrap(
                 "Balance",
@@ -363,7 +365,10 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapOverrideBossLootScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
+            {
                 Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled}.");
+                Hooks.FixBoss();
+            }
         }
 
         // BossLootCredit
@@ -374,7 +379,10 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapBossLootCredit))
                 Debug.Log("Invalid arguments.");
             else
+            {
                 Debug.Log($"Boss loot credit set to {WrapBossLootCredit}.");
+                Hooks.FixBoss();
+            }       
         }
 
         // DeadPlayersGetItems

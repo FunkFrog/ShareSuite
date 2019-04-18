@@ -14,12 +14,31 @@ namespace ShareSuite
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
                 BindingFlags.NonPublic | BindingFlags.Static);
 
+        public static void SplitTpMoney()
+        {
+            On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                if (self.isCharged && ShareSuite.WrapMoneyIsShared)
+                {
+                    foreach (var player in PlayerCharacterMasterController.instances)
+                    {
+                        player.master.money = (uint) 
+                            Mathf.FloorToInt(player.master.money / PlayerCharacterMasterController.instances.Count);
+                    }
+                }
+
+                orig(self, activator);
+            };
+        }
+        
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.WrapOverridePlayerScalingEnabled.Value)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
-                    if (!ShareSuite.WrapModIsEnabled.Value)
+                    FixBoss();
+                    SyncMoney();
+                    if (!ShareSuite.WrapModIsEnabled.Value || !ShareSuite.WrapOverridePlayerScalingEnabled.Value)
+
                     {
                         orig(self);
                         return;
@@ -29,19 +48,34 @@ namespace ShareSuite
                     Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
                     orig(self);
                 };
-
-            if (ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
-                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
-                {
-                    // return; F: Disabled until fixed for 2.0.0 T: no it works lol just not via ingame config
-                    if (!ShareSuite.WrapModIsEnabled.Value) return;
-                    // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
-                    var c = new ILCursor(il).Goto(99);
-                    c.Remove();
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value); // only works when it's a value
-                };
         }
-        
+
+        private static void SyncMoney()
+        {
+            if (!ShareSuite.WrapMoneyIsShared.Value) return;
+            foreach (var player in PlayerCharacterMasterController.instances)
+            {
+                player.master.money = NetworkUser.readOnlyInstancesList[0].master.money;
+            }
+        }
+
+        public static void FixBoss()
+        {
+            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            {
+                var c = new ILCursor(il).Goto(99);
+                c.Remove();
+                if (ShareSuite.WrapModIsEnabled && ShareSuite.WrapOverrideBossLootScalingEnabled)
+                {
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
+                }
+                else
+                {
+                    c.Emit(OpCodes.Ldc_I4, Run.instance.participatingPlayerCount); // standard, runs on every level start
+                }
+            );
+        }
+
 
         public static void OnGrantItem()
         {
@@ -69,39 +103,28 @@ namespace ShareSuite
 
         public static void ModifyGoldReward()
         {
-            if (ShareSuite.WrapMoneyIsShared.Value)
+            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
             {
-                On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
-                {
-                    if (!ShareSuite.WrapModIsEnabled.Value)
-                    {
-                        orig(self, info);
-                        return;
-                    }
+                orig(self, info);
+                if (!ShareSuite.WrapModIsEnabled 
+                    || !ShareSuite.WrapMoneyIsShared
+                    || !NetworkServer.active) return;
 
-                    if (!NetworkServer.active) return;
-                    GiveAllScaledMoney(self.goldReward);
+                GiveAllScaledMoney(self.goldReward);
+            };
 
-                    orig(self, info);
-                };
+            On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                orig(self, activator);
+                if (!ShareSuite.WrapModIsEnabled 
+                    || !ShareSuite.WrapMoneyIsShared
+                    || !NetworkServer.active) return;
 
-                On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
-                {
-                    if (!ShareSuite.WrapModIsEnabled.Value)
-                    {
-                        orig(self, activator);
-                        return;
-                    }
-                    
-                    if (!NetworkServer.active) return;
-                    GiveAllScaledMoney(self.goldReward);
-
-                    orig(self, activator);
-                };
-            }
+                GiveAllScaledMoney(self.goldReward);
+            };
         }
 
-        public static void GiveAllScaledMoney(float goldReward)
+        private static void GiveAllScaledMoney(float goldReward)
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
             {
@@ -169,14 +192,10 @@ namespace ShareSuite
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
                                 if (!playerCharacterMasterController.master.alive) continue;
-                                if (playerCharacterMasterController.master.GetBody() != characterBody)
-                                {
-                                    playerCharacterMasterController.master.GiveMoney(amount);
-                                }
-                                else
-                                {
-                                    playerCharacterMasterController.master.GiveMoney(purchaseDiff);
-                                }
+                                playerCharacterMasterController.master.GiveMoney(
+                                    playerCharacterMasterController.master.GetBody() != characterBody
+                                        ? amount
+                                        : purchaseDiff);
                             }
 
                             return;
