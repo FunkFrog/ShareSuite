@@ -13,7 +13,7 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.1")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> WrapModIsEnabled;
@@ -37,7 +37,7 @@ namespace ShareSuite
         {
             var blacklist = new HashSet<int>();
             var rawPieces = WrapItemBlacklist.Value.Split(',');
-            foreach(string piece in rawPieces)
+            foreach(var piece in rawPieces)
             {
                 if(int.TryParse(piece, out int itemNum)){
                     blacklist.Add(itemNum);
@@ -201,29 +201,17 @@ namespace ShareSuite
 
         private static bool TryParseIntoConfig<T>(string rawValue, ConfigWrapper<T> wrapper)
         {
-            ConfigWrapper<bool> boolWrapper = wrapper as ConfigWrapper<bool>;
-            if (boolWrapper != null)
+            switch (wrapper)
             {
-                if (bool.TryParse(rawValue, out bool result))
-                {
+                case ConfigWrapper<bool> boolWrapper when bool.TryParse(rawValue, out bool result):
                     boolWrapper.Value = result;
                     return true;
-                }
-                return false;
-            }
-            
-            ConfigWrapper<int> intWrapper = wrapper as ConfigWrapper<int>;
-            if (intWrapper != null)
-            {
-                if (int.TryParse(rawValue, out int result))
-                {
+                case ConfigWrapper<int> intWrapper when int.TryParse(rawValue, out int result):
                     intWrapper.Value = result;
                     return true;
-                }
-                return false;
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         // ModIsEnabled

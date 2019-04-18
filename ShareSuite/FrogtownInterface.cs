@@ -1,71 +1,68 @@
-﻿using BepInEx.Configuration;
-using RoR2;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BepInEx.Configuration;
+using RoR2;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace ShareSuite
 {
-    public class FrogtownInterface
+    public static class FrogtownInterface
     {
-        private static ConfigFile config;
+        private static ConfigFile _config;
         private static List<object> availableSettings = new List<object>();
-        private static Vector2 scrollPos;
-        private static HashSet<int> bannedItems;
+        private static Vector2 _scrollPos;
+        private static HashSet<int> _bannedItems;
 
         public static void Init(ConfigFile config)
         {
             //Soft dependency on mod loader
-            FrogtownInterface.config = config;
+            _config = config;
             Type modDetailsType = null;
             Type frogtownSharedType = null;
             foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (a.FullName.StartsWith("FrogtownShared,"))
+                if (!a.FullName.StartsWith("FrogtownShared,")) continue;
+                var allTypes = a.GetTypes();
+                foreach (var t in allTypes)
                 {
-                    var allTypes = a.GetTypes();
-                    foreach (Type t in allTypes)
+                    switch (t.Name)
                     {
-                        if (t.Name == "FrogtownModDetails")
-                        {
+                        case "FrogtownModDetails":
                             modDetailsType = t;
-                        }
-                        if (t.Name == "FrogtownShared")
-                        {
+                            break;
+                        case "FrogtownShared":
                             frogtownSharedType = t;
-                        }
+                            break;
                     }
-                    break;
                 }
+
+                break;
             }
 
             try
             {
-                if (modDetailsType != null && frogtownSharedType != null)
+                if (modDetailsType == null || frogtownSharedType == null) return;
+                //Will be set back to true by the manager when it initializes
+                ShareSuite.WrapModIsEnabled.Value = false;
+
+                var obj = Activator.CreateInstance(modDetailsType, "com.funkfrog_sipondo.sharesuite");
+                obj.SetFieldValue("githubAuthor", "FunkFrog");
+                obj.SetFieldValue("githubRepo", "RoR2SharedItems");
+                obj.SetFieldValue("description",
+                    "Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot and chest sniping. This mod aims to fix that!");
+                obj.SetFieldValue("OnGUI", new UnityAction(() => { OnSettingsGui(); }));
+                obj.SetFieldValue("afterToggle", new UnityAction(() =>
                 {
-                    //Will be set back to true by the manager when it initializes
-                    ShareSuite.WrapModIsEnabled.Value = false;
+                    ShareSuite.WrapModIsEnabled.Value = obj.GetPropertyValue<bool>("enabled");
+                    config.Save();
+                }));
 
-                    var obj = Activator.CreateInstance(modDetailsType, "com.funkfrog_sipondo.sharesuite");
-                    obj.SetFieldValue("githubAuthor", "FunkFrog");
-                    obj.SetFieldValue("githubRepo", "RoR2SharedItems");
-                    obj.SetFieldValue("description", "Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot and chest sniping. This mod aims to fix that!");
-                    obj.SetFieldValue("OnGUI", new UnityAction(() =>
-                    {
-                        OnSettingsGUI();
-                    }));
-                    obj.SetFieldValue("afterToggle", new UnityAction(() =>
-                    {
-                        ShareSuite.WrapModIsEnabled.Value = obj.GetPropertyValue<bool>("enabled");
-                        config.Save();
-                    }));
-
-                    var register = frogtownSharedType.GetMethod("RegisterMod");
-                    register.Invoke(null, new object[] { obj });
-                    InitSettings();
-                }
-            }catch(Exception e)
+                var register = frogtownSharedType.GetMethod("RegisterMod");
+                if (register != null) register.Invoke(null, new[] {obj});
+                InitSettings();
+            }
+            catch (Exception e)
             {
                 Debug.Log("Failed to initialize mod manager features");
                 Debug.Log(e.StackTrace);
@@ -91,96 +88,104 @@ namespace ShareSuite
             availableSettings.Add(ShareSuite.WrapBossLootCredit);
             availableSettings.Add(ShareSuite.WrapItemBlacklist);
 
-            bannedItems = ShareSuite.GetItemBlackList();
+            _bannedItems = ShareSuite.GetItemBlackList();
         }
 
-        public static void OnSettingsGUI()
+        private static void OnSettingsGui()
         {
-            for(int i = 0; i < availableSettings.Count; i++)
+            foreach (var rawSetting in availableSettings)
             {
-                var rawSetting = availableSettings[i];
-                var boolSetting = rawSetting as ConfigWrapper<bool>;
-                if (boolSetting != null)
+                switch (rawSetting)
                 {
-                    //check box style settings
-                    bool newValue = GUILayout.Toggle(boolSetting.Value, new GUIContent("  " + boolSetting.Definition.Key, boolSetting.Definition.Description));
-                    if (newValue != boolSetting.Value)
+                    case ConfigWrapper<bool> boolSetting:
                     {
-                        boolSetting.Value = newValue;
-                        config.Save();
-                    }
-                }
-
-                var intSetting = rawSetting as ConfigWrapper<int>;
-                if (intSetting != null)
-                {
-                    //numeric settings with a slider
-                    GUILayout.Label(new GUIContent(intSetting.Definition.Key + ": " + intSetting.Value, intSetting.Definition.Description));
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("0", GUILayout.ExpandWidth(false));
-                    double rawSelection = GUILayout.HorizontalSlider(intSetting.Value, 0, 32, GUILayout.Width(200));
-                    int newValue = (int)Math.Round(rawSelection);
-                    if (newValue != intSetting.Value)
-                    {
-                        intSetting.Value = newValue;
-                        config.Save();
-                    }
-                    GUILayout.Label("32", GUILayout.ExpandWidth(false));
-                    GUILayout.EndHorizontal();
-                }
-
-                var itemSetting = rawSetting as ConfigWrapper<string>;
-                if (itemSetting != null)
-                {
-                    //banned item setting
-                    GUILayout.Label(new GUIContent(itemSetting.Definition.Key, itemSetting.Definition.Description));
-                    scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Height(90));
-                    GUILayout.BeginHorizontal();
-                    foreach (var itemIndex in ItemCatalog.allItems)
-                    {
-                        var itemDef = ItemCatalog.GetItemDef(itemIndex);
-                        if (itemDef.tier == ItemTier.NoTier)
+                        //check box style settings
+                        var newValue = GUILayout.Toggle(boolSetting.Value,
+                            new GUIContent("  " + boolSetting.Definition.Key, boolSetting.Definition.Description));
+                        if (newValue != boolSetting.Value)
                         {
-                            continue;
+                            boolSetting.Value = newValue;
+                            _config.Save();
                         }
 
-                        var name = Language.GetString(itemDef.nameToken);
-                        bool isBanned = bannedItems.Contains((int)itemDef.itemIndex);
-                        var oldcolor = GUI.backgroundColor;
-                        GUI.backgroundColor = isBanned ? Color.red : Color.white;
-                        bool newIsBanned = GUILayout.Toggle(isBanned, new GUIContent(itemDef.pickupIconTexture, name), GUILayout.Width(64), GUILayout.Height(64));
-                        GUI.backgroundColor = oldcolor;
-                        if (isBanned != newIsBanned)
+                        break;
+                    }
+                    case ConfigWrapper<int> intSetting:
+                    {
+                        //numeric settings with a slider
+                        GUILayout.Label(new GUIContent(intSetting.Definition.Key + ": " + intSetting.Value,
+                            intSetting.Definition.Description));
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("1", GUILayout.ExpandWidth(false));
+                        double rawSelection = GUILayout.HorizontalSlider(intSetting.Value, 1, 10, GUILayout.Width(200));
+                        var newValue = (int) Math.Round(rawSelection);
+                        if (newValue != intSetting.Value)
                         {
+                            intSetting.Value = newValue;
+                            _config.Save();
+                        }
+
+                        GUILayout.Label("10", GUILayout.ExpandWidth(false));
+                        GUILayout.EndHorizontal();
+                        break;
+                    }
+                    case ConfigWrapper<string> itemSetting:
+                    {
+                        //banned item setting
+                        GUILayout.Label(new GUIContent(itemSetting.Definition.Key, itemSetting.Definition.Description));
+                        _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(90));
+                        GUILayout.BeginHorizontal();
+                        foreach (var itemIndex in ItemCatalog.allItems)
+                        {
+                            var itemDef = ItemCatalog.GetItemDef(itemIndex);
+                            if (itemDef.tier == ItemTier.NoTier)
+                            {
+                                continue;
+                            }
+
+                            var name = Language.GetString(itemDef.nameToken);
+                            var isBanned = _bannedItems.Contains((int) itemDef.itemIndex);
+                            var oldcolor = GUI.backgroundColor;
+                            GUI.backgroundColor = isBanned ? Color.red : Color.white;
+                            var newIsBanned = GUILayout.Toggle(isBanned,
+                                new GUIContent(itemDef.pickupIconTexture, name), GUILayout.Width(64),
+                                GUILayout.Height(64));
+                            GUI.backgroundColor = oldcolor;
+                            if (isBanned == newIsBanned) continue;
                             if (newIsBanned)
                             {
-                                bannedItems.Add((int)itemDef.itemIndex);
+                                _bannedItems.Add((int) itemDef.itemIndex);
                             }
                             else
                             {
-                                bannedItems.Remove((int)itemDef.itemIndex);
+                                _bannedItems.Remove((int) itemDef.itemIndex);
                             }
-                            itemSetting.Value = SetToStringList(bannedItems);
-                            config.Save();
+
+                            itemSetting.Value = SetToStringList(_bannedItems);
+                            _config.Save();
                         }
+
+                        GUILayout.EndHorizontal();
+                        GUILayout.EndScrollView();
+                        break;
                     }
-                    GUILayout.EndHorizontal();
-                    GUILayout.EndScrollView();
                 }
             }
         }
 
-        private static string SetToStringList(HashSet<int> set)
+        private static string SetToStringList(IEnumerable<int> set)
         {
-            string list = "";
-            foreach(int value in set)
+            var list = "";
+            foreach (int value in set)
             {
-                if(list.Length > 0)
+                if (list.Length > 0)
                 {
                     list += ",";
                 }
+
                 list += value.ToString();
             }
+
             return list;
         }
     }
