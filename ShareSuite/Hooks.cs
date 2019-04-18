@@ -18,7 +18,7 @@ namespace ShareSuite
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (self.isCharged && ShareSuite.WrapMoneyIsShared)
+                if (self.isCharged && ShareSuite.WrapMoneyIsShared.Value)
                 {
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
@@ -65,7 +65,7 @@ namespace ShareSuite
             {
                 var c = new ILCursor(il).Goto(99);
                 c.Remove();
-                if (ShareSuite.WrapModIsEnabled && ShareSuite.WrapOverrideBossLootScalingEnabled)
+                if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
                 {
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
                 }
@@ -73,7 +73,7 @@ namespace ShareSuite
                 {
                     c.Emit(OpCodes.Ldc_I4, Run.instance.participatingPlayerCount); // standard, runs on every level start
                 }
-            );
+            };
         }
 
 
@@ -106,8 +106,8 @@ namespace ShareSuite
             On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
             {
                 orig(self, info);
-                if (!ShareSuite.WrapModIsEnabled 
-                    || !ShareSuite.WrapMoneyIsShared
+                if (!ShareSuite.WrapModIsEnabled.Value 
+                    || !ShareSuite.WrapMoneyIsShared.Value
                     || !NetworkServer.active) return;
 
                 GiveAllScaledMoney(self.goldReward);
@@ -116,8 +116,8 @@ namespace ShareSuite
             On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
                 orig(self, activator);
-                if (!ShareSuite.WrapModIsEnabled 
-                    || !ShareSuite.WrapMoneyIsShared
+                if (!ShareSuite.WrapModIsEnabled.Value 
+                    || !ShareSuite.WrapMoneyIsShared.Value
                     || !NetworkServer.active) return;
 
                 GiveAllScaledMoney(self.goldReward);
