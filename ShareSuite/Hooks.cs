@@ -37,22 +37,22 @@ namespace ShareSuite
                 {
                     FixBoss();
                     SyncMoney();
-                    if (!ShareSuite.WrapModIsEnabled || !ShareSuite.WrapOverridePlayerScalingEnabled)
+                    if (!ShareSuite.WrapModIsEnabled.Value || !ShareSuite.WrapOverridePlayerScalingEnabled.Value)
+
                     {
                         orig(self);
                         return;
                     }
 
                     // Set interactables budget to 200 * config player count (normal calculation)
-                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit);
+                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
                     orig(self);
                 };
-
         }
 
         private static void SyncMoney()
         {
-            if (!ShareSuite.WrapMoneyIsShared) return;
+            if (!ShareSuite.WrapMoneyIsShared.Value) return;
             foreach (var player in PlayerCharacterMasterController.instances)
             {
                 player.master.money = NetworkUser.readOnlyInstancesList[0].master.money;
@@ -73,7 +73,7 @@ namespace ShareSuite
                 {
                     c.Emit(OpCodes.Ldc_I4, Run.instance.participatingPlayerCount); // standard, runs on every level start
                 }
-            };
+            );
         }
 
 
@@ -84,16 +84,16 @@ namespace ShareSuite
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
-                if (!ShareSuite.WrapItemBlacklist.Contains((int) item)
+                if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
                     && IsValidPickup(self.pickupIndex)
                     && IsMultiplayer()
-                    && ShareSuite.WrapModIsEnabled)
+                    && ShareSuite.WrapModIsEnabled.Value)
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                     {
                         // Ensure character is not original player that picked up item
                         if (player.inventory == inventory) continue;
-                        if (player.alive || ShareSuite.WrapDeadPlayersGetItems)
+                        if (player.alive || ShareSuite.WrapDeadPlayersGetItems.Value)
                             player.inventory.GiveItem(item);
                     }
 
@@ -129,7 +129,7 @@ namespace ShareSuite
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
             {
                 player.GiveMoney(
-                    (uint) Mathf.Ceil(goldReward * ShareSuite.WrapMoneyScalar - goldReward));
+                    (uint) Mathf.Floor(goldReward * ShareSuite.WrapMoneyScalar.Value - goldReward));
             }
         }
 
@@ -137,7 +137,7 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (!ShareSuite.WrapModIsEnabled)
+                if (!ShareSuite.WrapModIsEnabled.Value)
                 {
                     orig(self, activator);
                     return;
@@ -149,7 +149,7 @@ namespace ShareSuite
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
-                if (ShareSuite.WrapMoneyIsShared)
+                if (ShareSuite.WrapMoneyIsShared.Value)
                 {
                     //TODO add comments on what this does
                     switch (self.costType)
@@ -184,7 +184,7 @@ namespace ShareSuite
 
                             var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f *
-                                                 ShareSuite.WrapMoneyScalar);
+                                                 ShareSuite.WrapMoneyScalar.Value);
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
                                                  0.5f);
@@ -204,7 +204,7 @@ namespace ShareSuite
                 }
 
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
-                if (!IsMultiplayer() || !ShareSuite.WrapPrinterCauldronFixEnabled)
+                if (!IsMultiplayer() || !ShareSuite.WrapPrinterCauldronFixEnabled.Value)
                 {
                     orig(self, activator);
                     return;
@@ -231,7 +231,7 @@ namespace ShareSuite
         {
             On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
             {
-                if (!ShareSuite.WrapModIsEnabled)
+                if (!ShareSuite.WrapModIsEnabled.Value)
                 {
                     orig(self);
                     return;
@@ -243,7 +243,7 @@ namespace ShareSuite
                 // If this is a multi-player lobby and the fix is enabled and it's not a lunar item, don't drop an item
                 if (!IsMultiplayer()
                     || !IsValidPickup(self.CurrentPickupIndex())
-                    || !ShareSuite.WrapPrinterCauldronFixEnabled
+                    || !ShareSuite.WrapPrinterCauldronFixEnabled.Value
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostType.Money)
                 {
@@ -256,12 +256,12 @@ namespace ShareSuite
         private static bool IsValidPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
-            return IsWhiteItem(item) && ShareSuite.WrapWhiteItemsShared
-                   || IsGreenItem(item) && ShareSuite.WrapGreenItemsShared
-                   || IsRedItem(item) && ShareSuite.WrapRedItemsShared
-                   || pickup.IsLunar() && ShareSuite.WrapLunarItemsShared
-                   || IsBossItem(item) && ShareSuite.WrapBossItemsShared
-                   || IsQueensGland(item) && ShareSuite.WrapQueensGlandsShared;
+            return IsWhiteItem(item) && ShareSuite.WrapWhiteItemsShared.Value
+                   || IsGreenItem(item) && ShareSuite.WrapGreenItemsShared.Value
+                   || IsRedItem(item) && ShareSuite.WrapRedItemsShared.Value
+                   || pickup.IsLunar() && ShareSuite.WrapLunarItemsShared.Value
+                   || IsBossItem(item) && ShareSuite.WrapBossItemsShared.Value
+                   || IsQueensGland(item) && ShareSuite.WrapQueensGlandsShared.Value;
         }
 
         private static bool IsMultiplayer()
