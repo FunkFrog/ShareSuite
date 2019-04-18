@@ -14,6 +14,23 @@ namespace ShareSuite
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
                 BindingFlags.NonPublic | BindingFlags.Static);
 
+        public static void SplitTpMoney()
+        {
+            On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                if (self.isCharged && ShareSuite.WrapMoneyIsShared)
+                {
+                    foreach (var player in PlayerCharacterMasterController.instances)
+                    {
+                        player.master.money = (uint) 
+                            Mathf.FloorToInt(player.master.money / PlayerCharacterMasterController.instances.Count);
+                    }
+                }
+
+                orig(self, activator);
+            };
+        }
+        
         public static void DisableInteractablesScaling()
         {
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
