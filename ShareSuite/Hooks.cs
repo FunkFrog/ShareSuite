@@ -38,7 +38,7 @@ namespace ShareSuite
             {
                 var c = new ILCursor(il).Goto(99);
                 c.Remove();
-                if ((!ShareSuite.WrapModIsEnabled) && (ShareSuite.WrapOverrideBossLootScalingEnabled))
+                if (ShareSuite.WrapModIsEnabled && ShareSuite.WrapOverrideBossLootScalingEnabled)
                 {
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
                 }
@@ -101,9 +101,8 @@ namespace ShareSuite
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
             {
-                Debug.Log("gave " + player.GetBody().GetDisplayName() + " " + (uint) Mathf.Ceil(goldReward * 5000));
                 player.GiveMoney(
-                    (uint) Mathf.Ceil(goldReward * 5000));
+                    (uint) Mathf.Ceil(goldReward * ShareSuite.WrapMoneyScalar - goldReward));
             }
         }
 

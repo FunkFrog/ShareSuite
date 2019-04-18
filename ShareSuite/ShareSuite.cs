@@ -6,9 +6,11 @@ using BepInEx;
 using RoR2;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Local
+
 namespace ShareSuite
 {
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.5.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.5.2")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapModIsEnabled;
