@@ -16,10 +16,9 @@ namespace ShareSuite
 
         public static void DisableInteractablesScaling()
         {
-            if (ShareSuite.WrapOverridePlayerScalingEnabled)
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
-                    if (!ShareSuite.WrapModIsEnabled)
+                    if (!ShareSuite.WrapModIsEnabled || !ShareSuite.WrapOverridePlayerScalingEnabled)
                     {
                         orig(self);
                         return;
@@ -41,7 +40,7 @@ namespace ShareSuite
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
                 };
         }
-        
+
 
         public static void OnGrantItem()
         {
@@ -69,44 +68,34 @@ namespace ShareSuite
 
         public static void ModifyGoldReward()
         {
-            if (ShareSuite.WrapMoneyIsShared)
+            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
             {
-                On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
-                {
-                    if (!ShareSuite.WrapModIsEnabled)
-                    {
-                        orig(self, info);
-                        return;
-                    }
+                orig(self, info);
+                if (!ShareSuite.WrapModIsEnabled 
+                    || !ShareSuite.WrapMoneyIsShared
+                    || !NetworkServer.active) return;
 
-                    if (!NetworkServer.active) return;
-                    GiveAllScaledMoney(self.goldReward);
+                GiveAllScaledMoney(self.goldReward);
+            };
 
-                    orig(self, info);
-                };
+            On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                orig(self, activator);
+                if (!ShareSuite.WrapModIsEnabled 
+                    || !ShareSuite.WrapMoneyIsShared
+                    || !NetworkServer.active) return;
 
-                On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
-                {
-                    if (!ShareSuite.WrapModIsEnabled)
-                    {
-                        orig(self, activator);
-                        return;
-                    }
-                    
-                    if (!NetworkServer.active) return;
-                    GiveAllScaledMoney(self.goldReward);
-
-                    orig(self, activator);
-                };
-            }
+                GiveAllScaledMoney(self.goldReward);
+            };
         }
 
-        public static void GiveAllScaledMoney(float goldReward)
+        private static void GiveAllScaledMoney(float goldReward)
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
             {
+                Debug.Log("gave " + player.GetBody().GetDisplayName() + " " + (uint) Mathf.Ceil(goldReward * 5000));
                 player.GiveMoney(
-                    (uint) Mathf.Floor(goldReward * ShareSuite.WrapMoneyScalar - goldReward));
+                    (uint) Mathf.Ceil(goldReward * 5000));
             }
         }
 
@@ -169,14 +158,10 @@ namespace ShareSuite
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
                                 if (!playerCharacterMasterController.master.alive) continue;
-                                if (playerCharacterMasterController.master.GetBody() != characterBody)
-                                {
-                                    playerCharacterMasterController.master.GiveMoney(amount);
-                                }
-                                else
-                                {
-                                    playerCharacterMasterController.master.GiveMoney(purchaseDiff);
-                                }
+                                playerCharacterMasterController.master.GiveMoney(
+                                    playerCharacterMasterController.master.GetBody() != characterBody
+                                        ? amount
+                                        : purchaseDiff);
                             }
 
                             return;

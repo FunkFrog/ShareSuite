@@ -120,6 +120,8 @@ Open up the console window. All commands starts with **ss** and will autocomplet
 ---
 ### Changelog
 
+1.4.2: Fixed reflection.
+
 1.4.1: README.md fix.
 
 1.4.0: Introduced item blacklisting, made item sharing behave like Loot4All again.

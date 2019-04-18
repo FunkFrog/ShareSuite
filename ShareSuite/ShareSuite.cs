@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace ShareSuite
 {
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.4.1")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.5.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static bool WrapModIsEnabled;
@@ -152,13 +152,11 @@ namespace ShareSuite
                 "Toggles override of the scalar of boss loot drops to your configured balance.",
                 true).Value;
 
-             // Add config options for all settings
             WrapBossLootCredit = Config.Wrap(
                 "Settings",
                 "BossLootCredit",
                 "Specifies the amount of boss items dropped when boss drop override is true.",
                 1).Value;
-
 
             WrapDeadPlayersGetItems = Config.Wrap(
                 "Balance",
@@ -331,6 +329,7 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot credit set to {WrapBossLootCredit}.");
+                
         }
 
         // DeadPlayersGetItems
