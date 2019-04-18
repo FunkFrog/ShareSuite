@@ -317,7 +317,10 @@ namespace ShareSuite
             if (args.Count != 1 || !bool.TryParse(args[0], out WrapOverrideBossLootScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
+            {
                 Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled}.");
+                Hooks.FixBoss();
+            }
         }
 
         // BossLootCredit
@@ -328,8 +331,10 @@ namespace ShareSuite
             if (args.Count != 1 || !int.TryParse(args[0], out WrapBossLootCredit))
                 Debug.Log("Invalid arguments.");
             else
+            {
                 Debug.Log($"Boss loot credit set to {WrapBossLootCredit}.");
-                
+                Hooks.FixBoss();
+            }       
         }
 
         // DeadPlayersGetItems

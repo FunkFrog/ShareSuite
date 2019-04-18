@@ -18,6 +18,7 @@ namespace ShareSuite
         {
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
+                    FixBoss();
                     if (!ShareSuite.WrapModIsEnabled || !ShareSuite.WrapOverridePlayerScalingEnabled)
                     {
                         orig(self);
@@ -29,16 +30,23 @@ namespace ShareSuite
                     orig(self);
                 };
 
-            if (ShareSuite.WrapOverrideBossLootScalingEnabled)
-                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+        }
+
+        public static void FixBoss()
+        {
+            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            {
+                var c = new ILCursor(il).Goto(99);
+                c.Remove();
+                if ((!ShareSuite.WrapModIsEnabled) && (ShareSuite.WrapOverrideBossLootScalingEnabled))
                 {
-                    // return; F: Disabled until fixed for 2.0.0 T: no it works lol just not via ingame config
-                    if (!ShareSuite.WrapModIsEnabled) return;
-                    // Remove line where boss loot amount is specified and replace it with WrapBossLootCredit
-                    var c = new ILCursor(il).Goto(99);
-                    c.Remove();
                     c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
-                };
+                }
+                else
+                {
+                    c.Emit(OpCodes.Ldc_I4, Run.instance.participatingPlayerCount); // standard, runs on every level start
+                }
+            };
         }
 
 
