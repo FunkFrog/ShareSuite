@@ -67,7 +67,7 @@ namespace ShareSuite
                 c.Remove();
                 if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
                 {
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit); // only works when it's a value
+                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value); // only works when it's a value
                 }
                 else
                 {
