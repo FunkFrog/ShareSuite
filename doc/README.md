@@ -23,9 +23,17 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ### TO-DO
 
+Money Sharing 
+- Sync host and client balance on game/map start to ensure no desyncs/incompatibilities with other mods.
+- Set all money to host when shared money is enabled
+- Split money properly before turning it into xp when the tp is hit.
+- Check crowdfunder and brittle crown properly.
+
+Config
+- Reset IL hook for changes of the boss loot scalar
+
+Extra Features 
 - Shared Equipment
-- In-Game commands for changing config options, as well as a config option to completely disable the mod
-- Config option for disabling specific items from being shared
 
 ---
 
@@ -119,6 +127,8 @@ Open up the console window. All commands starts with **ss** and will autocomplet
 
 ---
 ### Changelog
+
+1.5.0: Definitive fix of all known bugs. Capsules now scale their money properly.
 
 1.4.2: Fixed reflection.
 
