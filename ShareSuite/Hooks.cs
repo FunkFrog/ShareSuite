@@ -19,6 +19,7 @@ namespace ShareSuite
                 On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
                 {
                     FixBoss();
+                    SyncMoney();
                     if (!ShareSuite.WrapModIsEnabled || !ShareSuite.WrapOverridePlayerScalingEnabled)
                     {
                         orig(self);
@@ -30,6 +31,15 @@ namespace ShareSuite
                     orig(self);
                 };
 
+        }
+
+        private static void SyncMoney()
+        {
+            if (!ShareSuite.WrapMoneyIsShared) return;
+            foreach (var player in PlayerCharacterMasterController.instances)
+            {
+                player.master.money = NetworkUser.readOnlyInstancesList[0].master.money;
+            }
         }
 
         public static void FixBoss()
