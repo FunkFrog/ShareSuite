@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using BepInEx.Configuration;
 using RoR2;
 using UnityEngine;
@@ -10,9 +11,10 @@ namespace ShareSuite
     public static class FrogtownInterface
     {
         private static ConfigFile _config;
-        private static List<object> availableSettings = new List<object>();
+        private static List<object> _availableSettings;
         private static Vector2 _scrollPos;
         private static HashSet<int> _bannedItems;
+        private static List<ItemIndex> _itemsByRarity;
 
         public static void Init(ConfigFile config)
         {
@@ -61,6 +63,7 @@ namespace ShareSuite
                 var register = frogtownSharedType.GetMethod("RegisterMod");
                 if (register != null) register.Invoke(null, new[] {obj});
                 InitSettings();
+                InitItemList();
             }
             catch (Exception e)
             {
@@ -72,28 +75,47 @@ namespace ShareSuite
         private static void InitSettings()
         {
             //Build list of settings that can be controlled in the UI
-            availableSettings.Add(ShareSuite.WrapMoneyIsShared);
-            availableSettings.Add(ShareSuite.WrapWhiteItemsShared);
-            availableSettings.Add(ShareSuite.WrapGreenItemsShared);
-            availableSettings.Add(ShareSuite.WrapRedItemsShared);
-            availableSettings.Add(ShareSuite.WrapLunarItemsShared);
-            availableSettings.Add(ShareSuite.WrapBossItemsShared);
-            availableSettings.Add(ShareSuite.WrapQueensGlandsShared);
-            availableSettings.Add(ShareSuite.WrapPrinterCauldronFixEnabled);
-            availableSettings.Add(ShareSuite.WrapOverridePlayerScalingEnabled);
-            availableSettings.Add(ShareSuite.WrapOverrideBossLootScalingEnabled);
-            availableSettings.Add(ShareSuite.WrapDeadPlayersGetItems);
-            availableSettings.Add(ShareSuite.WrapMoneyScalar);
-            availableSettings.Add(ShareSuite.WrapInteractablesCredit);
-            availableSettings.Add(ShareSuite.WrapBossLootCredit);
-            availableSettings.Add(ShareSuite.WrapItemBlacklist);
+            _availableSettings = new List<object>();
+
+            _availableSettings.Add(ShareSuite.WrapMoneyIsShared);
+            _availableSettings.Add(ShareSuite.WrapWhiteItemsShared);
+            _availableSettings.Add(ShareSuite.WrapGreenItemsShared);
+            _availableSettings.Add(ShareSuite.WrapRedItemsShared);
+            _availableSettings.Add(ShareSuite.WrapLunarItemsShared);
+            _availableSettings.Add(ShareSuite.WrapBossItemsShared);
+            _availableSettings.Add(ShareSuite.WrapQueensGlandsShared);
+            _availableSettings.Add(ShareSuite.WrapPrinterCauldronFixEnabled);
+            _availableSettings.Add(ShareSuite.WrapOverridePlayerScalingEnabled);
+            _availableSettings.Add(ShareSuite.WrapOverrideBossLootScalingEnabled);
+            _availableSettings.Add(ShareSuite.WrapDeadPlayersGetItems);
+            _availableSettings.Add(ShareSuite.WrapMoneyScalar);
+            _availableSettings.Add(ShareSuite.WrapInteractablesCredit);
+            _availableSettings.Add(ShareSuite.WrapBossLootCredit);
+            _availableSettings.Add(ShareSuite.WrapItemBlacklist);
 
             _bannedItems = ShareSuite.GetItemBlackList();
         }
 
+        private static void InitItemList()
+        {
+            _itemsByRarity = new List<ItemIndex>();
+            foreach (ItemIndex itemIndex in ItemCatalog.allItems)
+            {
+                var itemDef = ItemCatalog.GetItemDef(itemIndex);
+                if (itemDef.tier == ItemTier.NoTier) continue;
+                _itemsByRarity.Add(itemIndex);
+            }
+            _itemsByRarity.Sort((a, b) =>
+            {
+                var definitionA = ItemCatalog.GetItemDef(a);
+                var definitionB = ItemCatalog.GetItemDef(b);
+                return definitionA.tier.CompareTo(definitionB.tier);
+            });
+        }
+
         private static void OnSettingsGui()
         {
-            foreach (var rawSetting in availableSettings)
+            foreach (var rawSetting in _availableSettings)
             {
                 switch (rawSetting)
                 {
@@ -101,7 +123,7 @@ namespace ShareSuite
                     {
                         //check box style settings
                         var newValue = GUILayout.Toggle(boolSetting.Value,
-                            new GUIContent("  " + boolSetting.Definition.Key, boolSetting.Definition.Description));
+                            new GUIContent(AddSpaces(boolSetting.Definition.Key), boolSetting.Definition.Description));
                         if (newValue != boolSetting.Value)
                         {
                             boolSetting.Value = newValue;
@@ -113,7 +135,7 @@ namespace ShareSuite
                     case ConfigWrapper<int> intSetting:
                     {
                         //numeric settings with a slider
-                        GUILayout.Label(new GUIContent(intSetting.Definition.Key + ": " + intSetting.Value,
+                        GUILayout.Label(new GUIContent(AddSpaces(intSetting.Definition.Key) + ": " + intSetting.Value,
                             intSetting.Definition.Description));
                         GUILayout.BeginHorizontal();
                         GUILayout.Label("1", GUILayout.ExpandWidth(false));
@@ -132,17 +154,12 @@ namespace ShareSuite
                     case ConfigWrapper<string> itemSetting:
                     {
                         //banned item setting
-                        GUILayout.Label(new GUIContent(itemSetting.Definition.Key, itemSetting.Definition.Description));
+                        GUILayout.Label(new GUIContent(AddSpaces(itemSetting.Definition.Key), itemSetting.Definition.Description));
                         _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(90));
                         GUILayout.BeginHorizontal();
-                        foreach (var itemIndex in ItemCatalog.allItems)
+                        foreach (var itemIndex in _itemsByRarity)
                         {
                             var itemDef = ItemCatalog.GetItemDef(itemIndex);
-                            if (itemDef.tier == ItemTier.NoTier)
-                            {
-                                continue;
-                            }
-
                             var name = Language.GetString(itemDef.nameToken);
                             var isBanned = _bannedItems.Contains((int) itemDef.itemIndex);
                             var oldcolor = GUI.backgroundColor;
@@ -171,6 +188,11 @@ namespace ShareSuite
                     }
                 }
             }
+        }
+
+        private static string AddSpaces(string label)
+        {
+            return Regex.Replace(label, "([A-Z])", " $1");
         }
 
         private static string SetToStringList(IEnumerable<int> set)
