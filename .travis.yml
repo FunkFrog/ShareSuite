@@ -1,6 +1,6 @@
 language: csharp
 solution: ShareSuite.sln
 mono: none
-dotnet: 2.2.203
+dotnet: 2.1.502
 script:
  - dotnet restore
