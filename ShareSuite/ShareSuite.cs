@@ -192,13 +192,6 @@ namespace ShareSuite
                 "");
         }
 
-        private static int[] ConfigToIntArray(string configline)
-        {
-            var valueStrings = configline.Split(',');
-            var x = 0;
-            return (from item in valueStrings where int.TryParse(item, out x) select x).ToArray();
-        }
-
         private static bool TryParseIntoConfig<T>(string rawValue, ConfigWrapper<T> wrapper)
         {
             switch (wrapper)
