@@ -35,19 +35,18 @@ namespace ShareSuite
         {
             On.RoR2.HealthComponent.TakeDamage += (orig, self, info) =>
             {
-                var body = self.body;
-                
-                if (!body || !body.inventory)
-                {
+                if (!ShareSuite.WrapMoneyIsShared.Value 
+                    || !(bool) self.body 
+                    || !(bool) self.body.inventory) {
                     orig(self, info);
                     return;
                 }
+            
+                var body = self.body;
                 
                 var preDamageMoney = self.body.master.money;
                 
                 orig(self, info);
-                
-                if (!ShareSuite.WrapMoneyIsShared.Value) return;
 
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
                 foreach (var player in PlayerCharacterMasterController.instances)
@@ -62,17 +61,20 @@ namespace ShareSuite
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, info, victim) =>
             {
+                if (!ShareSuite.WrapMoneyIsShared.Value 
+                    || !info.attacker 
+                    || !info.attacker.GetComponent<CharacterBody>()) {
+                    orig(self, info, victim);
+                    return;
+                }
 
                 var body = info.attacker.GetComponent<CharacterBody>();
-
-                if (!body) return;
-
+                
                 var preDamageMoney = body.master.money;
                 
                 orig(self, info, victim);
                 
-                if (!ShareSuite.WrapMoneyIsShared.Value
-                    || !body.inventory) return;
+                if (!body.inventory) return;
 
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
                 foreach (var player in PlayerCharacterMasterController.instances)
