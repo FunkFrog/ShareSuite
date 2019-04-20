@@ -13,7 +13,7 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.1")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> WrapModIsEnabled;
@@ -63,6 +63,7 @@ namespace ShareSuite
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
             Hooks.FixBoss();
+            Hooks.BrittleCrownHook();
         }
 
         public class CommandHelper

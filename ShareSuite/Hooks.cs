@@ -22,7 +22,7 @@ namespace ShareSuite
                 {
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
-                        player.master.money = (uint) 
+                        player.master.money = (uint)
                             Mathf.FloorToInt(player.master.money / PlayerCharacterMasterController.instances.Count);
                     }
                 }
@@ -30,24 +30,108 @@ namespace ShareSuite
                 orig(self, activator);
             };
         }
-        
+
+        public static void BrittleCrownHook()
+        {
+            On.RoR2.HealthComponent.TakeDamage += (orig, self, info) =>
+            {
+                var body = self.body;
+                
+                if (!body || !body.inventory)
+                {
+                    orig(self, info);
+                    return;
+                }
+                
+                var preDamageMoney = self.body.master.money;
+                
+                orig(self, info);
+                
+                if (!ShareSuite.WrapMoneyIsShared.Value) return;
+
+                if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                foreach (var player in PlayerCharacterMasterController.instances)
+                {
+                    if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
+                    player.master.money -= preDamageMoney - self.body.master.money;
+                    EffectManager.instance.SimpleImpactEffect(Resources.Load<GameObject>(
+                            "Prefabs/Effects/ImpactEffects/CoinImpact"),
+                        player.master.GetBody().corePosition, Vector3.up, true);
+                }
+            };
+
+            On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, info, victim) =>
+            {
+
+                var body = info.attacker.GetComponent<CharacterBody>();
+
+                if (!body) return;
+
+                var preDamageMoney = body.master.money;
+                
+                orig(self, info, victim);
+                
+                if (!ShareSuite.WrapMoneyIsShared.Value
+                    || !body.inventory) return;
+
+                if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                foreach (var player in PlayerCharacterMasterController.instances)
+                {
+                    if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
+                    player.master.money += body.master.money - preDamageMoney;
+                }
+            };
+        }
+
+        public static void ModifyGoldReward()
+        {
+            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
+            {
+                orig(self, info);
+                if (!ShareSuite.WrapModIsEnabled.Value
+                    || !ShareSuite.WrapMoneyIsShared.Value
+                    || !NetworkServer.active) return;
+
+                GiveAllScaledMoney(self.goldReward);
+            };
+
+            On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
+            {
+                orig(self, activator);
+                if (!ShareSuite.WrapModIsEnabled.Value
+                    || !ShareSuite.WrapMoneyIsShared.Value
+                    || !NetworkServer.active) return;
+
+                GiveAllScaledMoney(self.goldReward);
+            };
+        }
+
+        private static void GiveAllScaledMoney(float goldReward)
+        {
+            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+            {
+                player.GiveMoney(
+                    (uint) Mathf.Floor(goldReward * ShareSuite.WrapMoneyScalar.Value - goldReward));
+            }
+        }
+
         public static void DisableInteractablesScaling()
         {
-                On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
+            On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
+            {
+                FixBoss();
+                SyncMoney();
+                if (!ShareSuite.WrapModIsEnabled.Value || !ShareSuite.WrapOverridePlayerScalingEnabled.Value)
+
                 {
-                    FixBoss();
-                    SyncMoney();
-                    if (!ShareSuite.WrapModIsEnabled.Value || !ShareSuite.WrapOverridePlayerScalingEnabled.Value)
-
-                    {
-                        orig(self);
-                        return;
-                    }
-
-                    // Set interactables budget to 200 * config player count (normal calculation)
-                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
                     orig(self);
-                };
+                    return;
+                }
+
+                // Set interactables budget to 200 * config player count (normal calculation)
+                Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
+                orig(self);
+            };
         }
 
         private static void SyncMoney()
@@ -71,7 +155,8 @@ namespace ShareSuite
                 }
                 else
                 {
-                    c.Emit(OpCodes.Ldc_I4, Run.instance.participatingPlayerCount); // standard, runs on every level start
+                    c.Emit(OpCodes.Ldc_I4,
+                        Run.instance.participatingPlayerCount); // standard, runs on every level start
                 }
             };
         }
@@ -99,38 +184,6 @@ namespace ShareSuite
 
                 orig(self, body, inventory);
             };
-        }
-
-        public static void ModifyGoldReward()
-        {
-            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
-            {
-                orig(self, info);
-                if (!ShareSuite.WrapModIsEnabled.Value 
-                    || !ShareSuite.WrapMoneyIsShared.Value
-                    || !NetworkServer.active) return;
-
-                GiveAllScaledMoney(self.goldReward);
-            };
-
-            On.RoR2.BarrelInteraction.OnInteractionBegin += (orig, self, activator) =>
-            {
-                orig(self, activator);
-                if (!ShareSuite.WrapModIsEnabled.Value 
-                    || !ShareSuite.WrapMoneyIsShared.Value
-                    || !NetworkServer.active) return;
-
-                GiveAllScaledMoney(self.goldReward);
-            };
-        }
-
-        private static void GiveAllScaledMoney(float goldReward)
-        {
-            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
-            {
-                player.GiveMoney(
-                    (uint) Mathf.Floor(goldReward * ShareSuite.WrapMoneyScalar.Value - goldReward));
-            }
         }
 
         public static void OnShopPurchase()
