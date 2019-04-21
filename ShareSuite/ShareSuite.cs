@@ -13,7 +13,7 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.5")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.6")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> WrapModIsEnabled;
@@ -158,7 +158,7 @@ namespace ShareSuite
 
             WrapOverridePlayerScalingEnabled = Config.Wrap(
                 "Balance",
-                "DisablePlayerScaling",
+                "OverridePlayerScaling",
                 "Toggles override of the scalar of interactables (chests, shrines, etc) that spawn in the world to your configured credit.",
                 true);
 
@@ -170,7 +170,7 @@ namespace ShareSuite
 
             WrapOverrideBossLootScalingEnabled = Config.Wrap(
                 "Balance",
-                "DisableBossLootScaling",
+                "OverrideBossLootScaling",
                 "Toggles override of the scalar of boss loot drops to your configured balance.",
                 true);
 

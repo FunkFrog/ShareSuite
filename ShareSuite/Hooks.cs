@@ -154,12 +154,14 @@ namespace ShareSuite
                     c.Remove();
                     if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
                     {
-                        c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value); // only works when it's a value
+                        // Needs to reference a getter
+                        c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value);
                     }
                     else
                     {
                         c.Emit(OpCodes.Ldc_I4,
-                            Run.instance.participatingPlayerCount); // standard, runs on every level start
+                            // Needs to reference a getter
+                            Run.instance.participatingPlayerCount);
                     }
                 };
                 orig(self, report);
