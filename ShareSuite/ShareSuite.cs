@@ -215,7 +215,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapModIsEnabled))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Mod status set to {WrapModIsEnabled}.");
+                Debug.Log($"Mod status set to {WrapModIsEnabled.Value}.");
         }
 
         // MoneyIsShared
@@ -226,7 +226,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapMoneyIsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Money sharing set to {WrapMoneyIsShared}.");
+                Debug.Log($"Money sharing set to {WrapMoneyIsShared.Value}.");
         }
 
         // MoneyScalar
@@ -237,7 +237,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapMoneyScalar))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Money multiplier set to {WrapMoneyScalar}.");
+                Debug.Log($"Money multiplier set to {WrapMoneyScalar.Value}.");
         }
 
         // WhiteItemsShared
@@ -248,7 +248,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapWhiteItemsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"White item sharing set to {WrapWhiteItemsShared}.");
+                Debug.Log($"White item sharing set to {WrapWhiteItemsShared.Value}.");
         }
 
         // GreenItemsShared
@@ -259,7 +259,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapGreenItemsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Green item sharing set to {WrapGreenItemsShared}.");
+                Debug.Log($"Green item sharing set to {WrapGreenItemsShared.Value}.");
         }
 
         // RedItemsShared
@@ -270,7 +270,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapRedItemsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Red item sharing set to {WrapRedItemsShared}.");
+                Debug.Log($"Red item sharing set to {WrapRedItemsShared.Value}.");
         }
 
         // LunarItemsShared
@@ -281,7 +281,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapLunarItemsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Lunar item sharing set to {WrapLunarItemsShared}.");
+                Debug.Log($"Lunar item sharing set to {WrapLunarItemsShared.Value}.");
         }
 
         // BossItemsShared
@@ -292,7 +292,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapBossItemsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Boss item sharing set to {WrapBossItemsShared}.");
+                Debug.Log($"Boss item sharing set to {WrapBossItemsShared.Value}.");
         }
 
         // QueensGlandsShared
@@ -303,7 +303,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapQueensGlandsShared))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Queens Gland sharing set to {WrapQueensGlandsShared}.");
+                Debug.Log($"Queens Gland sharing set to {WrapQueensGlandsShared.Value}.");
         }
 
         // PrinterCauldronFix
@@ -314,7 +314,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapPrinterCauldronFixEnabled))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Printer and cauldron fix set to {WrapPrinterCauldronFixEnabled}.");
+                Debug.Log($"Printer and cauldron fix set to {WrapPrinterCauldronFixEnabled.Value}.");
         }
 
         // DisablePlayerScaling
@@ -325,7 +325,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapOverridePlayerScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Player scaling disable set to {WrapOverridePlayerScalingEnabled}.");
+                Debug.Log($"Player scaling disable set to {WrapOverridePlayerScalingEnabled.Value}.");
         }
 
         // InteractablesCredit
@@ -336,7 +336,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapInteractablesCredit))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Interactables credit set to {WrapInteractablesCredit}.");
+                Debug.Log($"Interactables credit set to {WrapInteractablesCredit.Value}.");
         }
 
         // DisableBossLootScaling
@@ -348,7 +348,7 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
             {
-                Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled}.");
+                Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled.Value}.");
                 Hooks.FixBoss();
             }
         }
@@ -362,7 +362,7 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
             {
-                Debug.Log($"Boss loot credit set to {WrapBossLootCredit}.");
+                Debug.Log($"Boss loot credit set to {WrapBossLootCredit.Value}.");
                 Hooks.FixBoss();
             }       
         }
@@ -375,7 +375,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapDeadPlayersGetItems))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Boss loot scaling disable set to {WrapDeadPlayersGetItems}.");
+                Debug.Log($"Boss loot scaling disable set to {WrapDeadPlayersGetItems.Value}.");
         }
     }
 }
