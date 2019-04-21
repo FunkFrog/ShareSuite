@@ -62,7 +62,7 @@ namespace ShareSuite
             Hooks.DisableInteractablesScaling();
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
-            Hooks.FixBoss();
+            //Hooks.FixBoss(); shouldnt run here
             Hooks.BrittleCrownHook();
         }
 
