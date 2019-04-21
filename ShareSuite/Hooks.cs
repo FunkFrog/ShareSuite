@@ -147,19 +147,22 @@ namespace ShareSuite
 
         public static void FixBoss()
         {
-            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
-            {
-                var c = new ILCursor(il).Goto(99);
-                c.Remove();
-                if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
+            On.RoR2.BossGroup.OnCharacterDeathCallback += (orig, self, report) => {
+                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
                 {
-                    c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value); // only works when it's a value
-                }
-                else
-                {
-                    c.Emit(OpCodes.Ldc_I4,
-                        Run.instance.participatingPlayerCount); // standard, runs on every level start
-                }
+                    var c = new ILCursor(il).Goto(99);
+                    c.Remove();
+                    if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
+                    {
+                        c.Emit(OpCodes.Ldc_I4, ShareSuite.WrapBossLootCredit.Value); // only works when it's a value
+                    }
+                    else
+                    {
+                        c.Emit(OpCodes.Ldc_I4,
+                            Run.instance.participatingPlayerCount); // standard, runs on every level start
+                    }
+                };
+                orig(self, report);
             };
         }
 

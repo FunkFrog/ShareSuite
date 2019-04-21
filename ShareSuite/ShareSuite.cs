@@ -62,7 +62,7 @@ namespace ShareSuite
             Hooks.DisableInteractablesScaling();
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
-            //Hooks.FixBoss(); shouldnt run here
+            Hooks.FixBoss();
             Hooks.BrittleCrownHook();
         }
 
@@ -349,21 +349,19 @@ namespace ShareSuite
             else
             {
                 Debug.Log($"Boss loot scaling disable set to {WrapOverrideBossLootScalingEnabled.Value}.");
-                Hooks.FixBoss();
             }
         }
 
         // BossLootCredit
         [ConCommand(commandName = "ss_BossLootCredit", flags = ConVarFlags.None,
             helpText = "Modifies amount of boss item drops.")]
-        private static void CCBossLootCredit(ConCommandArgs args)
+        private static void CcBossLootCredit(ConCommandArgs args)
         {
             if (args.Count != 1 || !TryParseIntoConfig(args[0], WrapBossLootCredit))
                 Debug.Log("Invalid arguments.");
             else
             {
                 Debug.Log($"Boss loot credit set to {WrapBossLootCredit.Value}.");
-                Hooks.FixBoss();
             }       
         }
 
