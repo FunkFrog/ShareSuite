@@ -184,21 +184,21 @@ namespace ShareSuite
                         {
                             player.inventory.GiveItem(item);
 
-                            uint pickupQuantity = 1u;
-                            if (player.inventory)
-                            {
-                                if (item != ItemIndex.None)
-                                {
-                                    pickupQuantity = (uint)player.inventory.GetItemCount(item);
-                                }
-                            }
+                        //    uint pickupQuantity = 1u;
+                        //    if (player.inventory)
+                        //    {
+                        //        if (item != ItemIndex.None)
+                        //        {
+                        //            pickupQuantity = (uint)player.inventory.GetItemCount(item);
+                        //        }
+                        //    }
 
-                            var pickmsg = Reflection.GetNestedType<GenericPickupController>("PickupMessage");
-                            var msg = pickmsg.Instantiate();
+                        //    var pickmsg = Reflection.GetNestedType<GenericPickupController>("PickupMessage");
+                        //    var msg = pickmsg.Instantiate();
 
-                            msg.SetFieldValue("masterGameObject", player.gameObject);
-                            msg.SetFieldValue("pickupIndex", self.pickupIndex);
-                            msg.SetFieldValue("pickupQuantity", pickupQuantity);
+                        //    msg.SetFieldValue("masterGameObject", player.gameObject);
+                        //    msg.SetFieldValue("pickupIndex", self.pickupIndex);
+                        //    msg.SetFieldValue("pickupQuantity", pickupQuantity);
                         }
                     }
 

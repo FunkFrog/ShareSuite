@@ -27,14 +27,15 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ### TO-DO
 
-Money Sharing 
+Money Sharing
 
 - Check crowdfunder properly.
 
-Extra Features 
+Extra Features
 
 - Custom Chat Messages
 - Shared Equipment
+- Other loot distribution options
 
 ---
 
@@ -118,7 +119,7 @@ You can also set settings in-game with the commands listed below.
 
 `How do I use the in-game configuration GUI?`
 
-*Please install [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary), press* `shift + f10` *while in a game, and navigate to the* `Settings` *tab.*
+*Please install [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary), press* `ctrl + f10` *while in a game, and navigate to the* `Settings` *tab.*
 
 ---
 
@@ -171,11 +172,17 @@ Creators of these mods: If you are open to collaborate with us, we'd love to wor
 
 ### Changelog
 
+`1.6.4` - Fixed a cil error on startup.
+
+`1.6.3` - Fixed a README typo.
+
+`1.6.2` - Fixed bug where explosions would catapult you across the map. (Thanks to RookieCookie for reporting this bug!)
+
 `1.6.1` - Brittle Crown no longer de-syncs shared money.
 
 `1.6.0` - [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) v2.0.4+ now integrates directly with ShareSuite to give you an easy config GUI! If you wish to use this feature, download [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/)! Activating teleporters when money is shared now splits your money properly between players so you don't get an unintended boost of xp. Clients now sync their money balance with the host on map start for optimal compatibility with other mods.
 
-`1.5.2` - Fixed a conditional that kept boss loot scaling from ever activating. Removed a hard coded testing number that was unintentionally left in the code. (Thanks to jkbbwr for finding these two bugs)!
+`1.5.2` - Fixed a conditional that kept boss loot scaling from ever activating. Removed a hard coded testing number that was unintentionally left in the code. (Thanks to jkbbwr for finding these two bugs!)
 New & Improved README! Now with a fancy table (that doesn't really work on the site yet but that's okay.)
 
 `1.5.1` - Boss Loot Drop scalar now features live update support!
