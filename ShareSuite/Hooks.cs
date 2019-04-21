@@ -121,6 +121,7 @@ namespace ShareSuite
         {
             On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
             {
+                orig(self);
                 FixBoss();
                 SyncMoney();
                 if (!ShareSuite.WrapModIsEnabled.Value || !ShareSuite.WrapOverridePlayerScalingEnabled.Value)
@@ -132,7 +133,6 @@ namespace ShareSuite
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
-                orig(self);
             };
         }
 
