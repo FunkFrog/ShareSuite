@@ -40,7 +40,7 @@ namespace ShareSuite
             var rawPieces = ItemBlacklist.Value.Split(',');
             foreach(var piece in rawPieces)
             {
-                if(int.TryParse(piece, out int itemNum)){
+                if(int.TryParse(piece, out var itemNum)){
                     blacklist.Add(itemNum);
                 }
             }
