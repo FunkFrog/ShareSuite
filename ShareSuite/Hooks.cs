@@ -47,7 +47,7 @@ namespace ShareSuite
                 var preDamageMoney = self.body.master.money;
                 
                 orig(self, info);
-
+ 
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
