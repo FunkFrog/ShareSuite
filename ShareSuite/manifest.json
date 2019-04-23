@@ -1,0 +1,9 @@
+{
+  "name": "ShareSuite",
+  "version_number": "1.7.2",
+  "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
+  "description": "Share gear between all living members of your party - Completely customisable.",
+  "dependencies": [
+    "bbepis-BepInExPack-1.3.1"
+  ]
+}
