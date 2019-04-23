@@ -85,12 +85,13 @@ namespace ShareSuite
             _availableSettings.Add(ShareSuite.BossItemsShared);
             _availableSettings.Add(ShareSuite.QueensGlandsShared);
             _availableSettings.Add(ShareSuite.PrinterCauldronFixEnabled);
-            _availableSettings.Add(ShareSuite.OverridePlayerScalingEnabled);
-            _availableSettings.Add(ShareSuite.OverrideBossLootScalingEnabled);
             _availableSettings.Add(ShareSuite.DeadPlayersGetItems);
-            _availableSettings.Add(ShareSuite.MoneyScalar);
+            _availableSettings.Add(ShareSuite.OverridePlayerScalingEnabled);
             _availableSettings.Add(ShareSuite.InteractablesCredit);
+            _availableSettings.Add(ShareSuite.OverrideBossLootScalingEnabled);
             _availableSettings.Add(ShareSuite.BossLootCredit);
+            _availableSettings.Add(ShareSuite.MoneyScalarEnabled);
+            _availableSettings.Add(ShareSuite.MoneyScalar);
             _availableSettings.Add(ShareSuite.ItemBlacklist);
 
             _bannedItems = ShareSuite.GetItemBlackList();
@@ -99,7 +100,7 @@ namespace ShareSuite
         private static void InitItemList()
         {
             _itemsByRarity = new List<ItemIndex>();
-            foreach (ItemIndex itemIndex in ItemCatalog.allItems)
+            foreach (var itemIndex in ItemCatalog.allItems)
             {
                 var itemDef = ItemCatalog.GetItemDef(itemIndex);
                 if (itemDef.tier == ItemTier.NoTier) continue;

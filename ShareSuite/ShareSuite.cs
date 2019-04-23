@@ -18,8 +18,6 @@ namespace ShareSuite
     {
         public static ConfigWrapper<bool> ModIsEnabled;
         public static ConfigWrapper<bool> MoneyIsShared;
-        public static ConfigWrapper<bool> MoneyScalarEnabled;
-        public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<bool> WhiteItemsShared;
         public static ConfigWrapper<bool> GreenItemsShared;
         public static ConfigWrapper<bool> RedItemsShared;
@@ -27,11 +25,13 @@ namespace ShareSuite
         public static ConfigWrapper<bool> BossItemsShared;
         public static ConfigWrapper<bool> QueensGlandsShared;
         public static ConfigWrapper<bool> PrinterCauldronFixEnabled;
+        public static ConfigWrapper<bool> DeadPlayersGetItems;
         public static ConfigWrapper<bool> OverridePlayerScalingEnabled;
         public static ConfigWrapper<int> InteractablesCredit;
         public static ConfigWrapper<bool> OverrideBossLootScalingEnabled;
         public static ConfigWrapper<int> BossLootCredit;
-        public static ConfigWrapper<bool> DeadPlayersGetItems;
+        public static ConfigWrapper<bool> MoneyScalarEnabled;
+        public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist;
 
         public static HashSet<int> GetItemBlackList()
@@ -102,24 +102,11 @@ namespace ShareSuite
                 "Toggles mod.",
                 true);
 
-            // Add config options for all settings
             MoneyIsShared = Config.Wrap(
                 "Settings",
                 "MoneyShared",
                 "Toggles money sharing.",
                 false);
-            
-            MoneyScalarEnabled = Config.Wrap(
-                "Settings",
-                "MoneyScalarEnabled",
-                "Toggles money scalar.",
-                false);
-
-            MoneyScalar = Config.Wrap(
-                "Settings",
-                "MoneyScalar",
-                "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1);
 
             WhiteItemsShared = Config.Wrap(
                 "Settings",
@@ -163,6 +150,12 @@ namespace ShareSuite
                 "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
                 " dropping it on the ground.",
                 true);
+            
+            DeadPlayersGetItems = Config.Wrap(
+                "Balance",
+                "DeadPlayersGetItems",
+                "Toggles item sharing for dead players.",
+                false);
 
             OverridePlayerScalingEnabled = Config.Wrap(
                 "Balance",
@@ -188,11 +181,17 @@ namespace ShareSuite
                 "Specifies the amount of boss items dropped when boss drop override is true.",
                 1);
 
-            DeadPlayersGetItems = Config.Wrap(
-                "Balance",
-                "DeadPlayersGetItems",
-                "Toggles item sharing for dead players.",
+            MoneyScalarEnabled = Config.Wrap(
+                "Settings",
+                "MoneyScalarEnabled",
+                "Toggles money scalar.",
                 false);
+
+            MoneyScalar = Config.Wrap(
+                "Settings",
+                "MoneyScalar",
+                "Modifies player count used in calculations of gold earned when money sharing is on.",
+                1);
 
             ItemBlacklist = Config.Wrap(
                 "Settings",
