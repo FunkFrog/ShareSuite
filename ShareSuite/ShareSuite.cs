@@ -62,8 +62,9 @@ namespace ShareSuite
             Hooks.DisableInteractablesScaling();
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
-            Hooks.FixBoss();
             Hooks.BrittleCrownHook();
+            Hooks.PickupFix();
+            Hooks.FixBoss();
         }
 
         public class CommandHelper

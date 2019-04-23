@@ -10,6 +10,8 @@ namespace ShareSuite
 {
     public static class Hooks
     {
+        static int bossItems = 1;
+        static bool sendPickup = true;
         static MethodInfo sendPickupMessage =
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
                 BindingFlags.NonPublic | BindingFlags.Static);
@@ -18,7 +20,16 @@ namespace ShareSuite
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (self.isCharged && ShareSuite.MoneyIsShared.Value)
+                if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
+                {
+                    bossItems = ShareSuite.WrapBossLootCredit.Value;
+                }
+                else
+                {
+                    bossItems = Run.instance.participatingPlayerCount;
+                }
+
+                if (self.isCharged && ShareSuite.WrapMoneyIsShared.Value)
                 {
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
@@ -108,6 +119,15 @@ namespace ShareSuite
             };
         }
 
+        public static void PickupFix()
+        {
+            On.RoR2.Chat.AddPickupMessage += (orig, body, pickupToken, pickupColor, pickupQuantity) =>
+            {
+                if (sendPickup)
+                    orig(body, pickupToken, pickupColor, pickupQuantity);
+            };
+        }
+
         private static void GiveAllScaledMoney(float goldReward)
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -122,17 +142,12 @@ namespace ShareSuite
             On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
             {
                 orig(self);
-                FixBoss();
-                SyncMoney();
-                if (!ShareSuite.ModIsEnabled.Value || !ShareSuite.OverridePlayerScalingEnabled.Value)
-
-                {
-                    orig(self);
-                    return;
-                }
+                if (!ShareSuite.WrapModIsEnabled.Value) return;
 
                 // Set interactables budget to 200 * config player count (normal calculation)
-                Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                if (ShareSuite.WrapOverridePlayerScalingEnabled.Value)
+                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
+                SyncMoney();
             };
         }
 
@@ -147,24 +162,11 @@ namespace ShareSuite
 
         public static void FixBoss()
         {
-            On.RoR2.BossGroup.OnCharacterDeathCallback += (orig, self, report) => {
-                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
-                {
-                    var c = new ILCursor(il).Goto(99);
-                    c.Remove();
-                    if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
-                    {
-                        // Needs to reference a getter
-                        c.Emit(OpCodes.Ldc_I4, ShareSuite.BossLootCredit.Value);
-                    }
-                    else
-                    {
-                        c.Emit(OpCodes.Ldc_I4,
-                            // Needs to reference a getter
-                            Run.instance.participatingPlayerCount);
-                    }
-                };
-                orig(self, report);
+            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            {
+                var c = new ILCursor(il).Goto(77);
+                c.Remove();
+                c.EmitDelegate<Func<Run, int>>((f) => { return bossItems; });
             };
         }
 
@@ -188,22 +190,9 @@ namespace ShareSuite
                         if (player.alive || ShareSuite.DeadPlayersGetItems.Value)
                         {
                             player.inventory.GiveItem(item);
-
-                        //    uint pickupQuantity = 1u;
-                        //    if (player.inventory)
-                        //    {
-                        //        if (item != ItemIndex.None)
-                        //        {
-                        //            pickupQuantity = (uint)player.inventory.GetItemCount(item);
-                        //        }
-                        //    }
-
-                        //    var pickmsg = Reflection.GetNestedType<GenericPickupController>("PickupMessage");
-                        //    var msg = pickmsg.Instantiate();
-
-                        //    msg.SetFieldValue("masterGameObject", player.gameObject);
-                        //    msg.SetFieldValue("pickupIndex", self.pickupIndex);
-                        //    msg.SetFieldValue("pickupQuantity", pickupQuantity);
+                            sendPickup = false;
+                            sendPickupMessage.Invoke(null, new object[] { player, self.pickupIndex });
+                            sendPickup = true;
                         }
                     }
 
