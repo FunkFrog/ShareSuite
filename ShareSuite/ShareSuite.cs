@@ -13,11 +13,12 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.6.6")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.7.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled;
         public static ConfigWrapper<bool> MoneyIsShared;
+        public static ConfigWrapper<bool> MoneyScalarEnabled;
         public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<bool> WhiteItemsShared;
         public static ConfigWrapper<bool> GreenItemsShared;
@@ -59,12 +60,12 @@ namespace ShareSuite
             Hooks.OnGrantItem();
             Hooks.OnShopPurchase();
             Hooks.OnPurchaseDrop();
-            Hooks.DisableInteractablesScaling();
+            Hooks.OverrideInteractablesScaling();
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
             Hooks.BrittleCrownHook();
             Hooks.PickupFix();
-            Hooks.FixBoss();
+            Hooks.OverrideBossScaling();
         }
 
         public class CommandHelper
@@ -106,6 +107,12 @@ namespace ShareSuite
                 "Settings",
                 "MoneyShared",
                 "Toggles money sharing.",
+                false);
+            
+            MoneyScalarEnabled = Config.Wrap(
+                "Settings",
+                "MoneyScalarEnabled",
+                "Toggles money scalar.",
                 false);
 
             MoneyScalar = Config.Wrap(
@@ -228,6 +235,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Money sharing set to {MoneyIsShared.Value}.");
+        }
+        
+        // MoneyScalarEnabled
+        [ConCommand(commandName = "ss_MoneyScalarEnabled", flags = ConVarFlags.None,
+            helpText = "Modifies whether the money scalar is enabled.")]
+        private static void CcMoneyScalarEnabled(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], MoneyScalarEnabled))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Money scaling toggle set to {MoneyScalarEnabled.Value}.");
         }
 
         // MoneyScalar
