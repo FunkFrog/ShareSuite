@@ -46,7 +46,7 @@ namespace ShareSuite
             {
                 if (modDetailsType == null || frogtownSharedType == null) return;
                 //Will be set back to true by the manager when it initializes
-                ShareSuite.WrapModIsEnabled.Value = false;
+                ShareSuite.ModIsEnabled.Value = false;
 
                 var obj = Activator.CreateInstance(modDetailsType, "com.funkfrog_sipondo.sharesuite");
                 obj.SetFieldValue("githubAuthor", "FunkFrog");
@@ -56,7 +56,7 @@ namespace ShareSuite
                 obj.SetFieldValue("OnGUI", new UnityAction(() => { OnSettingsGui(); }));
                 obj.SetFieldValue("afterToggle", new UnityAction(() =>
                 {
-                    ShareSuite.WrapModIsEnabled.Value = obj.GetPropertyValue<bool>("enabled");
+                    ShareSuite.ModIsEnabled.Value = obj.GetPropertyValue<bool>("enabled");
                     config.Save();
                 }));
 
@@ -77,21 +77,21 @@ namespace ShareSuite
             //Build list of settings that can be controlled in the UI
             _availableSettings = new List<object>();
 
-            _availableSettings.Add(ShareSuite.WrapMoneyIsShared);
-            _availableSettings.Add(ShareSuite.WrapWhiteItemsShared);
-            _availableSettings.Add(ShareSuite.WrapGreenItemsShared);
-            _availableSettings.Add(ShareSuite.WrapRedItemsShared);
-            _availableSettings.Add(ShareSuite.WrapLunarItemsShared);
-            _availableSettings.Add(ShareSuite.WrapBossItemsShared);
-            _availableSettings.Add(ShareSuite.WrapQueensGlandsShared);
-            _availableSettings.Add(ShareSuite.WrapPrinterCauldronFixEnabled);
-            _availableSettings.Add(ShareSuite.WrapOverridePlayerScalingEnabled);
-            _availableSettings.Add(ShareSuite.WrapOverrideBossLootScalingEnabled);
-            _availableSettings.Add(ShareSuite.WrapDeadPlayersGetItems);
-            _availableSettings.Add(ShareSuite.WrapMoneyScalar);
-            _availableSettings.Add(ShareSuite.WrapInteractablesCredit);
-            _availableSettings.Add(ShareSuite.WrapBossLootCredit);
-            _availableSettings.Add(ShareSuite.WrapItemBlacklist);
+            _availableSettings.Add(ShareSuite.MoneyIsShared);
+            _availableSettings.Add(ShareSuite.WhiteItemsShared);
+            _availableSettings.Add(ShareSuite.GreenItemsShared);
+            _availableSettings.Add(ShareSuite.RedItemsShared);
+            _availableSettings.Add(ShareSuite.LunarItemsShared);
+            _availableSettings.Add(ShareSuite.BossItemsShared);
+            _availableSettings.Add(ShareSuite.QueensGlandsShared);
+            _availableSettings.Add(ShareSuite.PrinterCauldronFixEnabled);
+            _availableSettings.Add(ShareSuite.OverridePlayerScalingEnabled);
+            _availableSettings.Add(ShareSuite.OverrideBossLootScalingEnabled);
+            _availableSettings.Add(ShareSuite.DeadPlayersGetItems);
+            _availableSettings.Add(ShareSuite.MoneyScalar);
+            _availableSettings.Add(ShareSuite.InteractablesCredit);
+            _availableSettings.Add(ShareSuite.BossLootCredit);
+            _availableSettings.Add(ShareSuite.ItemBlacklist);
 
             _bannedItems = ShareSuite.GetItemBlackList();
         }
