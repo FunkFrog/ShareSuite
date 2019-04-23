@@ -64,6 +64,7 @@ namespace ShareSuite
             Hooks.SplitTpMoney();
             Hooks.FixBoss();
             Hooks.BrittleCrownHook();
+            Hooks.PickupFix();
         }
 
         public class CommandHelper

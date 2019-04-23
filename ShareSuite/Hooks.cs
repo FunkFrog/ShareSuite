@@ -10,6 +10,7 @@ namespace ShareSuite
 {
     public static class Hooks
     {
+        static bool sendPickup = true;
         static MethodInfo sendPickupMessage =
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
                 BindingFlags.NonPublic | BindingFlags.Static);
@@ -108,6 +109,15 @@ namespace ShareSuite
             };
         }
 
+        public static void PickupFix()
+        {
+            On.RoR2.Chat.AddPickupMessage += (orig, body, pickupToken, pickupColor, pickupQuantity) =>
+            {
+                if (sendPickup)
+                    orig(body, pickupToken, pickupColor, pickupQuantity);
+            };
+        }
+
         private static void GiveAllScaledMoney(float goldReward)
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -188,22 +198,9 @@ namespace ShareSuite
                         if (player.alive || ShareSuite.DeadPlayersGetItems.Value)
                         {
                             player.inventory.GiveItem(item);
-
-                        //    uint pickupQuantity = 1u;
-                        //    if (player.inventory)
-                        //    {
-                        //        if (item != ItemIndex.None)
-                        //        {
-                        //            pickupQuantity = (uint)player.inventory.GetItemCount(item);
-                        //        }
-                        //    }
-
-                        //    var pickmsg = Reflection.GetNestedType<GenericPickupController>("PickupMessage");
-                        //    var msg = pickmsg.Instantiate();
-
-                        //    msg.SetFieldValue("masterGameObject", player.gameObject);
-                        //    msg.SetFieldValue("pickupIndex", self.pickupIndex);
-                        //    msg.SetFieldValue("pickupQuantity", pickupQuantity);
+                            sendPickup = false;
+                            sendPickupMessage.Invoke(null, new object[] { player, self.pickupIndex });
+                            sendPickup = true;
                         }
                     }
 
