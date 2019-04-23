@@ -10,6 +10,7 @@ namespace ShareSuite
 {
     public static class Hooks
     {
+        static int bossItems = 1;
         static bool sendPickup = true;
         static MethodInfo sendPickupMessage =
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
@@ -19,7 +20,16 @@ namespace ShareSuite
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (self.isCharged && ShareSuite.MoneyIsShared.Value)
+                if (ShareSuite.WrapModIsEnabled.Value && ShareSuite.WrapOverrideBossLootScalingEnabled.Value)
+                {
+                    bossItems = ShareSuite.WrapBossLootCredit.Value;
+                }
+                else
+                {
+                    bossItems = Run.instance.participatingPlayerCount;
+                }
+
+                if (self.isCharged && ShareSuite.WrapMoneyIsShared.Value)
                 {
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
@@ -132,17 +142,12 @@ namespace ShareSuite
             On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
             {
                 orig(self);
-                FixBoss();
-                SyncMoney();
-                if (!ShareSuite.ModIsEnabled.Value || !ShareSuite.OverridePlayerScalingEnabled.Value)
-
-                {
-                    orig(self);
-                    return;
-                }
+                if (!ShareSuite.WrapModIsEnabled.Value) return;
 
                 // Set interactables budget to 200 * config player count (normal calculation)
-                Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                if (ShareSuite.WrapOverridePlayerScalingEnabled.Value)
+                    Reflection.SetFieldValue(self, "interactableCredit", 200 * ShareSuite.WrapInteractablesCredit.Value);
+                SyncMoney();
             };
         }
 
@@ -157,24 +162,11 @@ namespace ShareSuite
 
         public static void FixBoss()
         {
-            On.RoR2.BossGroup.OnCharacterDeathCallback += (orig, self, report) => {
-                IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
-                {
-                    var c = new ILCursor(il).Goto(99);
-                    c.Remove();
-                    if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
-                    {
-                        // Needs to reference a getter
-                        c.Emit(OpCodes.Ldc_I4, ShareSuite.BossLootCredit.Value);
-                    }
-                    else
-                    {
-                        c.Emit(OpCodes.Ldc_I4,
-                            // Needs to reference a getter
-                            Run.instance.participatingPlayerCount);
-                    }
-                };
-                orig(self, report);
+            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            {
+                var c = new ILCursor(il).Goto(77);
+                c.Remove();
+                c.EmitDelegate<Func<Run, int>>((f) => { return bossItems; });
             };
         }
 
