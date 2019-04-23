@@ -1,6 +1,6 @@
 [//]: # ( Why hello there! Welcome to the ShareSuite readme. Feel free to use this as a basis for your readme :) )
 
-# ShareSuite
+# ShareSuite [![Build Status](https://travis-ci.com/FunkFrog/RoR2SharedItems.svg?branch=master)](https://travis-ci.com/FunkFrog/RoR2SharedItems)
 #### By FunkFrog and Sipondo
 
 This mod has been developed out of frustration of the item distribution in Risk of Rain 2.
@@ -17,6 +17,8 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 - Compatible with 3D Printers and Cauldrons - each player may consume their own items to earn an item from the cauldron. These items are given directly to the purchaser so that it does not affect other players' items.
 
+- Money sharing + a gained money scalar.
+
 - Toggleable scaling of boss loot and interactables spawning for balance.
 
 - Configuration options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*).
@@ -27,15 +29,14 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ### TO-DO
 
-Money Sharing
+Money Sharing 
 
-- Check crowdfunder properly.
+- Check crowdfunder properly
 
-Extra Features
+Extra Features 
 
 - Custom Chat Messages
 - Shared Equipment
-- Other loot distribution options
 
 ---
 
@@ -59,7 +60,6 @@ You can also set settings in-game with the commands listed below.
 | :------------------------- | :-----------: | -------------------------: |
 | Mod Enabled                |          True |                 ss_Enabled |
 | Money is Shared            |         False |           ss_MoneyIsShared |
-| Money Scalar               |             1 |             ss_MoneyScalar |
 | White Items are Shared     |          True |        ss_WhiteItemsShared |
 | Green Items are Shared     |          True |        ss_GreenItemsShared |
 | Red Items are Shared       |          True |          ss_RedItemsShared |
@@ -67,11 +67,13 @@ You can also set settings in-game with the commands listed below.
 | Boss Items are Shared      |          True |         ss_BossItemsShared |
 | Queens Glands are Shared   |         False |      ss_QueensGlandsShared |
 | Dupe Fix                   |          True |      ss_PrinterCauldronFix |
+| Dead Players Get Items     |         False |     ss_DeadPlayersGetItems |
 | Override Player Scaling    |          True |   ss_OverridePlayerScaling |
 | Interactables Credit       |             1 |     ss_InteractablesCredit |
 | Override Boss Loot Scaling |          True | ss_OverrideBossLootScaling |
 | Boss Loot Credit           |             1 |          ss_BossLootCredit |
-| Dead Players Get Items     |         False |     ss_DeadPlayersGetItems |
+| Money Scalar Enabled       |         False |      ss_MoneyScalarEnabled |
+| Money Scalar               |             1 |             ss_MoneyScalar |
 | Blacklist                  |         Empty |                        N/A |
 
 ---
@@ -172,7 +174,17 @@ Creators of these mods: If you are open to collaborate with us, we'd love to wor
 
 ### Changelog
 
-`1.6.4` - Fixed a cil error on startup.
+`1.7.2` - Completion of config refactor. It should be easier to read and use now :)
+
+`1.7.1` - README fix. (whoops!)
+
+`1.7.0` - Fix of Boss Loot live update and rare chance for no interactables to spawn bug. Due to overwhelming use of the mod for the money scaling/sharing feature, we have separated the money scalar and the money sharing into two different toggle options. Have fun!
+
+`1.6.6` - Fixed a bug where console commands would spit out an object instead of the current command value when set. **Modified override config names, if you have changed these, you WILL have to set the new ones to the previous values.** Disable Boss Loot Scaling -> Override Boss Loot Scaling and Disable Player Scaling -> Override Player Scaling.
+
+`1.6.5` - Applied hotpatch to fix very rare cases of interactables not spawning at all also causing no teleporter to spawn. Will look into this bug further.
+
+`1.6.4` - Fixed an error on startup.
 
 `1.6.3` - Fixed a README typo.
 
