@@ -174,6 +174,16 @@ namespace ShareSuite
         }
 
 
+        private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
+        {
+            if (!NetworkServer.active) return;
+            if (self.currentEquipmentIndex == newEquipmentIndex) return;
+            var equipment = self.GetEquipment(0U);
+            var charges = equipment.charges;
+            if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
+            self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
+        }
+    
         public static void OnGrantItem()
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
