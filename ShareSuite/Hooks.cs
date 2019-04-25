@@ -184,6 +184,13 @@ namespace ShareSuite
             self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
         }
     
+        private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
+        {
+            if (characterMaster.bodyPrefab.name != "ToolbotBody") return;
+            SetEquipmentIndex(characterMaster.inventory, equip,
+                (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
+        }
+
         public static void OnGrantItem()
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
