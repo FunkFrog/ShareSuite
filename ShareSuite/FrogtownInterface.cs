@@ -81,6 +81,7 @@ namespace ShareSuite
             _availableSettings.Add(ShareSuite.WhiteItemsShared);
             _availableSettings.Add(ShareSuite.GreenItemsShared);
             _availableSettings.Add(ShareSuite.RedItemsShared);
+            _availableSettings.Add(ShareSuite.EquipmentShared);
             _availableSettings.Add(ShareSuite.LunarItemsShared);
             _availableSettings.Add(ShareSuite.BossItemsShared);
             _availableSettings.Add(ShareSuite.QueensGlandsShared);

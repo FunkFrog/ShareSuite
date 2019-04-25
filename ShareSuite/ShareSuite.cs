@@ -21,6 +21,7 @@ namespace ShareSuite
         public static ConfigWrapper<bool> WhiteItemsShared;
         public static ConfigWrapper<bool> GreenItemsShared;
         public static ConfigWrapper<bool> RedItemsShared;
+        public static ConfigWrapper<bool> EquipmentShared;
         public static ConfigWrapper<bool> LunarItemsShared;
         public static ConfigWrapper<bool> BossItemsShared;
         public static ConfigWrapper<bool> QueensGlandsShared;
@@ -125,6 +126,12 @@ namespace ShareSuite
                 "RedItemsShared",
                 "Toggles item sharing for legendary items.",
                 true);
+
+            EquipmentShared = Config.Wrap(
+                "Settings",
+                "EquipmentShared",
+                "Toggles item sharing for equipment.",
+                false);
 
             LunarItemsShared = Config.Wrap(
                 "Settings",
@@ -289,6 +296,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Red item sharing set to {RedItemsShared.Value}.");
+        }
+
+        // EquipmentShared
+        [ConCommand(commandName = "ss_EquipmentShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether equipment is shared or not.")]
+        private static void CcEquipmentShared(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], EquipmentShared))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Equipment sharing set to {EquipmentShared.Value}.");
         }
 
         // LunarItemsShared

@@ -325,9 +325,11 @@ namespace ShareSuite
         private static bool IsValidPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
+            var equip = pickup.equipmentIndex;
             return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
                    || IsGreenItem(item) && ShareSuite.GreenItemsShared.Value
                    || IsRedItem(item) && ShareSuite.RedItemsShared.Value
+                   || IsEquipment(equip) && ShareSuite.EquipmentShared.Value
                    || pickup.IsLunar() && ShareSuite.LunarItemsShared.Value
                    || IsBossItem(item) && ShareSuite.BossItemsShared.Value
                    || IsQueensGland(item) && ShareSuite.QueensGlandsShared.Value;
@@ -352,6 +354,11 @@ namespace ShareSuite
         public static bool IsRedItem(ItemIndex index)
         {
             return ItemCatalog.tier3ItemList.Contains(index);
+        }
+
+        public static bool IsEquipment(EquipmentIndex index)
+        {
+            return EquipmentCatalog.allEquipment.Contains(index);
         }
 
         public static bool IsBossItem(ItemIndex index)
