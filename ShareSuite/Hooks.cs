@@ -200,7 +200,7 @@ namespace ShareSuite
 
                 if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
-                    && IsValidPickup(self.pickupIndex)
+                    && IsValidItemPickup(self.pickupIndex)
                     && IsMultiplayer()
                     && ShareSuite.ModIsEnabled.Value)
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -329,7 +329,7 @@ namespace ShareSuite
                 Debug.Log("Cost type: " + costType);
                 
                 if (!IsMultiplayer()
-                    || !IsValidPickup(self.CurrentPickupIndex())
+                    || !IsValidItemPickup(self.CurrentPickupIndex())
                     || !ShareSuite.PrinterCauldronFixEnabled.Value
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostType.Money)
@@ -339,14 +339,24 @@ namespace ShareSuite
             };
         }
 
-        private static bool IsValidPickup(PickupIndex pickup)
+        /// <summary>
+        /// This function is currently ineffective, but may be later extended to quickly set a valiadtor
+        /// on equipments to narrow them down to a set of ranges beyond just blacklisting.
+        /// </summary>
+        /// <param name="pickup">Takes a PickupIndex that's a valid equipment.</param>
+        /// <returns>True if the given PickupIndex validates, otherwise false.</returns>
+        private static bool IsValidEquipmentPickup(PickupIndex pickup)
+        {
+            var equip = pickup.equipmentIndex;
+            return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
+        }
+
+        private static bool IsValidItemPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
-            var equip = pickup.equipmentIndex;
             return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
                    || IsGreenItem(item) && ShareSuite.GreenItemsShared.Value
                    || IsRedItem(item) && ShareSuite.RedItemsShared.Value
-                   || IsEquipment(equip) && ShareSuite.EquipmentShared.Value
                    || pickup.IsLunar() && ShareSuite.LunarItemsShared.Value
                    || IsBossItem(item) && ShareSuite.BossItemsShared.Value
                    || IsQueensGland(item) && ShareSuite.QueensGlandsShared.Value;
