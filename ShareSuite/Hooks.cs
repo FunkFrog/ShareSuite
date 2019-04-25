@@ -184,6 +184,35 @@ namespace ShareSuite
             self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
         }
     
+        public static void OnGrantEquipment()
+        {
+            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
+            {
+                var equip = self.pickupIndex.equipmentIndex;
+
+                if (!ShareSuite.GetItemBlackList().Contains((int) equip)
+                    && NetworkServer.active
+                    && IsValidEquipmentPickup(self.pickupIndex)
+                    && IsMultiplayer()
+                    && ShareSuite.ModIsEnabled.Value)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    {
+                        SyncToolbotEquip(player, ref equip);
+                        
+                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                        if (player.inventory == inventory) continue;
+                        
+                        player.inventory.SetEquipmentIndex(equip);
+                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
+                        SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
+                            new object[] {player, new PickupIndex(equip)});
+                    }
+
+                orig(self, body, inventory);
+            };
+        }
+
         private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
         {
             if (characterMaster.bodyPrefab.name != "ToolbotBody") return;

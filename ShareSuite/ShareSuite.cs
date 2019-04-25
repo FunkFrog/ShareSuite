@@ -59,6 +59,7 @@ namespace ShareSuite
             };
             // Register all the hooks
             Hooks.OnGrantItem();
+            Hooks.OnGrantEquipment();
             Hooks.OnShopPurchase();
             Hooks.OnPurchaseDrop();
             Hooks.OverrideInteractablesScaling();
