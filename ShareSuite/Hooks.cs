@@ -174,6 +174,52 @@ namespace ShareSuite
         }
 
 
+        private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
+        {
+            if (!NetworkServer.active) return;
+            if (self.currentEquipmentIndex == newEquipmentIndex) return;
+            var equipment = self.GetEquipment(0U);
+            var charges = equipment.charges;
+            if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
+            self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
+        }
+    
+        public static void OnGrantEquipment()
+        {
+            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
+            {
+                var equip = self.pickupIndex.equipmentIndex;
+
+                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
+                    && NetworkServer.active
+                    && IsValidEquipmentPickup(self.pickupIndex)
+                    && IsMultiplayer()
+                    && ShareSuite.ModIsEnabled.Value)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    {
+                        SyncToolbotEquip(player, ref equip);
+                        
+                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                        if (player.inventory == inventory) continue;
+                        
+                        player.inventory.SetEquipmentIndex(equip);
+                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
+                        SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
+                            new object[] {player, new PickupIndex(equip)});
+                    }
+
+                orig(self, body, inventory);
+            };
+        }
+
+        private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
+        {
+            if (characterMaster.bodyPrefab.name != "ToolbotBody") return;
+            SetEquipmentIndex(characterMaster.inventory, equip,
+                (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
+        }
+
         public static void OnGrantItem()
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
@@ -183,7 +229,7 @@ namespace ShareSuite
 
                 if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
-                    && IsValidPickup(self.pickupIndex)
+                    && IsValidItemPickup(self.pickupIndex)
                     && IsMultiplayer()
                     && ShareSuite.ModIsEnabled.Value)
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -312,7 +358,7 @@ namespace ShareSuite
                 Debug.Log("Cost type: " + costType);
                 
                 if (!IsMultiplayer()
-                    || !IsValidPickup(self.CurrentPickupIndex())
+                    || !IsValidItemPickup(self.CurrentPickupIndex())
                     || !ShareSuite.PrinterCauldronFixEnabled.Value
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostType.Money)
@@ -322,7 +368,19 @@ namespace ShareSuite
             };
         }
 
-        private static bool IsValidPickup(PickupIndex pickup)
+        /// <summary>
+        /// This function is currently ineffective, but may be later extended to quickly set a valiadtor
+        /// on equipments to narrow them down to a set of ranges beyond just blacklisting.
+        /// </summary>
+        /// <param name="pickup">Takes a PickupIndex that's a valid equipment.</param>
+        /// <returns>True if the given PickupIndex validates, otherwise false.</returns>
+        private static bool IsValidEquipmentPickup(PickupIndex pickup)
+        {
+            var equip = pickup.equipmentIndex;
+            return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
+        }
+
+        private static bool IsValidItemPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
             return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
@@ -352,6 +410,11 @@ namespace ShareSuite
         public static bool IsRedItem(ItemIndex index)
         {
             return ItemCatalog.tier3ItemList.Contains(index);
+        }
+
+        public static bool IsEquipment(EquipmentIndex index)
+        {
+            return EquipmentCatalog.allEquipment.Contains(index);
         }
 
         public static bool IsBossItem(ItemIndex index)

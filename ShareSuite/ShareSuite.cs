@@ -13,26 +13,28 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.7.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.7.2")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled;
         public static ConfigWrapper<bool> MoneyIsShared;
-        public static ConfigWrapper<bool> MoneyScalarEnabled;
-        public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<bool> WhiteItemsShared;
         public static ConfigWrapper<bool> GreenItemsShared;
         public static ConfigWrapper<bool> RedItemsShared;
+        public static ConfigWrapper<bool> EquipmentShared;
         public static ConfigWrapper<bool> LunarItemsShared;
         public static ConfigWrapper<bool> BossItemsShared;
         public static ConfigWrapper<bool> QueensGlandsShared;
         public static ConfigWrapper<bool> PrinterCauldronFixEnabled;
+        public static ConfigWrapper<bool> DeadPlayersGetItems;
         public static ConfigWrapper<bool> OverridePlayerScalingEnabled;
         public static ConfigWrapper<int> InteractablesCredit;
         public static ConfigWrapper<bool> OverrideBossLootScalingEnabled;
         public static ConfigWrapper<int> BossLootCredit;
-        public static ConfigWrapper<bool> DeadPlayersGetItems;
+        public static ConfigWrapper<bool> MoneyScalarEnabled;
+        public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist;
+        public static ConfigWrapper<string> EquipmentBlacklist;
 
         public static HashSet<int> GetItemBlackList()
         {
@@ -47,6 +49,14 @@ namespace ShareSuite
             return blacklist;
         }
 
+        public static HashSet<int> GetEquipmentBlackList()
+        {
+            var blacklist = new HashSet<int>();
+            var rawPieces = EquipmentBlacklist.Value.Split(',');
+            foreach (var index in rawPieces.Select(x => int.TryParse(x, out var i) ? i : -1)) blacklist.Add(index);
+            return blacklist;
+        }
+
         public ShareSuite()
         {
             InitWrap();
@@ -58,6 +68,7 @@ namespace ShareSuite
             };
             // Register all the hooks
             Hooks.OnGrantItem();
+            Hooks.OnGrantEquipment();
             Hooks.OnShopPurchase();
             Hooks.OnPurchaseDrop();
             Hooks.OverrideInteractablesScaling();
@@ -102,24 +113,11 @@ namespace ShareSuite
                 "Toggles mod.",
                 true);
 
-            // Add config options for all settings
             MoneyIsShared = Config.Wrap(
                 "Settings",
                 "MoneyShared",
                 "Toggles money sharing.",
                 false);
-            
-            MoneyScalarEnabled = Config.Wrap(
-                "Settings",
-                "MoneyScalarEnabled",
-                "Toggles money scalar.",
-                false);
-
-            MoneyScalar = Config.Wrap(
-                "Settings",
-                "MoneyScalar",
-                "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1);
 
             WhiteItemsShared = Config.Wrap(
                 "Settings",
@@ -138,6 +136,12 @@ namespace ShareSuite
                 "RedItemsShared",
                 "Toggles item sharing for legendary items.",
                 true);
+
+            EquipmentShared = Config.Wrap(
+                "Settings",
+                "EquipmentShared",
+                "Toggles item sharing for equipment.",
+                false);
 
             LunarItemsShared = Config.Wrap(
                 "Settings",
@@ -163,6 +167,12 @@ namespace ShareSuite
                 "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
                 " dropping it on the ground.",
                 true);
+            
+            DeadPlayersGetItems = Config.Wrap(
+                "Balance",
+                "DeadPlayersGetItems",
+                "Toggles item sharing for dead players.",
+                false);
 
             OverridePlayerScalingEnabled = Config.Wrap(
                 "Balance",
@@ -188,16 +198,28 @@ namespace ShareSuite
                 "Specifies the amount of boss items dropped when boss drop override is true.",
                 1);
 
-            DeadPlayersGetItems = Config.Wrap(
-                "Balance",
-                "DeadPlayersGetItems",
-                "Toggles item sharing for dead players.",
+            MoneyScalarEnabled = Config.Wrap(
+                "Settings",
+                "MoneyScalarEnabled",
+                "Toggles money scalar.",
                 false);
+
+            MoneyScalar = Config.Wrap(
+                "Settings",
+                "MoneyScalar",
+                "Modifies player count used in calculations of gold earned when money sharing is on.",
+                1);
 
             ItemBlacklist = Config.Wrap(
                 "Settings",
                 "ItemBlacklist",
                 "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
+                "");
+
+            EquipmentBlacklist = Config.Wrap(
+                "Settings",
+                "EquipmentBlacklist",
+                "Equipment (by index) that you do not want to share, comma seperated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
                 "");
         }
 
@@ -290,6 +312,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Red item sharing set to {RedItemsShared.Value}.");
+        }
+
+        // EquipmentShared
+        [ConCommand(commandName = "ss_EquipmentShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether equipment is shared or not.")]
+        private static void CcEquipmentShared(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], EquipmentShared))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Equipment sharing set to {EquipmentShared.Value}.");
         }
 
         // LunarItemsShared
