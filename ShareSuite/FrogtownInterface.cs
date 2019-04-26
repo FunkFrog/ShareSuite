@@ -14,7 +14,9 @@ namespace ShareSuite
         private static List<object> _availableSettings;
         private static Vector2 _scrollPos;
         private static HashSet<int> _bannedItems;
+        private static HashSet<int> _bannedEquipment;
         private static List<ItemIndex> _itemsByRarity;
+        private static List<EquipmentIndex> _equipment;
 
         public static void Init(ConfigFile config)
         {
@@ -64,6 +66,7 @@ namespace ShareSuite
                 if (register != null) register.Invoke(null, new[] {obj});
                 InitSettings();
                 InitItemList();
+                InitEquipmentList();
             }
             catch (Exception e)
             {
@@ -94,8 +97,10 @@ namespace ShareSuite
             _availableSettings.Add(ShareSuite.MoneyScalarEnabled);
             _availableSettings.Add(ShareSuite.MoneyScalar);
             _availableSettings.Add(ShareSuite.ItemBlacklist);
+            _availableSettings.Add(ShareSuite.EquipmentBlacklist);
 
             _bannedItems = ShareSuite.GetItemBlackList();
+            _bannedEquipment = ShareSuite.GetEquipmentBlackList();
         }
 
         private static void InitItemList()
@@ -112,6 +117,23 @@ namespace ShareSuite
                 var definitionA = ItemCatalog.GetItemDef(a);
                 var definitionB = ItemCatalog.GetItemDef(b);
                 return definitionA.tier.CompareTo(definitionB.tier);
+            });
+        }
+
+        private static void InitEquipmentList()
+        {
+            _equipment = new List<EquipmentIndex>();
+            foreach (var equipmentIndex in EquipmentCatalog.allEquipment)
+            {
+                var itemDef = EquipmentCatalog.GetEquipmentDef(equipmentIndex);
+                if (itemDef.equipmentIndex == EquipmentIndex.None) continue;
+                _equipment.Add(equipmentIndex);
+            }
+            _equipment.Sort((a, b) =>
+            {
+                var definitionA = EquipmentCatalog.GetEquipmentDef(a);
+                var definitionB = EquipmentCatalog.GetEquipmentDef(b);
+                return definitionA.equipmentIndex.CompareTo(definitionB.equipmentIndex);
             });
         }
 
@@ -153,36 +175,62 @@ namespace ShareSuite
                         GUILayout.EndHorizontal();
                         break;
                     }
-                    case ConfigWrapper<string> itemSetting:
+                    case ConfigWrapper<string> pickupSetting:
                     {
                         //banned item setting
-                        GUILayout.Label(new GUIContent(AddSpaces(itemSetting.Definition.Key), itemSetting.Definition.Description));
+                        GUILayout.Label(new GUIContent(AddSpaces(pickupSetting.Definition.Key), pickupSetting.Definition.Description));
                         _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(90));
                         GUILayout.BeginHorizontal();
-                        foreach (var itemIndex in _itemsByRarity)
-                        {
-                            var itemDef = ItemCatalog.GetItemDef(itemIndex);
-                            var name = Language.GetString(itemDef.nameToken);
-                            var isBanned = _bannedItems.Contains((int) itemDef.itemIndex);
-                            var oldcolor = GUI.backgroundColor;
-                            GUI.backgroundColor = isBanned ? Color.red : Color.white;
-                            var newIsBanned = GUILayout.Toggle(isBanned,
-                                new GUIContent(itemDef.pickupIconTexture, name), GUILayout.Width(64),
-                                GUILayout.Height(64));
-                            GUI.backgroundColor = oldcolor;
-                            if (isBanned == newIsBanned) continue;
-                            if (newIsBanned)
-                            {
-                                _bannedItems.Add((int) itemDef.itemIndex);
-                            }
-                            else
-                            {
-                                _bannedItems.Remove((int) itemDef.itemIndex);
-                            }
 
-                            itemSetting.Value = SetToStringList(_bannedItems);
-                            _config.Save();
-                        }
+                        bool isItemBlacklist = !pickupSetting.Definition.Description.ToLower().Contains("equipment");
+                        
+                        // Temporary switch for item/equipment blacklist
+                        if (isItemBlacklist)
+                            foreach (var itemIndex in _itemsByRarity)
+                            {
+                                var itemDef = ItemCatalog.GetItemDef(itemIndex);
+                                var name = Language.GetString(itemDef.nameToken);
+                                var isBanned = _bannedItems.Contains((int) itemDef.itemIndex);
+                                var oldcolor = GUI.backgroundColor;
+                                GUI.backgroundColor = isBanned ? Color.red : Color.white;
+                                var newIsBanned = GUILayout.Toggle(isBanned,
+                                    new GUIContent(itemDef.pickupIconTexture, name), GUILayout.Width(64),
+                                    GUILayout.Height(64));
+                                GUI.backgroundColor = oldcolor;
+                                if (isBanned == newIsBanned) continue;
+                                if (newIsBanned)
+                                {
+                                    _bannedItems.Add((int) itemDef.itemIndex);
+                                }
+                                else
+                                {
+                                    _bannedItems.Remove((int) itemDef.itemIndex);
+                                }
+
+                                pickupSetting.Value = SetToStringList(_bannedItems);
+                                _config.Save();
+                            }
+                        else
+                            foreach (var equipmentIndex in _equipment)
+                            {
+                                var equipmentDef = EquipmentCatalog.GetEquipmentDef(equipmentIndex);
+                                var name = Language.GetString(equipmentDef.nameToken);
+                                var isBanned = _bannedEquipment.Contains((int) equipmentDef.equipmentIndex);
+                                var oldcolor = GUI.backgroundColor;
+                                GUI.backgroundColor = isBanned ? Color.red : Color.white;
+                                var newIsBanned = GUILayout.Toggle(isBanned,
+                                    new GUIContent(equipmentDef.pickupIconTexture, name), GUILayout.Width(64),
+                                    GUILayout.Height(64));
+                                GUI.backgroundColor = oldcolor;
+                                
+                                if (isBanned == newIsBanned) continue;
+                                
+                                if (newIsBanned) _bannedEquipment.Add((int) equipmentDef.equipmentIndex);
+                                else _bannedEquipment.Remove((int) equipmentDef.equipmentIndex);
+                                
+                                pickupSetting.Value = SetToStringList(_bannedEquipment);
+                                _config.Save();
+                            }
 
                         GUILayout.EndHorizontal();
                         GUILayout.EndScrollView();
