@@ -190,7 +190,7 @@ namespace ShareSuite
             {
                 var equip = self.pickupIndex.equipmentIndex;
 
-                if (!ShareSuite.GetItemBlackList().Contains((int) equip)
+                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
                     && NetworkServer.active
                     && IsValidEquipmentPickup(self.pickupIndex)
                     && IsMultiplayer()

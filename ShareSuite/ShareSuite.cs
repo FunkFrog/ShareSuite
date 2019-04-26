@@ -34,6 +34,7 @@ namespace ShareSuite
         public static ConfigWrapper<bool> MoneyScalarEnabled;
         public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist;
+        public static ConfigWrapper<string> EquipmentBlacklist;
 
         public static HashSet<int> GetItemBlackList()
         {
@@ -45,6 +46,14 @@ namespace ShareSuite
                     blacklist.Add(itemNum);
                 }
             }
+            return blacklist;
+        }
+
+        public static HashSet<int> GetEquipmentBlackList()
+        {
+            var blacklist = new HashSet<int>();
+            var rawPieces = EquipmentBlacklist.Value.Split(',');
+            foreach (var index in rawPieces.Select(x => int.TryParse(x, out var i) ? i : -1)) blacklist.Add(index);
             return blacklist;
         }
 
@@ -205,6 +214,12 @@ namespace ShareSuite
                 "Settings",
                 "ItemBlacklist",
                 "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
+                "");
+
+            EquipmentBlacklist = Config.Wrap(
+                "Settings",
+                "EquipmentBlacklist",
+                "Equipment (by index) that you do not want to share, comma seperated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
                 "");
         }
 
