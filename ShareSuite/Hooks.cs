@@ -297,13 +297,14 @@ namespace ShareSuite
                             }
 
                             var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
-                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+                            var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
+                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
+                                                 shrineBloodBehavior.goldToPaidHpRatio);
                             
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
-
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
-                                                 0.5f);
+                                                 shrineBloodBehavior.goldToPaidHpRatio);
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
