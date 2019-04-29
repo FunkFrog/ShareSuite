@@ -122,14 +122,14 @@ namespace ShareSuite
             };
         }
 
-        public static void PickupFix()
+        /*public static void PickupFix()
         {
             On.RoR2.Chat.AddPickupMessage += (orig, body, pickupToken, pickupColor, pickupQuantity) =>
             {
                 if (_sendPickup)
                     orig(body, pickupToken, pickupColor, pickupQuantity);
             };
-        }
+        }*/
 
         private static void GiveAllScaledMoney(float goldReward)
         {
@@ -205,8 +205,8 @@ namespace ShareSuite
                         
                         player.inventory.SetEquipmentIndex(equip);
                         self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
-                        SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
-                            new object[] {player, new PickupIndex(equip)});
+                        /*SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
+                            new object[] {player, new PickupIndex(equip)});*/
                     }
 
                 orig(self, body, inventory);
@@ -238,9 +238,9 @@ namespace ShareSuite
                         if (player.inventory == inventory) continue;
                         if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
                         player.inventory.GiveItem(item);
-                        _sendPickup = false;
+                        /*_sendPickup = false;
                         SendPickupMessage.Invoke(null, new object[] {player, self.pickupIndex});
-                        _sendPickup = true;
+                        _sendPickup = true;*/
                     }
 
                 orig(self, body, inventory);

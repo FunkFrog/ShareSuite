@@ -75,7 +75,7 @@ namespace ShareSuite
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
             Hooks.BrittleCrownHook();
-            Hooks.PickupFix();
+            // Hooks.PickupFix();
             Hooks.OverrideBossScaling();
         }
 
