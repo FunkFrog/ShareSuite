@@ -13,6 +13,7 @@ namespace ShareSuite
         private static ConfigFile _config;
         private static List<object> _availableSettings;
         private static Vector2 _scrollPos;
+        private static Vector2 _scrollPos2;
         private static HashSet<int> _bannedItems;
         private static HashSet<int> _bannedEquipment;
         private static List<ItemIndex> _itemsByRarity;
@@ -177,15 +178,16 @@ namespace ShareSuite
                     }
                     case ConfigWrapper<string> pickupSetting:
                     {
+                        bool isItemBlacklist = !pickupSetting.Definition.Key.ToLower().Contains("equipment");
+                        
                         //banned item setting
                         GUILayout.Label(new GUIContent(AddSpaces(pickupSetting.Definition.Key), pickupSetting.Definition.Description));
-                        _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(90));
-                        GUILayout.BeginHorizontal();
 
-                        bool isItemBlacklist = !pickupSetting.Definition.Description.ToLower().Contains("equipment");
-                        
                         // Temporary switch for item/equipment blacklist
                         if (isItemBlacklist)
+                        {
+                            _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(90));
+                            GUILayout.BeginHorizontal();
                             foreach (var itemIndex in _itemsByRarity)
                             {
                                 var itemDef = ItemCatalog.GetItemDef(itemIndex);
@@ -210,7 +212,11 @@ namespace ShareSuite
                                 pickupSetting.Value = SetToStringList(_bannedItems);
                                 _config.Save();
                             }
+                        }
                         else
+                        {
+                            _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2, GUILayout.Height(90));
+                            GUILayout.BeginHorizontal();
                             foreach (var equipmentIndex in _equipment)
                             {
                                 var equipmentDef = EquipmentCatalog.GetEquipmentDef(equipmentIndex);
@@ -222,15 +228,16 @@ namespace ShareSuite
                                     new GUIContent(equipmentDef.pickupIconTexture, name), GUILayout.Width(64),
                                     GUILayout.Height(64));
                                 GUI.backgroundColor = oldcolor;
-                                
+
                                 if (isBanned == newIsBanned) continue;
-                                
+
                                 if (newIsBanned) _bannedEquipment.Add((int) equipmentDef.equipmentIndex);
                                 else _bannedEquipment.Remove((int) equipmentDef.equipmentIndex);
-                                
+
                                 pickupSetting.Value = SetToStringList(_bannedEquipment);
                                 _config.Save();
                             }
+                        }
 
                         GUILayout.EndHorizontal();
                         GUILayout.EndScrollView();
