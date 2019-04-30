@@ -74,23 +74,21 @@ namespace ShareSuite
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, info, victim) =>
             {
-                if (!ShareSuite.MoneyIsShared.Value
-                    || !info.attacker
-                    || !info.attacker.GetComponent<CharacterBody>())
+                if (!ShareSuite.MoneyIsShared.Value || !(bool) info.attacker ||
+                    !(bool) info.attacker.GetComponent<CharacterBody>() ||
+                    !(bool) info.attacker.GetComponent<CharacterBody>().master)
                 {
                     orig(self, info, victim);
                     return;
                 }
 
                 var body = info.attacker.GetComponent<CharacterBody>();
-
                 var preDamageMoney = body.master.money;
 
                 orig(self, info, victim);
 
-                if (!body.inventory) return;
-
-                if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
                     if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
