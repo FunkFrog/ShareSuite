@@ -11,7 +11,7 @@ namespace ShareSuite
     public static class Hooks
     {
         private static int _bossItems = 1;
-        private static bool _sendPickup = true;
+        // private static bool _sendPickup = true;
 
         private static readonly MethodInfo SendPickupMessage =
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
@@ -99,7 +99,7 @@ namespace ShareSuite
 
         public static void ModifyGoldReward()
         {
-            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
+            On.RoR2.DeathRewards.OnKilledServer += (orig, self, info) =>
             {
                 orig(self, info);
                 if (!ShareSuite.ModIsEnabled.Value
@@ -163,9 +163,9 @@ namespace ShareSuite
 
         public static void OverrideBossScaling()
         {
-            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            IL.RoR2.BossGroup.DropRewards += il => // Replace boss drops
             {
-                var c = new ILCursor(il).Goto(77);
+                var c = new ILCursor(il).Goto(1);
                 c.Remove();
                 c.EmitDelegate<Func<Run, int>>(f => _bossItems);
             };
@@ -254,10 +254,10 @@ namespace ShareSuite
                     orig(self, activator);
                     return;
                 }
-
+                
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
-
+                
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
@@ -266,7 +266,7 @@ namespace ShareSuite
                     //TODO add comments on what this does
                     switch (self.costType)
                     {
-                        case CostType.Money:
+                        case CostTypeIndex.Money:
                         {
                             orig(self, activator);
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -281,7 +281,7 @@ namespace ShareSuite
                             return;
                         }
 
-                        case CostType.PercentHealth:
+                        case CostTypeIndex.PercentHealth:
                         {
                             orig(self, activator);
                             var teamMaxHealth = 0;
@@ -328,9 +328,9 @@ namespace ShareSuite
                 var shop = self.GetComponent<ShopTerminalBehavior>();
 
                 // If the cost type is an item, give the user the item directly and send the pickup message
-                if (self.costType == CostType.WhiteItem
-                    || self.costType == CostType.GreenItem
-                    || self.costType == CostType.RedItem)
+                if (self.costType == CostTypeIndex.WhiteItem
+                    || self.costType == CostTypeIndex.GreenItem
+                    || self.costType == CostTypeIndex.RedItem)
                 {
                     var item = shop.CurrentPickupIndex().itemIndex;
                     inventory.GiveItem(item);
@@ -353,14 +353,14 @@ namespace ShareSuite
                 }
 
                 if (!NetworkServer.active) return;
+                
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
-                Debug.Log("Cost type: " + costType);
                 
                 if (!IsMultiplayer()
                     || !IsValidItemPickup(self.CurrentPickupIndex())
                     || !ShareSuite.PrinterCauldronFixEnabled.Value
                     || self.itemTier == ItemTier.Lunar
-                    || costType == CostType.Money)
+                    || costType == CostTypeIndex.Money)
                 {
                     orig(self);
                 }

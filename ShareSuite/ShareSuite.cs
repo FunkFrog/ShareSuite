@@ -13,7 +13,7 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.7.2")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.8.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled;
