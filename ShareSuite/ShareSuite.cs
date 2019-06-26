@@ -13,7 +13,7 @@ using UnityEngine;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.7.2")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.8.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled;
@@ -21,6 +21,7 @@ namespace ShareSuite
         public static ConfigWrapper<bool> WhiteItemsShared;
         public static ConfigWrapper<bool> GreenItemsShared;
         public static ConfigWrapper<bool> RedItemsShared;
+        public static ConfigWrapper<bool> EquipmentShared;
         public static ConfigWrapper<bool> LunarItemsShared;
         public static ConfigWrapper<bool> BossItemsShared;
         public static ConfigWrapper<bool> QueensGlandsShared;
@@ -33,6 +34,7 @@ namespace ShareSuite
         public static ConfigWrapper<bool> MoneyScalarEnabled;
         public static ConfigWrapper<int> MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist;
+        public static ConfigWrapper<string> EquipmentBlacklist;
 
         public static HashSet<int> GetItemBlackList()
         {
@@ -47,6 +49,14 @@ namespace ShareSuite
             return blacklist;
         }
 
+        public static HashSet<int> GetEquipmentBlackList()
+        {
+            var blacklist = new HashSet<int>();
+            var rawPieces = EquipmentBlacklist.Value.Split(',');
+            foreach (var index in rawPieces.Select(x => int.TryParse(x, out var i) ? i : -1)) blacklist.Add(index);
+            return blacklist;
+        }
+
         public ShareSuite()
         {
             InitWrap();
@@ -58,13 +68,14 @@ namespace ShareSuite
             };
             // Register all the hooks
             Hooks.OnGrantItem();
+            Hooks.OnGrantEquipment();
             Hooks.OnShopPurchase();
             Hooks.OnPurchaseDrop();
             Hooks.OverrideInteractablesScaling();
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
             Hooks.BrittleCrownHook();
-            Hooks.PickupFix();
+            // Hooks.PickupFix();
             Hooks.OverrideBossScaling();
         }
 
@@ -125,6 +136,12 @@ namespace ShareSuite
                 "RedItemsShared",
                 "Toggles item sharing for legendary items.",
                 true);
+
+            EquipmentShared = Config.Wrap(
+                "Settings",
+                "EquipmentShared",
+                "Toggles item sharing for equipment.",
+                false);
 
             LunarItemsShared = Config.Wrap(
                 "Settings",
@@ -197,6 +214,12 @@ namespace ShareSuite
                 "Settings",
                 "ItemBlacklist",
                 "Items (by index) that you do not want to share, comma seperated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
+                "");
+
+            EquipmentBlacklist = Config.Wrap(
+                "Settings",
+                "EquipmentBlacklist",
+                "Equipment (by index) that you do not want to share, comma seperated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-Equipment-names",
                 "");
         }
 
@@ -289,6 +312,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Red item sharing set to {RedItemsShared.Value}.");
+        }
+
+        // EquipmentShared
+        [ConCommand(commandName = "ss_EquipmentShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether equipment is shared or not.")]
+        private static void CcEquipmentShared(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], EquipmentShared))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Equipment sharing set to {EquipmentShared.Value}.");
         }
 
         // LunarItemsShared

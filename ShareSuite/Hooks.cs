@@ -11,7 +11,7 @@ namespace ShareSuite
     public static class Hooks
     {
         private static int _bossItems = 1;
-        private static bool _sendPickup = true;
+        // private static bool _sendPickup = true;
 
         private static readonly MethodInfo SendPickupMessage =
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
@@ -74,23 +74,21 @@ namespace ShareSuite
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, info, victim) =>
             {
-                if (!ShareSuite.MoneyIsShared.Value
-                    || !info.attacker
-                    || !info.attacker.GetComponent<CharacterBody>())
+                if (!ShareSuite.MoneyIsShared.Value || !(bool) info.attacker ||
+                    !(bool) info.attacker.GetComponent<CharacterBody>() ||
+                    !(bool) info.attacker.GetComponent<CharacterBody>().master)
                 {
                     orig(self, info, victim);
                     return;
                 }
 
                 var body = info.attacker.GetComponent<CharacterBody>();
-
                 var preDamageMoney = body.master.money;
 
                 orig(self, info, victim);
 
-                if (!body.inventory) return;
-
-                if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+                
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
                     if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
@@ -101,7 +99,7 @@ namespace ShareSuite
 
         public static void ModifyGoldReward()
         {
-            On.RoR2.DeathRewards.OnKilled += (orig, self, info) =>
+            On.RoR2.DeathRewards.OnKilledServer += (orig, self, info) =>
             {
                 orig(self, info);
                 if (!ShareSuite.ModIsEnabled.Value
@@ -122,14 +120,14 @@ namespace ShareSuite
             };
         }
 
-        public static void PickupFix()
+        /*public static void PickupFix()
         {
             On.RoR2.Chat.AddPickupMessage += (orig, body, pickupToken, pickupColor, pickupQuantity) =>
             {
                 if (_sendPickup)
                     orig(body, pickupToken, pickupColor, pickupQuantity);
             };
-        }
+        }*/
 
         private static void GiveAllScaledMoney(float goldReward)
         {
@@ -165,14 +163,60 @@ namespace ShareSuite
 
         public static void OverrideBossScaling()
         {
-            IL.RoR2.BossGroup.OnCharacterDeathCallback += il => // Replace boss drops
+            IL.RoR2.BossGroup.DropRewards += il => // Replace boss drops
             {
-                var c = new ILCursor(il).Goto(77);
+                var c = new ILCursor(il).Goto(1);
                 c.Remove();
                 c.EmitDelegate<Func<Run, int>>(f => _bossItems);
             };
         }
 
+
+        private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
+        {
+            if (!NetworkServer.active) return;
+            if (self.currentEquipmentIndex == newEquipmentIndex) return;
+            var equipment = self.GetEquipment(0U);
+            var charges = equipment.charges;
+            if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
+            self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
+        }
+    
+        public static void OnGrantEquipment()
+        {
+            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
+            {
+                var equip = self.pickupIndex.equipmentIndex;
+
+                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
+                    && NetworkServer.active
+                    && IsValidEquipmentPickup(self.pickupIndex)
+                    && IsMultiplayer()
+                    && ShareSuite.ModIsEnabled.Value)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    {
+                        SyncToolbotEquip(player, ref equip);
+                        
+                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                        if (player.inventory == inventory) continue;
+                        
+                        player.inventory.SetEquipmentIndex(equip);
+                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
+                        /*SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
+                            new object[] {player, new PickupIndex(equip)});*/
+                    }
+
+                orig(self, body, inventory);
+            };
+        }
+
+        private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
+        {
+            if (characterMaster.bodyPrefab.name != "ToolbotBody") return;
+            SetEquipmentIndex(characterMaster.inventory, equip,
+                (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
+        }
 
         public static void OnGrantItem()
         {
@@ -183,7 +227,7 @@ namespace ShareSuite
 
                 if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
-                    && IsValidPickup(self.pickupIndex)
+                    && IsValidItemPickup(self.pickupIndex)
                     && IsMultiplayer()
                     && ShareSuite.ModIsEnabled.Value)
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -192,9 +236,9 @@ namespace ShareSuite
                         if (player.inventory == inventory) continue;
                         if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
                         player.inventory.GiveItem(item);
-                        _sendPickup = false;
+                        /*_sendPickup = false;
                         SendPickupMessage.Invoke(null, new object[] {player, self.pickupIndex});
-                        _sendPickup = true;
+                        _sendPickup = true;*/
                     }
 
                 orig(self, body, inventory);
@@ -210,10 +254,10 @@ namespace ShareSuite
                     orig(self, activator);
                     return;
                 }
-
+                
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
-
+                
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
@@ -222,7 +266,7 @@ namespace ShareSuite
                     //TODO add comments on what this does
                     switch (self.costType)
                     {
-                        case CostType.Money:
+                        case CostTypeIndex.Money:
                         {
                             orig(self, activator);
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -237,7 +281,7 @@ namespace ShareSuite
                             return;
                         }
 
-                        case CostType.PercentHealth:
+                        case CostTypeIndex.PercentHealth:
                         {
                             orig(self, activator);
                             var teamMaxHealth = 0;
@@ -251,13 +295,14 @@ namespace ShareSuite
                             }
 
                             var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
-                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * 0.5f);
+                            var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
+                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
+                                                 shrineBloodBehavior.goldToPaidHpRatio);
                             
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
-
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
-                                                 0.5f);
+                                                 shrineBloodBehavior.goldToPaidHpRatio);
 
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
@@ -283,9 +328,9 @@ namespace ShareSuite
                 var shop = self.GetComponent<ShopTerminalBehavior>();
 
                 // If the cost type is an item, give the user the item directly and send the pickup message
-                if (self.costType == CostType.WhiteItem
-                    || self.costType == CostType.GreenItem
-                    || self.costType == CostType.RedItem)
+                if (self.costType == CostTypeIndex.WhiteItem
+                    || self.costType == CostTypeIndex.GreenItem
+                    || self.costType == CostTypeIndex.RedItem)
                 {
                     var item = shop.CurrentPickupIndex().itemIndex;
                     inventory.GiveItem(item);
@@ -308,21 +353,33 @@ namespace ShareSuite
                 }
 
                 if (!NetworkServer.active) return;
+                
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
-                Debug.Log("Cost type: " + costType);
                 
                 if (!IsMultiplayer()
-                    || !IsValidPickup(self.CurrentPickupIndex())
+                    || !IsValidItemPickup(self.CurrentPickupIndex())
                     || !ShareSuite.PrinterCauldronFixEnabled.Value
                     || self.itemTier == ItemTier.Lunar
-                    || costType == CostType.Money)
+                    || costType == CostTypeIndex.Money)
                 {
                     orig(self);
                 }
             };
         }
 
-        private static bool IsValidPickup(PickupIndex pickup)
+        /// <summary>
+        /// This function is currently ineffective, but may be later extended to quickly set a valiadtor
+        /// on equipments to narrow them down to a set of ranges beyond just blacklisting.
+        /// </summary>
+        /// <param name="pickup">Takes a PickupIndex that's a valid equipment.</param>
+        /// <returns>True if the given PickupIndex validates, otherwise false.</returns>
+        private static bool IsValidEquipmentPickup(PickupIndex pickup)
+        {
+            var equip = pickup.equipmentIndex;
+            return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
+        }
+
+        private static bool IsValidItemPickup(PickupIndex pickup)
         {
             var item = pickup.itemIndex;
             return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
@@ -352,6 +409,11 @@ namespace ShareSuite
         public static bool IsRedItem(ItemIndex index)
         {
             return ItemCatalog.tier3ItemList.Contains(index);
+        }
+
+        public static bool IsEquipment(EquipmentIndex index)
+        {
+            return EquipmentCatalog.allEquipment.Contains(index);
         }
 
         public static bool IsBossItem(ItemIndex index)

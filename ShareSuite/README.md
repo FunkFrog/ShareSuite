@@ -63,6 +63,7 @@ You can also set settings in-game with the commands listed below.
 | White Items are Shared     |          True |        ss_WhiteItemsShared |
 | Green Items are Shared     |          True |        ss_GreenItemsShared |
 | Red Items are Shared       |          True |          ss_RedItemsShared |
+| Equipment is shared        |          True |         ss_EquipmentShared |
 | Lunar Items are Shared     |         False |        ss_LunarItemsShared |
 | Boss Items are Shared      |          True |         ss_BossItemsShared |
 | Queens Glands are Shared   |         False |      ss_QueensGlandsShared |
