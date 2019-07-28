@@ -88,7 +88,6 @@ namespace ShareSuite
             _availableSettings.Add(ShareSuite.EquipmentShared);
             _availableSettings.Add(ShareSuite.LunarItemsShared);
             _availableSettings.Add(ShareSuite.BossItemsShared);
-            _availableSettings.Add(ShareSuite.QueensGlandsShared);
             _availableSettings.Add(ShareSuite.PrinterCauldronFixEnabled);
             _availableSettings.Add(ShareSuite.DeadPlayersGetItems);
             _availableSettings.Add(ShareSuite.OverridePlayerScalingEnabled);

@@ -47,6 +47,8 @@ namespace ShareSuite
         {
             On.RoR2.HealthComponent.TakeDamage += (orig, self, info) =>
             {
+                if (!NetworkServer.active) return;
+                
                 if (!ShareSuite.MoneyIsShared.Value
                     || !(bool) self.body
                     || !(bool) self.body.inventory)
@@ -368,7 +370,7 @@ namespace ShareSuite
         }
 
         /// <summary>
-        /// This function is currently ineffective, but may be later extended to quickly set a valiadtor
+        /// This function is currently ineffective, but may be later extended to quickly set a validator
         /// on equipments to narrow them down to a set of ranges beyond just blacklisting.
         /// </summary>
         /// <param name="pickup">Takes a PickupIndex that's a valid equipment.</param>
@@ -386,8 +388,7 @@ namespace ShareSuite
                    || IsGreenItem(item) && ShareSuite.GreenItemsShared.Value
                    || IsRedItem(item) && ShareSuite.RedItemsShared.Value
                    || pickup.IsLunar() && ShareSuite.LunarItemsShared.Value
-                   || IsBossItem(item) && ShareSuite.BossItemsShared.Value
-                   || IsQueensGland(item) && ShareSuite.QueensGlandsShared.Value;
+                   || IsBossItem(item) && ShareSuite.BossItemsShared.Value;
         }
 
         private static bool IsMultiplayer()
@@ -418,7 +419,10 @@ namespace ShareSuite
 
         public static bool IsBossItem(ItemIndex index)
         {
-            return index == ItemIndex.Knurl;
+            return index == ItemIndex.Knurl
+                || index == ItemIndex.SprintWisp
+                || index == ItemIndex.TitanGoldDuringTP
+                || index == ItemIndex.BeetleGland;
         }
 
         public static bool IsQueensGland(ItemIndex index)
