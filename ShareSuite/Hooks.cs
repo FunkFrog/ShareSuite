@@ -147,6 +147,7 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
+                var defaultCredit = self.GetFieldValue<int>("interactableCredit");
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
@@ -165,6 +166,7 @@ namespace ShareSuite
 
         public static void OverrideBossScaling()
         {
+            
             IL.RoR2.BossGroup.DropRewards += il => // Replace boss drops
             {
                 var c = new ILCursor(il).Goto(1);
@@ -358,9 +360,9 @@ namespace ShareSuite
                 
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
                 
-                if (!IsMultiplayer()
-                    || !IsValidItemPickup(self.CurrentPickupIndex())
-                    || !ShareSuite.PrinterCauldronFixEnabled.Value
+                if (   !IsMultiplayer()
+                    || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared on pickup
+                    && !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix is disabled
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostTypeIndex.Money)
                 {

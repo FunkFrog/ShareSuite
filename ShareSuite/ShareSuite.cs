@@ -14,7 +14,8 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.9.1")]
+    [BepInDependency("com.bepis.r2api", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.10.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled;
@@ -99,6 +100,7 @@ namespace ShareSuite
                 orig(self);
             };
             // Register all the hooks
+            Hooks.OverrideBossScaling();
             Hooks.OnGrantItem();
             Hooks.OnGrantEquipment();
             Hooks.OnShopPurchase();
@@ -108,7 +110,6 @@ namespace ShareSuite
             Hooks.SplitTpMoney();
             Hooks.BrittleCrownHook();
             // Hooks.PickupFix();
-            Hooks.OverrideBossScaling();
         }
 
         public class CommandHelper
