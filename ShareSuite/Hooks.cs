@@ -1,7 +1,6 @@
-using System;
 using System.Linq;
 using System.Reflection;
-using MonoMod.Cil;
+using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,7 +47,7 @@ namespace ShareSuite
             On.RoR2.HealthComponent.TakeDamage += (orig, self, info) =>
             {
                 if (!NetworkServer.active) return;
-                
+
                 if (!ShareSuite.MoneyIsShared.Value
                     || !(bool) self.body
                     || !(bool) self.body.inventory)
@@ -62,7 +61,7 @@ namespace ShareSuite
                 var preDamageMoney = self.body.master.money;
 
                 orig(self, info);
- 
+
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
@@ -90,7 +89,7 @@ namespace ShareSuite
                 orig(self, info, victim);
 
                 if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
-                
+
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
                     if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
@@ -166,12 +165,10 @@ namespace ShareSuite
 
         public static void OverrideBossScaling()
         {
-            
-            IL.RoR2.BossGroup.DropRewards += il => // Replace boss drops
+            On.RoR2.BossGroup.DropRewards += (orig, self) => // Replace boss drops
             {
-                var c = new ILCursor(il).Goto(1);
-                c.Remove();
-                c.EmitDelegate<Func<Run, int>>(f => _bossItems);
+                ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
+                orig(self);
             };
         }
 
@@ -185,7 +182,7 @@ namespace ShareSuite
             if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
             self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
         }
-    
+
         public static void OnGrantEquipment()
         {
             On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
@@ -201,10 +198,10 @@ namespace ShareSuite
                         .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
                     {
                         SyncToolbotEquip(player, ref equip);
-                        
+
                         // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
                         if (player.inventory == inventory) continue;
-                        
+
                         player.inventory.SetEquipmentIndex(equip);
                         self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
                         /*SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
@@ -258,10 +255,10 @@ namespace ShareSuite
                     orig(self, activator);
                     return;
                 }
-                
+
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
-                
+
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
@@ -302,7 +299,7 @@ namespace ShareSuite
                             var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                                  shrineBloodBehavior.goldToPaidHpRatio);
-                            
+
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
@@ -357,10 +354,10 @@ namespace ShareSuite
                 }
 
                 if (!NetworkServer.active) return;
-                
+
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
-                
-                if (   !IsMultiplayer()
+
+                if (!IsMultiplayer()
                     || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared on pickup
                     && !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix is disabled
                     || self.itemTier == ItemTier.Lunar
@@ -422,9 +419,9 @@ namespace ShareSuite
         public static bool IsBossItem(ItemIndex index)
         {
             return index == ItemIndex.Knurl
-                || index == ItemIndex.SprintWisp
-                || index == ItemIndex.TitanGoldDuringTP
-                || index == ItemIndex.BeetleGland;
+                   || index == ItemIndex.SprintWisp
+                   || index == ItemIndex.TitanGoldDuringTP
+                   || index == ItemIndex.BeetleGland;
         }
 
         public static bool IsQueensGland(ItemIndex index)
