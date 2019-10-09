@@ -2,6 +2,6 @@
 
 # RoR2 ShareSuite
 
-Risk of Rain 2's ShareSuite mod.
+An item sharing mod for Risk of Rain 2.
 
 Please see https://thunderstore.io/package/FunkFrog-and-Sipondo/ShareSuite/ for more information!
