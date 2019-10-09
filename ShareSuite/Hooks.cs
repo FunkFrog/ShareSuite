@@ -4,6 +4,7 @@ using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace ShareSuite
 {
@@ -146,9 +147,13 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
-                // var defaultCredit = self.GetFieldValue<int>("interactableCredit");
+                var defaultCredit = self.GetFieldValue<int>("interactableCredit");
+                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
+                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
+
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
+                    if (goldshores || mysteryspace) return;
                     self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
                 SyncMoney();
             };
