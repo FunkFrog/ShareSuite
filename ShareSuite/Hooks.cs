@@ -146,7 +146,7 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
-                var defaultCredit = self.GetFieldValue<int>("interactableCredit");
+                // var defaultCredit = self.GetFieldValue<int>("interactableCredit");
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
@@ -255,7 +255,7 @@ namespace ShareSuite
                     orig(self, activator);
                     return;
                 }
-
+                
                 // Return if you can't afford the item
                 if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -284,6 +284,7 @@ namespace ShareSuite
 
                         case CostTypeIndex.PercentHealth:
                         {
+                            Debug.Log("interaction began");
                             orig(self, activator);
                             var teamMaxHealth = 0;
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -299,12 +300,14 @@ namespace ShareSuite
                             var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                                  shrineBloodBehavior.goldToPaidHpRatio);
+                            Debug.Log(amount);
 
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
                             var purchaseDiff =
                                 amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
                                                  shrineBloodBehavior.goldToPaidHpRatio);
 
+                            Debug.Log(purchaseDiff);
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                             {
                                 if (!playerCharacterMasterController.master.alive) continue;
@@ -327,7 +330,7 @@ namespace ShareSuite
                 }
 
                 var shop = self.GetComponent<ShopTerminalBehavior>();
-
+                
                 // If the cost type is an item, give the user the item directly and send the pickup message
                 if (self.costType == CostTypeIndex.WhiteItem
                     || self.costType == CostTypeIndex.GreenItem
@@ -422,11 +425,6 @@ namespace ShareSuite
                    || index == ItemIndex.SprintWisp
                    || index == ItemIndex.TitanGoldDuringTP
                    || index == ItemIndex.BeetleGland;
-        }
-
-        public static bool IsQueensGland(ItemIndex index)
-        {
-            return index == ItemIndex.BeetleGland;
         }
     }
 }

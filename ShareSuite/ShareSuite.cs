@@ -15,30 +15,18 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.10.1")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.10.4")]
     public class ShareSuite : BaseUnityPlugin
     {
-        public static ConfigWrapper<bool> ModIsEnabled;
-        public static ConfigWrapper<bool> MoneyIsShared;
-        public static ConfigWrapper<bool> WhiteItemsShared;
-        public static ConfigWrapper<bool> GreenItemsShared;
-        public static ConfigWrapper<bool> RedItemsShared;
-        public static ConfigWrapper<bool> EquipmentShared;
-        public static ConfigWrapper<bool> LunarItemsShared;
-        public static ConfigWrapper<bool> BossItemsShared;
-        public static ConfigWrapper<bool> PrinterCauldronFixEnabled;
-        public static ConfigWrapper<bool> DeadPlayersGetItems;
-        public static ConfigWrapper<bool> OverridePlayerScalingEnabled;
-        public static ConfigWrapper<int> InteractablesCredit;
-        public static ConfigWrapper<bool> OverrideBossLootScalingEnabled;
-        public static ConfigWrapper<int> BossLootCredit;
-        public static ConfigWrapper<bool> MoneyScalarEnabled;
-        public static ConfigWrapper<int> MoneyScalar;
-        public static ConfigWrapper<string> ItemBlacklist;
-        public static ConfigWrapper<string> EquipmentBlacklist;
+        public static ConfigWrapper<bool> ModIsEnabled, MoneyIsShared, WhiteItemsShared, GreenItemsShared, 
+            RedItemsShared, EquipmentShared, LunarItemsShared, BossItemsShared, PrinterCauldronFixEnabled, 
+            DeadPlayersGetItems, OverridePlayerScalingEnabled, OverrideBossLootScalingEnabled, MoneyScalarEnabled;
+        public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
+        public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
 
         public static HashSet<int> GetItemBlackList()
         {
+            
             var blacklist = new HashSet<int>();
             var rawPieces = ItemBlacklist.Value.Split(',');
             foreach (var piece in rawPieces)
@@ -68,6 +56,7 @@ namespace ShareSuite
             var highestBal = (uint) HighestBalance();
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
+                if (!playerCharacterMasterController.master.alive) continue;
                 if (playerCharacterMasterController.master.money != highestBal)
                 {
                     playerCharacterMasterController.master.money = highestBal;
@@ -80,6 +69,7 @@ namespace ShareSuite
             var teamMaxMoney = 0;
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
+                if (!playerCharacterMasterController.master.alive) continue;
                 var charBalance = playerCharacterMasterController.master.money;
                 if (charBalance > teamMaxMoney)
                 {
