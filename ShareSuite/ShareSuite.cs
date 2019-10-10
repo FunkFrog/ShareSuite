@@ -53,31 +53,14 @@ namespace ShareSuite
             if (!NetworkServer.active
                 || !MoneyIsShared.Value) return;
 
-            var highestBal = (uint) HighestBalance();
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
                 if (!playerCharacterMasterController.master.alive) continue;
-                if (playerCharacterMasterController.master.money != highestBal)
+                if (playerCharacterMasterController.master.money != Hooks.sharedMoneyValue)
                 {
-                    playerCharacterMasterController.master.money = highestBal;
+                    playerCharacterMasterController.master.money = (uint) Hooks.sharedMoneyValue;
                 }
             }
-        }
-
-        private static int HighestBalance()
-        {
-            var teamMaxMoney = 0;
-            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
-            {
-                if (!playerCharacterMasterController.master.alive) continue;
-                var charBalance = playerCharacterMasterController.master.money;
-                if (charBalance > teamMaxMoney)
-                {
-                    teamMaxMoney = (int) charBalance;
-                }
-            }
-
-            return teamMaxMoney;
         }
 
         public ShareSuite()
@@ -90,6 +73,7 @@ namespace ShareSuite
                 orig(self);
             };
             // Register all the hooks
+            Hooks.sharedMoneyValue = 0;
             Hooks.OverrideBossScaling();
             Hooks.OnGrantItem();
             Hooks.OnGrantEquipment();
