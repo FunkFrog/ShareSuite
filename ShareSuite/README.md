@@ -3,7 +3,7 @@
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Frustrating, right? This mod has been developed out of that very frustration at the distribution of items in Risk of Rain 2. With ShareSuite, we aim to fix that!
+Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Frustrating, right? This mod has been developed over frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
 Multiplayer RoR2 games should be quick, wacky fun, but often have loot being stolen and power imbalances between players. Obviously, the best way to solve this issue is to remove the incentive to steal the loot in the first place!
 
