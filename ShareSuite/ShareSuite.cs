@@ -15,7 +15,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.10.4")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.11.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled, MoneyIsShared, WhiteItemsShared, GreenItemsShared, 
@@ -215,7 +215,7 @@ namespace ShareSuite
                 "Settings",
                 "ItemBlacklist",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names",
-                "53,82,86");
+                "53,60,82,86");
 
             EquipmentBlacklist = Config.Wrap(
                 "Settings",
