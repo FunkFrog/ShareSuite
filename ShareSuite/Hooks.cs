@@ -10,6 +10,7 @@ namespace ShareSuite
 {
     public static class Hooks
     {
+        public static int sharedMoneyValue;
         private static int _bossItems = 1;
         // private static bool _sendPickup = true;
 
@@ -32,14 +33,18 @@ namespace ShareSuite
 
                 if (self.isCharged && ShareSuite.MoneyIsShared.Value)
                 {
+                    var players = PlayerCharacterMasterController.instances.Count;
+                    sharedMoneyValue /= players;
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
                         player.master.money = (uint)
-                            Mathf.FloorToInt(player.master.money / PlayerCharacterMasterController.instances.Count);
+                            Mathf.FloorToInt(player.master.money / players);
                     }
                 }
 
                 orig(self, activator);
+
+                sharedMoneyValue = 0;
             };
         }
 
@@ -63,11 +68,15 @@ namespace ShareSuite
 
                 orig(self, info);
 
+                var postDamageMoney = self.body.master.money;
+                
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+
+                sharedMoneyValue -= (int) preDamageMoney - (int) postDamageMoney;
+                
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
                     if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
-                    player.master.money -= preDamageMoney - self.body.master.money;
                     EffectManager.instance.SimpleImpactEffect(Resources.Load<GameObject>(
                             "Prefabs/Effects/ImpactEffects/CoinImpact"),
                         player.master.GetBody().corePosition, Vector3.up, true);
@@ -91,11 +100,7 @@ namespace ShareSuite
 
                 if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
 
-                foreach (var player in PlayerCharacterMasterController.instances)
-                {
-                    if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
-                    player.master.money += body.master.money - preDamageMoney;
-                }
+                sharedMoneyValue += (int) body.master.money - (int) preDamageMoney;
             };
         }
 
@@ -133,11 +138,7 @@ namespace ShareSuite
 
         private static void GiveAllScaledMoney(float goldReward)
         {
-            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
-            {
-                player.GiveMoney(
-                    (uint) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward));
-            }
+            sharedMoneyValue += (int) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward);
         }
 
         public static void OverrideInteractablesScaling()
@@ -147,25 +148,17 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
-                var defaultCredit = self.GetFieldValue<int>("interactableCredit");
+                sharedMoneyValue = 15;
+
                 bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
                 bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    if (goldshores || mysteryspace) return;
-                    self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
-                SyncMoney();
+                    if (goldshores || mysteryspace)
+                        return;
+                self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
             };
-        }
-
-        private static void SyncMoney()
-        {
-            if (!ShareSuite.MoneyIsShared.Value) return;
-            foreach (var player in PlayerCharacterMasterController.instances)
-            {
-                player.master.money = NetworkUser.readOnlyInstancesList[0].master.money;
-            }
         }
 
         public static void OverrideBossScaling()
@@ -275,21 +268,12 @@ namespace ShareSuite
                         case CostTypeIndex.Money:
                         {
                             orig(self, activator);
-                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
-                            {
-                                if (playerCharacterMasterController.master.alive &&
-                                    playerCharacterMasterController.master.GetBody() != characterBody)
-                                {
-                                    playerCharacterMasterController.master.money -= (uint) self.cost;
-                                }
-                            }
-
+                            sharedMoneyValue -= (int) self.cost;
                             return;
                         }
 
                         case CostTypeIndex.PercentHealth:
                         {
-                            Debug.Log("interaction began");
                             orig(self, activator);
                             var teamMaxHealth = 0;
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -305,23 +289,10 @@ namespace ShareSuite
                             var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                                  shrineBloodBehavior.goldToPaidHpRatio);
-                            Debug.Log(amount);
 
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
-                            var purchaseDiff =
-                                amount - (uint) ((double) characterBody.maxHealth * purchaseInteraction.cost / 100.0 *
-                                                 shrineBloodBehavior.goldToPaidHpRatio);
 
-                            Debug.Log(purchaseDiff);
-                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
-                            {
-                                if (!playerCharacterMasterController.master.alive) continue;
-                                playerCharacterMasterController.master.GiveMoney(
-                                    playerCharacterMasterController.master.GetBody() != characterBody
-                                        ? amount
-                                        : purchaseDiff);
-                            }
-
+                            sharedMoneyValue += (int) amount;
                             return;
                         }
                     }
