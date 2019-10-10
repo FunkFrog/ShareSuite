@@ -9,6 +9,17 @@ Multiplayer RoR2 games should be quick wacky fun, but often have problems with s
 
 This mod is your best solution to these problems!
 
+**`NOTE: The game recently updated. We're currently waiting on an R2API update, and until that point, this mod WILL NOT WORK. Join the Discord for status updates.`**
+
+|   Most Recent Update - 1.11.0    |
+|:--------------------------------|
+| Fix issues with gold sharing |
+| Complete README redesign |
+| Fix things spawning on maps they shouldn't |
+| Updated default blacklisted items |
+
+**If you'd like more info on this update, check the changelog at the bottom of the page!**
+
 ### ![Features](https://i.imgur.com/6jCWYtn.png "ShareSuite Features")
 
 **Want a more detailed look at any of our features? Click the [*Show me more*] button next to the bullet!**
@@ -184,11 +195,8 @@ This mod is your best solution to these problems!
 - Complete README.md refactor. It should be a lot nicer to look at and easier to navigate now!
 - Resolve issue where items would spawn on maps they weren't supposed to.
 - Re-worked the gold sharing system to resolve state issues that have been experienced.
-
-### `1.10.5`
 - Add Lepton Daisy and Halcyon Seed to the default unshared list as they provide buffs for everyone in the lobby and granting them to everyone makes them stronger. 
     - If you'd like to update your config to match these changes, please add `,82,86` to the end of the Item Blacklist in your config!
-
 
 ### `1.10.4` 
 - Fixed a similar bug as 1.10.3; Money will no longer stay above the highest amount of money a dead player has. (Thanks to Elysium for finding this!) 
@@ -202,5 +210,9 @@ This mod is your best solution to these problems!
 
 ### `1.10.2` 
 - Added Discord link to the README. Mod file is unchanged.
+
+### `1.10.1`
+- Update to R2API-2.1.15
+- Fixes bug involving boss drops not dropping the correct amount of loot.
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
