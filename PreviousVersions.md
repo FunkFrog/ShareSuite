@@ -1,5 +1,9 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.10.1` 
+- Update to R2API-2.1.15
+- Fixes bug involving boss drops not dropping the correct amount of loot.
+
 `1.10.0` - Large bugfix patch. Resolved ItemDropAPI erroring, Aurelionite not dropping the Halcyon seed, and a duplication glitch concerning 3D printers.
 
 `1.9.1` - Update R2Api dependency to 2.1.0
