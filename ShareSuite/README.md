@@ -1,6 +1,5 @@
-[//]: # ( Why hello there! Welcome to the ShareSuite readme. Feel free to use this as a basis for your readme :) )
-
-# ShareSuite [![Build Status](https://travis-ci.com/FunkFrog/RoR2SharedItems.svg?branch=master)](https://travis-ci.com/FunkFrog/RoR2SharedItems)
+[//]: # ( Hello :D )
+# ShareSuite
 #### By FunkFrog and Sipondo
 
 This mod has been developed out of frustration of the item distribution in Risk of Rain 2.
@@ -8,7 +7,7 @@ This mod has been developed out of frustration of the item distribution in Risk 
 Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot sniping. This mod aims to fix that!
 
 ---
-
+ 
 ## Features
 
 - Any item pickups (*non-gland and non-lunar by default*) are given to all living members of your party.
@@ -27,22 +26,31 @@ Multiplayer RoR2 games should be quick wacky fun, but are often plagued by loot 
 
 ---
 
+## Discord
+We now have a Discord server for the mod! Come join us at https://discord.gg/c7QnQeb
+
+---
+
 ### TO-DO
 
-Money Sharing 
+Known Bugs
 
-- Check crowdfunder properly
+- Crowdfunder desyncs shared money
+- Equipment drones desync shared equipment
 
-Extra Features 
+Extra Features
 
 - Custom Chat Messages
+- Item pickup cards for every player
 - Shared Equipment
+    - Shared Equipment feature completion
+    - Remove invalid items from the FrogTown equipment blacklist slider
 
 ---
 
 ### Installation Guide
 
-- Copy the `SharedSuite.dll` file to your BepInEx plugins folder.
+- Copy the `ShareSuite.dll` file to your BepInEx plugins folder.
 - Enjoy your items / money
 
 ---
@@ -63,10 +71,9 @@ You can also set settings in-game with the commands listed below.
 | White Items are Shared     |          True |        ss_WhiteItemsShared |
 | Green Items are Shared     |          True |        ss_GreenItemsShared |
 | Red Items are Shared       |          True |          ss_RedItemsShared |
-| Equipment is shared        |          True |         ss_EquipmentShared |
+| Equipment is Shared        |         False |         ss_EquipmentShared |
 | Lunar Items are Shared     |         False |        ss_LunarItemsShared |
 | Boss Items are Shared      |          True |         ss_BossItemsShared |
-| Queens Glands are Shared   |         False |      ss_QueensGlandsShared |
 | Dupe Fix                   |          True |      ss_PrinterCauldronFix |
 | Dead Players Get Items     |         False |     ss_DeadPlayersGetItems |
 | Override Player Scaling    |          True |   ss_OverridePlayerScaling |
@@ -75,7 +82,8 @@ You can also set settings in-game with the commands listed below.
 | Boss Loot Credit           |             1 |          ss_BossLootCredit |
 | Money Scalar Enabled       |         False |      ss_MoneyScalarEnabled |
 | Money Scalar               |             1 |             ss_MoneyScalar |
-| Blacklist                  |         Empty |                        N/A |
+| Item Blacklist             |            53 |                        N/A |
+| Equipment Blacklist        |         Empty |                        N/A |
 
 ---
 
@@ -88,11 +96,11 @@ You can also set settings in-game with the commands listed below.
 
 ---
 
-`Does this make the game easier?`
+`Does this make the game easier? How do you balance it?`
 
 *Technically, the game should be ever so slightly harder than vanilla this way. Either way, it should be extremely close to the original game's balance.*
 
-*For example, the amount of interactables (*chests, shrines, etc.*) is similar to that in a single player game.*
+*We only spawn the amount of interactables that would be spawned for 1 player in a lobby of any size. Boss and Lunar items are not shared. There are no ways to abuse this mod to dupe items. We cut player XP gained from money at the end of rounds to combat leveling faster. Teleporters only drop one item per boss killed. This mod has been tediously balanced and we do everything we can to keep the experience as un-broken as possible. If you have any ideas of ways to improve this, let us know!*
 
 ---
 
@@ -174,6 +182,34 @@ Creators of these mods: If you are open to collaborate with us, we'd love to wor
 ---
 
 ### Changelog
+
+`1.10.5` - Add Lepton Daisy and Halcyon Seed to the default unshared list as they provide buffs for everyone in the lobby and granting them to everyone makes them stronger. If you'd like to update your config to match these changes, please add `,82,86` to the end of the Item Blacklist in your config!
+
+`1.10.4` - Fixed a similar bug as 1.10.3; Money will no longer stay above the highest amount of money a dead player has. (Thanks to Elysium for finding this!) Also updated R2Api dependency to 2.1.16.
+
+`1.10.3` - Moved Discord link below Features list. Fixed incorrectly formatted horizontal rule. Fixed bug with Shared money keeping everyone at the same balance if a teammate died. What should I work on next? [Vote here!](https://www.strawpoll.me/18656636)
+
+`1.10.2` - Added Discord link to the README. Mod file is unchanged.
+
+`1.10.1` - Update to R2API-2.1.15, resolve bug involving boss drops not dropping the correct amount of loot.
+
+`1.10.0` - Large bugfix patch. Resolved ItemDropAPI erroring, Aurelionite not dropping the Halcyon seed, and a duplication glitch concerning 3D printers.
+
+`1.9.1` - Update R2Api dependency to 2.1.0
+
+`1.9.0` - Fixed typos. Removed the "Queens Gland is Shared" config option, replaced it with putting the item in the shared blacklist by default (item ID 53 if you would like to add it to your current config! If you're updating from a previous version and want this item to remain unshared, you WILL have to add it to your config) Moved the "BossLootCredit" config entry from the "Settings" category to the "Balance" category. If you've modified this from the default, you'll have to change it once more.
+
+`1.8.3` - Fix a bug concerning the two new boss items -- Halcyon Seed and Little Disciple -- not being shared when Share Boss Items is turned on. (Thanks to Eracat for finding this bug!)
+
+`1.8.2` - General README update.
+
+`1.8.1` - README Update to include equipment sharing console command.
+
+`1.8.0` - Shared equipment is here! Updated mod to function with 6/25/19 patch. 
+
+`1.7.4` - Crowdfunder desync fix
+
+`1.7.3` - Massive readme fix
 
 `1.7.2` - Completion of config refactor. It should be easier to read and use now :)
 
