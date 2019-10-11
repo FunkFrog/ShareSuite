@@ -3,20 +3,17 @@
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-Ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that was for your friend? This mod has been developed out of frustration at the distribution of items in Risk of Rain 2. We aim to fix that with ShareSuite!
+Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Frustrating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
-Multiplayer RoR2 games should be quick wacky fun, but often have problems with stealing loot and an imbalance between players.
-
-This mod is your best solution to these problems!
+Multiplayer RoR2 games should be quick, wacky fun, but often have loot being stolen and power imbalances between players. Obviously, the best way to solve this issue is to remove the incentive to steal the loot in the first place!
 
 **`NOTE: The game recently updated. We're currently waiting on an R2API update, and until that point, this mod WILL NOT WORK. Join the Discord for status updates.`**
 
-|   Most Recent Update - 1.11.0    |
+|   Most Recent Update - 1.12.0    |
 |:--------------------------------|
-| Fix issues with gold sharing |
-| Complete README redesign |
-| Fix things spawning on maps they shouldn't |
-| Updated default blacklisted items |
+| **MAJOR** Critical money sharing bug fixed |
+| **MAJOR** Critical 3D Printer/Cauldron bug fixed |
+| Re-wrote part of the README |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -149,7 +146,6 @@ This mod is your best solution to these problems!
 - Shared money's state is often inconsistent
     - Crowdfunder de-syncs shared money
 - Equipment drones de-sync shared equipment
-- Disabling 3DPrinter/Cauldron fix seems to break them - we're looking into this
 
 #### Features in Development
 
@@ -190,7 +186,13 @@ This mod is your best solution to these problems!
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `1.11.0 (CURRENT)`
+### `1.12.0 (CURRENT)`
+- Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
+- Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
+    - Thank you to Commie#8573 for helping me test and fix these bugs!
+- Made improvements to the README's writing to make it sound less like a student who wanted to meet a sentence requirement on an essay.
+    
+### `1.11.0`
 - Complete README.md refactor. It should be a lot nicer to look at and easier to navigate now!
 - Resolve issue where items would spawn on maps they weren't supposed to.
 - Re-worked the gold sharing system to resolve state issues that have been experienced.
@@ -209,9 +211,5 @@ This mod is your best solution to these problems!
 
 ### `1.10.2` 
 - Added Discord link to the README. Mod file is unchanged.
-
-### `1.10.1`
-- Update to R2API-2.1.15
-  - Fixes bug involving boss drops not dropping the correct amount of loot.
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
