@@ -10,7 +10,7 @@ namespace ShareSuite
 {
     public static class Hooks
     {
-        public static int sharedMoneyValue;
+        public static int SharedMoneyValue;
         private static int _bossItems = 1;
         // private static bool _sendPickup = true;
 
@@ -34,7 +34,7 @@ namespace ShareSuite
                 if (self.isCharged && ShareSuite.MoneyIsShared.Value)
                 {
                     var players = PlayerCharacterMasterController.instances.Count;
-                    sharedMoneyValue /= players;
+                    SharedMoneyValue /= players;
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
                         player.master.money = (uint)
@@ -44,7 +44,7 @@ namespace ShareSuite
 
                 orig(self, activator);
 
-                sharedMoneyValue = 0;
+                SharedMoneyValue = 0;
             };
         }
 
@@ -72,7 +72,7 @@ namespace ShareSuite
                 
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
 
-                sharedMoneyValue -= (int) preDamageMoney - (int) postDamageMoney;
+                SharedMoneyValue -= (int) preDamageMoney - (int) postDamageMoney;
                 
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
@@ -100,7 +100,7 @@ namespace ShareSuite
 
                 if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
 
-                sharedMoneyValue += (int) body.master.money - (int) preDamageMoney;
+                SharedMoneyValue += (int) body.master.money - (int) preDamageMoney;
             };
         }
 
@@ -138,7 +138,7 @@ namespace ShareSuite
 
         private static void GiveAllScaledMoney(float goldReward)
         {
-            sharedMoneyValue += (int) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward);
+            SharedMoneyValue += (int) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward);
         }
 
         public static void OverrideInteractablesScaling()
@@ -150,7 +150,7 @@ namespace ShareSuite
                 
                 // This should run on every map, as it is required to fix shared money.
                 // Reset shared money value to the default (15) at the start of each round
-                sharedMoneyValue = 15;
+                SharedMoneyValue = 15;
                 
                 bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
                 bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
@@ -168,7 +168,7 @@ namespace ShareSuite
 
         public static void OverrideBossScaling()
         {
-            On.RoR2.BossGroup.DropRewards += (orig, self) => // Replace boss drops
+            On.RoR2.BossGroup.DropRewards += (orig, self) => 
             {
                 ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
                 orig(self);
@@ -273,7 +273,7 @@ namespace ShareSuite
                         case CostTypeIndex.Money:
                         {
                             orig(self, activator);
-                            sharedMoneyValue -= (int) self.cost;
+                            SharedMoneyValue -= self.cost;
                             return;
                         }
 
@@ -297,7 +297,7 @@ namespace ShareSuite
 
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
 
-                            sharedMoneyValue += (int) amount;
+                            SharedMoneyValue += (int) amount;
                             return;
                         }
                     }

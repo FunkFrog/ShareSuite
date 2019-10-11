@@ -15,7 +15,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.11.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.11.1")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled, MoneyIsShared, WhiteItemsShared, GreenItemsShared, 
@@ -56,9 +56,9 @@ namespace ShareSuite
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
                 if (!playerCharacterMasterController.master.alive) continue;
-                if (playerCharacterMasterController.master.money != Hooks.sharedMoneyValue)
+                if (playerCharacterMasterController.master.money != Hooks.SharedMoneyValue)
                 {
-                    playerCharacterMasterController.master.money = (uint) Hooks.sharedMoneyValue;
+                    playerCharacterMasterController.master.money = (uint) Hooks.SharedMoneyValue;
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace ShareSuite
                 orig(self);
             };
             // Register all the hooks
-            Hooks.sharedMoneyValue = 0;
+            Hooks.SharedMoneyValue = 0;
             Hooks.OverrideBossScaling();
             Hooks.OnGrantItem();
             Hooks.OnGrantEquipment();
