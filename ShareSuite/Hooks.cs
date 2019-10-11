@@ -14,11 +14,15 @@ namespace ShareSuite
 
         private static int _bossItems = 1;
         // private static bool _sendPickup = true;
-
-        private static readonly MethodInfo SendPickupMessage =
-            typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                BindingFlags.NonPublic | BindingFlags.Static);
-
+        
+        public static void OverrideBossScaling()
+        {
+            On.RoR2.BossGroup.DropRewards += (orig, self) =>
+            {
+                ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
+                orig(self);
+            };
+        }
         public static void SplitTpMoney()
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
@@ -129,7 +133,7 @@ namespace ShareSuite
 
                 if (!ShareSuite.MoneyScalarEnabled.Value
                     || !NetworkServer.active) return;
-                
+
                 GiveAllScaledMoney(self.goldReward);
             };
         }
@@ -170,62 +174,6 @@ namespace ShareSuite
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
             };
-        }
-
-        public static void OverrideBossScaling()
-        {
-            On.RoR2.BossGroup.DropRewards += (orig, self) =>
-            {
-                ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
-                orig(self);
-            };
-        }
-
-
-        private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
-        {
-            if (!NetworkServer.active) return;
-            if (self.currentEquipmentIndex == newEquipmentIndex) return;
-            var equipment = self.GetEquipment(0U);
-            var charges = equipment.charges;
-            if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
-            self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
-        }
-
-        public static void OnGrantEquipment()
-        {
-            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
-            {
-                var equip = self.pickupIndex.equipmentIndex;
-
-                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
-                    && NetworkServer.active
-                    && IsValidEquipmentPickup(self.pickupIndex)
-                    && IsMultiplayer()
-                    && ShareSuite.ModIsEnabled.Value)
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
-                    {
-                        SyncToolbotEquip(player, ref equip);
-
-                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
-                        if (player.inventory == inventory) continue;
-
-                        player.inventory.SetEquipmentIndex(equip);
-                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
-                        /*SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
-                            new object[] {player, new PickupIndex(equip)});*/
-                    }
-
-                orig(self, body, inventory);
-            };
-        }
-
-        private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
-        {
-            if (characterMaster.bodyPrefab.name != "ToolbotBody") return;
-            SetEquipmentIndex(characterMaster.inventory, equip,
-                (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
         }
 
         public static void OnGrantItem()
@@ -338,7 +286,7 @@ namespace ShareSuite
             On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
             {
                 if (!ShareSuite.ModIsEnabled.Value
-                 || !NetworkServer.active)
+                    || !NetworkServer.active)
                 {
                     orig(self);
                     return;
@@ -356,6 +304,56 @@ namespace ShareSuite
                 }
             };
         }
+        
+         private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
+        {
+            if (!NetworkServer.active) return;
+            if (self.currentEquipmentIndex == newEquipmentIndex) return;
+            var equipment = self.GetEquipment(0U);
+            var charges = equipment.charges;
+            if (equipment.equipmentIndex == EquipmentIndex.None) charges = 1;
+            self.SetEquipment(new EquipmentState(newEquipmentIndex, equipment.chargeFinishTime, charges), slot);
+        }
+
+        public static void OnGrantEquipment()
+        {
+            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
+            {
+                var equip = self.pickupIndex.equipmentIndex;
+
+                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
+                    && NetworkServer.active
+                    && IsValidEquipmentPickup(self.pickupIndex)
+                    && IsMultiplayer()
+                    && ShareSuite.ModIsEnabled.Value)
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    {
+                        SyncToolbotEquip(player, ref equip);
+
+                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                        if (player.inventory == inventory) continue;
+
+                        player.inventory.SetEquipmentIndex(equip);
+                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
+                        /*SendPickupMessage.Invoke(inventory.GetComponent<CharacterMaster>(),
+                            new object[] {player, new PickupIndex(equip)});*/
+                    }
+
+                orig(self, body, inventory);
+            };
+        }
+
+        private static void SyncToolbotEquip(CharacterMaster characterMaster, ref EquipmentIndex equip)
+        {
+            if (characterMaster.bodyPrefab.name != "ToolbotBody") return;
+            SetEquipmentIndex(characterMaster.inventory, equip,
+                (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
+        }
+        
+        private static readonly MethodInfo SendPickupMessage =
+            typeof(GenericPickupController).GetMethod("SendPickupMessage",
+                BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// This function is currently ineffective, but may be later extended to quickly set a validator
