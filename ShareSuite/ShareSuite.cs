@@ -15,18 +15,28 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.11.1")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.12.0")]
     public class ShareSuite : BaseUnityPlugin
     {
-        public static ConfigWrapper<bool> ModIsEnabled, MoneyIsShared, WhiteItemsShared, GreenItemsShared, 
-            RedItemsShared, EquipmentShared, LunarItemsShared, BossItemsShared, PrinterCauldronFixEnabled, 
-            DeadPlayersGetItems, OverridePlayerScalingEnabled, OverrideBossLootScalingEnabled, MoneyScalarEnabled;
+        public static ConfigWrapper<bool> ModIsEnabled,
+            MoneyIsShared,
+            WhiteItemsShared,
+            GreenItemsShared,
+            RedItemsShared,
+            EquipmentShared,
+            LunarItemsShared,
+            BossItemsShared,
+            PrinterCauldronFixEnabled,
+            DeadPlayersGetItems,
+            OverridePlayerScalingEnabled,
+            OverrideBossLootScalingEnabled,
+            MoneyScalarEnabled;
+
         public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
 
         public static HashSet<int> GetItemBlackList()
         {
-            
             var blacklist = new HashSet<int>();
             var rawPieces = ItemBlacklist.Value.Split(',');
             foreach (var piece in rawPieces)
@@ -56,9 +66,9 @@ namespace ShareSuite
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
                 if (!playerCharacterMasterController.master.alive) continue;
-                if (playerCharacterMasterController.master.money != Hooks.SharedMoneyValue)
+                if (playerCharacterMasterController.master.money != MoneySharingHooks.SharedMoneyValue)
                 {
-                    playerCharacterMasterController.master.money = (uint) Hooks.SharedMoneyValue;
+                    playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
                 }
             }
         }
@@ -73,17 +83,16 @@ namespace ShareSuite
                 orig(self);
             };
             // Register all the hooks
-            Hooks.SharedMoneyValue = 0;
-            Hooks.OverrideBossScaling();
-            Hooks.OnGrantItem();
-            Hooks.OnGrantEquipment();
-            Hooks.OnShopPurchase();
-            Hooks.OnPurchaseDrop();
-            Hooks.OverrideInteractablesScaling();
-            Hooks.ModifyGoldReward();
-            Hooks.SplitTpMoney();
-            Hooks.BrittleCrownHook();
-            // Hooks.PickupFix();
+            GeneralHooks.OverrideBossScaling();
+            GeneralHooks.OnPlaceTeleporter();
+            GeneralHooks.OnTpInteraction();
+            ItemSharingHooks.OnGrantItem();
+            ItemSharingHooks.OnShopPurchase();
+            ItemSharingHooks.OnPurchaseDrop();
+            MoneySharingHooks.SharedMoneyValue = 0;
+            MoneySharingHooks.ModifyGoldReward();
+            MoneySharingHooks.BrittleCrownHook();
+            EquipmentSharingHooks.OnGrantEquipment();
         }
 
         public class CommandHelper
