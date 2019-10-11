@@ -147,17 +147,18 @@ namespace ShareSuite
             {
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
+                
+                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
+                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
+                
+                if (goldshores || mysteryspace)
+                        return;
 
                 sharedMoneyValue = 15;
 
-                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
-                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
-
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    if (goldshores || mysteryspace)
-                        return;
-                self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
             };
         }
 
@@ -337,8 +338,8 @@ namespace ShareSuite
                 var costType = self.GetComponent<PurchaseInteraction>().costType;
 
                 if (!IsMultiplayer()
-                    || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared on pickup
-                    && !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix is disabled
+                    || (!IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared on pickup
+                    && !ShareSuite.PrinterCauldronFixEnabled.Value) // dupe fix is disabled
                     || self.itemTier == ItemTier.Lunar
                     || costType == CostTypeIndex.Money)
                 {
