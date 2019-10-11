@@ -189,7 +189,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 ### `1.12.0 (CURRENT)`
 - Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
 - Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
-    - Thank you to Commie#8573 for helping me test and fix these bugs!
+    - Thank you to Commie for helping me test and fix these bugs!
 - Made improvements to the README's writing to make it sound less like a student who wanted to meet a sentence requirement on an essay.
     
 ### `1.11.0`
