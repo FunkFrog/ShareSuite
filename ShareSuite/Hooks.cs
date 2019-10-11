@@ -148,13 +148,17 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
                 
+                // This should run on every map, as it is required to fix shared money.
+                // Reset shared money value to the default (15) at the start of each round
+                sharedMoneyValue = 15;
+                
                 bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
                 bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
                 
                 if (goldshores || mysteryspace)
                         return;
 
-                sharedMoneyValue = 15;
+                
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
