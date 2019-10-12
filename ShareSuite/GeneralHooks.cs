@@ -21,23 +21,23 @@ namespace ShareSuite
                 // Reset shared money value to the default (15) at the start of each round
                 MoneySharingHooks.SharedMoneyValue = 15;
 
-                #region InteractablesCredit
+                #region InteractiblesCredit
 
-                var interactableCredit = 200;
+                var interactibleCredit = 200;
 
                 var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
                 if (component)
                 {
                     // Fetch the amount of interactables we may play with.
-                    interactableCredit = component.sceneDirectorInteractibleCredits;
+                    interactibleCredit = component.sceneDirectorInteractibleCredits;
                     if (component.bonusInteractibleCreditObjects != null)
                     {
-                        foreach (var bonusIntractableCreditObject in component.bonusInteractibleCreditObjects)
+                        foreach (var bonusIntractibleCreditObject in component.bonusInteractibleCreditObjects)
                         {
-                            if (bonusIntractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
+                            if (bonusIntractibleCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
                             {
-                                interactableCredit += bonusIntractableCreditObject.points;
+                                interactibleCredit += bonusIntractibleCreditObject.points;
                             }
                         }
                     }
@@ -55,12 +55,13 @@ namespace ShareSuite
                                              2, 3), 1.0);
 
                     // Apply the transformation. It is of paramount importance that creditModifier == 1.0 for a 1p game.
-                    interactableCredit = (int) (component.sceneDirectorInteractibleCredits / creditModifier);
+                    // We must apply the transformation to interactibleCredit otherwise bonusIntractibleCreditObject will be overwritten.
+                    interactibleCredit = (int)(interactibleCredit / creditModifier);
                 }
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue("interactableCredit", interactibleCredit * ShareSuite.InteractablesCredit.Value);
 
                 #endregion
             };
