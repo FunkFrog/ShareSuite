@@ -23,13 +23,14 @@ namespace ShareSuite
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
+                #region Sharedmoney
                 if (ShareSuite.MoneyIsShared.Value)
                 {
-                    //TODO add comments on what this does
                     switch (self.costType)
                     {
                         case CostTypeIndex.Money:
                         {
+                            // Remove money from shared money pool
                             orig(self, activator);
                             MoneySharingHooks.SharedMoneyValue -= self.cost;
                             return;
@@ -37,6 +38,8 @@ namespace ShareSuite
 
                         case CostTypeIndex.PercentHealth:
                         {
+                            // Share the damage taken from a sacrifice
+                            // as it generates shared money
                             orig(self, activator);
                             var teamMaxHealth = 0;
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -60,7 +63,9 @@ namespace ShareSuite
                         }
                     }
                 }
+                #endregion
 
+                #region Cauldronfix
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
                 if (!GeneralHooks.IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
@@ -80,6 +85,7 @@ namespace ShareSuite
                     SendPickupMessage.Invoke(null,
                         new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
                 }
+                #endregion Cauldronfix
 
                 orig(self, activator);
             };
@@ -113,23 +119,27 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
+                if (!ShareSuite.ModIsEnabled.Value)
+                {
+                    orig(self, body, inventory);
+                    return;
+                }
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
                 if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
                     && IsValidItemPickup(self.pickupIndex)
-                    && GeneralHooks.IsMultiplayer()
-                    && ShareSuite.ModIsEnabled.Value)
+                    && GeneralHooks.IsMultiplayer())
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                     {
                         // Ensure character is not original player that picked up item
                         if (player.inventory == inventory) continue;
+
+                        // Do not reward dead players if not required
                         if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
+
                         player.inventory.GiveItem(item);
-                        /*_sendPickup = false;
-                        SendPickupMessage.Invoke(null, new object[] {player, self.pickupIndex});
-                        _sendPickup = true;*/
                     }
 
                 orig(self, body, inventory);

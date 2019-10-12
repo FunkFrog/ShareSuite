@@ -25,9 +25,42 @@ namespace ShareSuite
                 if (goldshores || mysteryspace)
                     return;
 
+                #region InteractablesCredit
+                var interactableCredit = 200;
+
+                var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
+
+                if (component)
+                {
+                    // Fetch the amount of interactables we may play with.
+                    interactableCredit = component.sceneDirectorInteractibleCredits;
+                    if (component.bonusInteractibleCreditObjects != null)
+                    {
+                        foreach (var bonusIntractableCreditObject in component.bonusInteractibleCreditObjects)
+                        {
+                            if (bonusIntractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
+                            {
+                                interactableCredit += bonusIntractableCreditObject.points;
+                            }
+                        }
+                    }
+
+                    // The flat creditModifier slightly adjust interactables based on the amount of players.
+                    // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
+                    var creditModifier = (float)(0.95 + System.Math.Min(Run.instance.participatingPlayerCount, 8) * 0.05);
+
+                    // In addition to our flat modifier, we additionally introduce a stage modifier.
+                    // This reduces player strength early game (as having more bodies gives a flat power increase early game).
+                    creditModifier = creditModifier * (float)System.Math.Max(1.0 + 0.1 * System.Math.Min(Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2, 3), 1.0);
+
+                    // Apply the transformation. It is of paramount importance that creditModifier == 1.0 for a 1p game.
+                    interactableCredit = (int)(component.sceneDirectorInteractibleCredits / creditModifier);
+                }
+
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
+                #endregion  
             };
         }
 
@@ -35,13 +68,17 @@ namespace ShareSuite
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
+                #region Itemsharing
                 if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
                     BossItems = ShareSuite.BossLootCredit.Value;
                 else
                     BossItems = Run.instance.participatingPlayerCount;
+                #endregion Itemsharing
 
+                #region Moneysharing
                 if (self.isCharged && ShareSuite.MoneyIsShared.Value)
                     MoneySharingHooks.AdjustTpMoney();
+                #endregion Moneysharing
 
                 orig(self, activator);
             };
@@ -51,6 +88,13 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards += (orig, self) =>
             {
+                // TODO: Shouldn't there be a ss check here?
+                if (!ShareSuite.ModIsEnabled.Value)
+                {
+                    orig(self);
+                    return;
+                }
+
                 ItemDropAPI.BossDropParticipatingPlayerCount = BossItems;
                 orig(self);
             };
@@ -58,7 +102,7 @@ namespace ShareSuite
 
         public static bool IsMultiplayer()
         {
-            // Check if there are more then 1 players in the lobby
+            // Check whether there are more then 1 players in the lobby
             return PlayerCharacterMasterController.instances.Count > 1;
         }
     }
