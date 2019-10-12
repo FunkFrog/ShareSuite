@@ -7,13 +7,11 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be quick, wacky fun, but often have loot being stolen and power imbalances between players. Obviously, the best way to solve this issue is to remove the incentive to steal the loot in the first place!
 
-**`NOTE: The game recently updated. We're currently waiting on an R2API update, and until that point, this mod WILL NOT WORK. Join the Discord for status updates.`**
-
-|   Most Recent Update - 1.12.0    |
+|   Most Recent Update - 1.13.0    |
 |:--------------------------------|
-| **MAJOR** Critical money sharing bug fixed |
-| **MAJOR** Critical 3D Printer/Cauldron bug fixed |
-| Re-wrote part of the README |
+| **MAJOR** Correction of default scaling to vary with maps |
+| **MAJOR** Addition of Experimental Mode — Check the changelog! |
+| **MAJOR** Fix critical bug with entering portals |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -46,6 +44,11 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Want red items to be unique? Hate the fact that everyone gets hooves? No worries, we've got a solution. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#customization)
     - Config options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*). 
     - Item and equipment blacklists also exist for disabling specific items you don't want shared.
+
+- Want the game to be harder when you're playing with friends? Turn on the Experimental Mode! (*`NEW`*)
+    - Scales the interactable spawns to be fewer when you have more players with you.
+    - Makes the game harder while still maintaining the core feel of ShareSuite.
+    - Works best with Money Sharing on!
 
 - The config file allows you to customize the mod down to the slightest detail. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#config)
     - See the **Configuration** section for more information!
@@ -90,12 +93,13 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 | Dupe Fix                   |          True |      ss_PrinterCauldronFix |
 | Dead Players Get Items     |         False |     ss_DeadPlayersGetItems |
 | Override Player Scaling    |          True |   ss_OverridePlayerScaling |
+| Experimental Mode          |         False |        ss_ExperimentalMode |
 | Interactables Credit       |             1 |     ss_InteractablesCredit |
 | Override Boss Loot Scaling |          True | ss_OverrideBossLootScaling |
 | Boss Loot Credit           |             1 |          ss_BossLootCredit |
 | Money Scalar Enabled       |         False |      ss_MoneyScalarEnabled |
 | Money Scalar               |             1 |             ss_MoneyScalar |
-| Item Blacklist             |      53,82,86 |                        N/A |
+| Item Blacklist             |   53,60,82,86 |                        N/A |
 | Equipment Blacklist        |         Empty |                        N/A |
 
 **Tip: Want to reset your config?**
@@ -149,6 +153,10 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 #### Features in Development
 
+- Experimental Mode (*`NEW`*)
+    - Tune Experimental Mode to feel better
+    - Add customizability to the difficulty of experimental mode
+    - Rename the mode - send us suggestions in the Discord!
 - Custom Chat Messages
 - Item pickup cards for every player
 - Shared Equipment
@@ -186,7 +194,15 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `1.12.0 (CURRENT)`
+### `1.13.0 (CURRENT)`
+- Changed the way the interactables scaling works to vary with maps - bigger maps will now feel appropriately filled out
+- Added a new Experimental Mode! (Future name may be Hardcore/Hard mode, we're not sure yet)
+    - Higher numbers of players reduces the amount of interactable spawns.
+    - Makes the game more difficult but feels fairer to play to some.
+    - Try it out and let us know how you feel on the [Discord](https://discord.gg/c7QnQeb)!
+- Fixed a critical bug with new shared money - you can now enter portals without soft-locking your run.
+
+### `1.12.0`
 - Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
 - Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
     - Thank you to Commie for helping me test and fix these bugs!
@@ -208,8 +224,5 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Fixed incorrectly formatted horizontal rule. 
 - Fixed bug with Shared money keeping everyone at the same balance if a teammate died. 
 - What should I work on next? [Vote here!](https://www.strawpoll.me/18656636)
-
-### `1.10.2` 
-- Added Discord link to the README. Mod file is unchanged.
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
