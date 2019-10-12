@@ -18,7 +18,6 @@ namespace ShareSuite
                 // Allow for money sharing triggers as teleporter is inactive
                 MoneySharingHooks.SetTeleporterActive(false);
 
-
                 // This should run on every map, as it is required to fix shared money.
                 // Reset shared money value to the default (15) at the start of each round
                 MoneySharingHooks.SharedMoneyValue = 15;
