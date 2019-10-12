@@ -15,6 +15,10 @@ namespace ShareSuite
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
+                // Allow for money sharing triggers as teleporter is inactive
+                MoneySharingHooks.SetTeleporterActive(false);
+
+
                 // This should run on every map, as it is required to fix shared money.
                 // Reset shared money value to the default (15) at the start of each round
                 MoneySharingHooks.SharedMoneyValue = 15;
@@ -74,11 +78,6 @@ namespace ShareSuite
                 else
                     BossItems = Run.instance.participatingPlayerCount;
                 #endregion Itemsharing
-
-                #region Moneysharing
-                if (self.isCharged && ShareSuite.MoneyIsShared.Value)
-                    MoneySharingHooks.AdjustTpMoney();
-                #endregion Moneysharing
 
                 orig(self, activator);
             };

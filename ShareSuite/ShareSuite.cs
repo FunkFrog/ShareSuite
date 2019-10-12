@@ -15,7 +15,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.12.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.14.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         #region ConfigWrapper init
@@ -63,7 +63,8 @@ namespace ShareSuite
         public void Update()
         {
             if (!NetworkServer.active
-                || !MoneyIsShared.Value) return;
+                || !MoneyIsShared.Value
+                || MoneySharingHooks.TeleporterActive) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
@@ -96,6 +97,7 @@ namespace ShareSuite
             MoneySharingHooks.SharedMoneyValue = 0;
             MoneySharingHooks.ModifyGoldReward();
             MoneySharingHooks.BrittleCrownHook();
+            MoneySharingHooks.SplitTpMoney();
             EquipmentSharingHooks.OnGrantEquipment();
             #endregion
         }

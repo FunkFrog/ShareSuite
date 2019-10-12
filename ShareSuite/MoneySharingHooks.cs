@@ -6,6 +6,7 @@ namespace ShareSuite
 {
     public static class MoneySharingHooks
     {
+        public static bool TeleporterActive;
         public static int SharedMoneyValue;
 
         public static void BrittleCrownHook()
@@ -119,21 +120,34 @@ namespace ShareSuite
             };
         }
 
+        public static void SplitTpMoney()
+        {
+            On.RoR2.SceneExitController.Begin += (orig, self) =>
+            {
+                TeleporterActive = true;
+                if (ShareSuite.ModIsEnabled.Value
+                    || !ShareSuite.MoneyIsShared.Value)
+                {
+                    var players = PlayerCharacterMasterController.instances.Count;
+                    foreach (var player in PlayerCharacterMasterController.instances)
+                    {
+                        player.master.money = (uint)
+                            Mathf.FloorToInt(player.master.money / players);
+                    }
+                }
+                orig(self);
+            };
+        }
+
         private static void GiveAllScaledMoney(float goldReward)
         {
             //Apply gold rewards to shared money pool
             SharedMoneyValue += (int) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward);
         }
 
-        public static void AdjustTpMoney()
+        public static void SetTeleporterActive(bool active)
         {
-            var players = PlayerCharacterMasterController.instances.Count;
-            SharedMoneyValue /= players;
-            foreach (var player in PlayerCharacterMasterController.instances)
-            {
-                player.master.money = (uint)
-                    Mathf.FloorToInt(player.master.money / players);
-            }
+            TeleporterActive = active;
         }
     }
 }
