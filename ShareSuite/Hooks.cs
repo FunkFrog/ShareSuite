@@ -12,7 +12,6 @@ namespace ShareSuite
         public static int SharedMoneyValue;
         public static bool TeleporterActive;
         private static int _bossItems = 1;
-        // private static bool _sendPickup = true;
         
         public static void OverrideBossScaling()
         {
@@ -55,14 +54,6 @@ namespace ShareSuite
                             Mathf.FloorToInt(player.master.money / players);
                     }
                 }
-
-                if (ShareSuite.ExperimentalScaling.Value && Run.instance.stageClearCount == 0)
-                {
-                    Chat.AddMessage("Hey, thanks a ton for trying out ShareSuite's Experimental Scaling mode!");
-                    Chat.AddMessage(
-                        "If you like (or don't like) how this feels in comparison to normal, we'd love to hear your feedback!");
-                }
-
                 orig(self);
             };
         }
@@ -152,15 +143,6 @@ namespace ShareSuite
             };
         }
 
-        /*public static void PickupFix()
-        {
-            On.RoR2.Chat.AddPickupMessage += (orig, body, pickupToken, pickupColor, pickupQuantity) =>
-            {
-                if (_sendPickup)
-                    orig(body, pickupToken, pickupColor, pickupQuantity);
-            };
-        }*/
-
         private static void GiveAllScaledMoney(float goldReward)
         {
             SharedMoneyValue += (int) Mathf.Floor(goldReward * ShareSuite.MoneyScalar.Value - goldReward);
@@ -168,34 +150,30 @@ namespace ShareSuite
 
         public static void OverrideInteractablesScaling()
         {
-            On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) => //Replace 1 player values
+            On.RoR2.SceneDirector.PlaceTeleporter += (orig, self) =>
             {
                 orig(self);
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
+                #region SharedMoney
                 // This should run on every map, as it is required to fix shared money.
                 // Reset shared money value to the default (15) at the start of each round
                 TeleporterActive = false;
                 
                 SharedMoneyValue = 15;
+                #endregion
 
+                #region Interactablescredit
                 // Hopfully a future proof method of determining the proper amount of credits for 1 player
                 // Consider using IL when BepInEx RC2 is released to clean up code
-                var interactableCredit = 0;
-                var creditBalance = (float)(0.85 + Run.instance.participatingPlayerCount * 0.15);
+                var interactableCredit = 200;
+                
                 var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
                 if (component)
                 {
-                    if (ShareSuite.ExperimentalScaling.Value)
-                    {
-                        interactableCredit = (int)(component.sceneDirectorInteractibleCredits / creditBalance);
-                        if (interactableCredit < 150 && interactableCredit != 0) interactableCredit = 150;
-                    }
-                    else
-                    {
-                        interactableCredit = component.sceneDirectorInteractibleCredits;
-                    }
+                    // Fetch the amount of interactables we may play with.
+                    interactableCredit = component.sceneDirectorInteractibleCredits;
                     if (component.bonusInteractibleCreditObjects != null)
                     {
                         foreach (var bonusIntractableCreditObject in component.bonusInteractibleCreditObjects)
@@ -206,11 +184,23 @@ namespace ShareSuite
                             }
                         }
                     }
+
+                    // The flat creditModifier slightly adjust interactables based on the amount of players.
+                    // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
+                    var creditModifier = (float)(0.95 + System.Math.Min(Run.instance.participatingPlayerCount, 8) * 0.05);
+
+                    // In addition to our flat modifier, we additionally introduce a stage modifier.
+                    // This reduces player strength early game (as having more bodies gives a flat power increase early game).
+                    creditModifier = creditModifier * (float) System.Math.Max(1.0 + 0.1 * System.Math.Min(Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2, 3), 1.0);
+
+                    // Apply the transformation. It is of paramount importance that creditModifier == 1.0 for a 1p game.
+                    interactableCredit = (int)(component.sceneDirectorInteractibleCredits / creditModifier);
                 }
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
+                #endregion
             };
         }
 
@@ -218,24 +208,31 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
             {
+                if (!ShareSuite.ModIsEnabled.Value)
+                {
+                    orig(self, body, inventory);
+                    return;
+                }
+
+                #region Item sharing
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 
-                if (!ShareSuite.GetItemBlackList().Contains((int) item)
+                if (!ShareSuite.GetItemBlackList().Contains((int)item)
                     && NetworkServer.active
                     && IsValidItemPickup(self.pickupIndex)
-                    && IsMultiplayer()
-                    && ShareSuite.ModIsEnabled.Value)
+                    && IsMultiplayer())
                     foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                     {
                         // Ensure character is not original player that picked up item
                         if (player.inventory == inventory) continue;
+
+                        // Do not reward dead players if not required
                         if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
+
                         player.inventory.GiveItem(item);
-                        /*_sendPickup = false;
-                        SendPickupMessage.Invoke(null, new object[] {player, self.pickupIndex});
-                        _sendPickup = true;*/
                     }
+                #endregion
 
                 orig(self, body, inventory);
             };
@@ -257,13 +254,14 @@ namespace ShareSuite
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
 
+                #region Sharedmoney
                 if (ShareSuite.MoneyIsShared.Value)
                 {
-                    //TODO add comments on what this does
                     switch (self.costType)
                     {
                         case CostTypeIndex.Money:
                         {
+                            // Remove money from shared money pool
                             orig(self, activator);
                             SharedMoneyValue -= self.cost;
                             return;
@@ -271,6 +269,8 @@ namespace ShareSuite
 
                         case CostTypeIndex.PercentHealth:
                         {
+                            // Share the damage taken from a sacrifice
+                            // as it generates shared money
                             orig(self, activator);
                             var teamMaxHealth = 0;
                             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
@@ -294,7 +294,9 @@ namespace ShareSuite
                         }
                     }
                 }
+                #endregion
 
+                #region Cauldronfix
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
                 if (!IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
@@ -314,6 +316,7 @@ namespace ShareSuite
                     SendPickupMessage.Invoke(null,
                         new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
                 }
+                #endregion Cauldronfix
 
                 orig(self, activator);
             };

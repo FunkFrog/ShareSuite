@@ -30,8 +30,7 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
-            MoneyScalarEnabled,
-            ExperimentalScaling;
+            MoneyScalarEnabled;
 
         public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
@@ -186,12 +185,6 @@ namespace ShareSuite
                 "Balance",
                 "DeadPlayersGetItems",
                 "Toggles item sharing for dead players.",
-                false);
-            
-            ExperimentalScaling = Config.Wrap(
-                "Balance",
-                "ExperimentalScaling",
-                "Experimental scaling mode that leaves less loot the more players are in the lobby. Requires OverridePlayerScalingEnabled to be set to true.",
                 false);
 
             OverridePlayerScalingEnabled = Config.Wrap(
@@ -437,15 +430,5 @@ namespace ShareSuite
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
         }
         
-        // Experimental Scaling
-        [ConCommand(commandName = "ss_ExperimentalScaling", flags = ConVarFlags.None,
-            helpText = "Toggles the Experimental Scaling mode - Check the README on Thunderstore for more info!")]
-        private static void CcExperimentalScaling(ConCommandArgs args)
-        {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], ExperimentalScaling))
-                Debug.Log("Invalid arguments.");
-            else
-                Debug.Log($"Boss loot scaling disable set to {ExperimentalScaling.Value}.");
-        }
     }
 }
