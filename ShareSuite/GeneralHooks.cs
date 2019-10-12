@@ -23,12 +23,6 @@ namespace ShareSuite
                 // Reset shared money value to the default (15) at the start of each round
                 MoneySharingHooks.SharedMoneyValue = 15;
 
-                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
-                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
-
-                if (goldshores || mysteryspace)
-                    return;
-
                 #region InteractablesCredit
                 var interactableCredit = 200;
 
