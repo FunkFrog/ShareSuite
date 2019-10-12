@@ -16,8 +16,8 @@ namespace ShareSuite
                 if (!NetworkServer.active) return;
 
                 if (!ShareSuite.MoneyIsShared.Value
-                    || !(bool)self.body
-                    || !(bool)self.body.inventory
+                    || !(bool) self.body
+                    || !(bool) self.body.inventory
                     || !ShareSuite.ModIsEnabled.Value)
                 {
                     orig(self, info);
@@ -25,6 +25,7 @@ namespace ShareSuite
                 }
 
                 #region Sharedmoney
+
                 // The idea here is that we track amount of money pre and post function evaluation.
                 // We can subsequently apply the difference to the shared pool.
                 var body = self.body;
@@ -39,7 +40,7 @@ namespace ShareSuite
                 if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
 
                 // Apply the calculation to the shared money pool
-                SharedMoneyValue += (int)postDamageMoney - (int)preDamageMoney;
+                SharedMoneyValue += (int) postDamageMoney - (int) preDamageMoney;
 
                 // Add impact effect
                 foreach (var player in PlayerCharacterMasterController.instances)
@@ -49,6 +50,7 @@ namespace ShareSuite
                             "Prefabs/Effects/ImpactEffects/CoinImpact"),
                         player.master.GetBody().corePosition, Vector3.up, true);
                 }
+
                 #endregion
             };
 
@@ -65,6 +67,7 @@ namespace ShareSuite
                 }
 
                 #region Sharedmoney
+
                 // The idea here is that we track amount of money pre and post function evaluation.
                 // We can subsequently apply the difference to the shared pool.
                 var body = info.attacker.GetComponent<CharacterBody>();
@@ -80,6 +83,7 @@ namespace ShareSuite
 
                 // Apply the calculation to the shared money pool
                 SharedMoneyValue += (int) postDamageMoney - (int) preDamageMoney;
+
                 #endregion
             };
         }
@@ -93,6 +97,7 @@ namespace ShareSuite
                 if (!ShareSuite.ModIsEnabled.Value) return;
 
                 #region Sharedmoney
+
                 // Collect reward from kill and put it into shared pool
                 SharedMoneyValue += (int) self.goldReward;
 
@@ -100,6 +105,7 @@ namespace ShareSuite
                     || !NetworkServer.active) return;
 
                 GiveAllScaledMoney(self.goldReward);
+
                 #endregion
             };
 
@@ -108,6 +114,7 @@ namespace ShareSuite
                 orig(self, activator);
 
                 #region Sharedmoney
+
                 // Collect reward from barrel and put it into shared pool
                 if (!ShareSuite.ModIsEnabled.Value) return;
                 SharedMoneyValue += self.goldReward;
@@ -116,6 +123,7 @@ namespace ShareSuite
                     || !NetworkServer.active) return;
 
                 GiveAllScaledMoney(self.goldReward);
+
                 #endregion
             };
         }
@@ -125,16 +133,20 @@ namespace ShareSuite
             On.RoR2.SceneExitController.Begin += (orig, self) =>
             {
                 TeleporterActive = true;
-                if (ShareSuite.ModIsEnabled.Value
+                if (!ShareSuite.ModIsEnabled.Value
                     || !ShareSuite.MoneyIsShared.Value)
                 {
-                    var players = PlayerCharacterMasterController.instances.Count;
-                    foreach (var player in PlayerCharacterMasterController.instances)
-                    {
-                        player.master.money = (uint)
-                            Mathf.FloorToInt(player.master.money / players);
-                    }
+                    orig(self);
+                    return;
                 }
+
+                var players = PlayerCharacterMasterController.instances.Count;
+                foreach (var player in PlayerCharacterMasterController.instances)
+                {
+                    player.master.money = (uint)
+                        Mathf.FloorToInt(player.master.money / players);
+                }
+
                 orig(self);
             };
         }

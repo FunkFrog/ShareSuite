@@ -1,6 +1,5 @@
 using R2API;
 using RoR2;
-using UnityEngine.SceneManagement;
 
 namespace ShareSuite
 {
@@ -23,6 +22,7 @@ namespace ShareSuite
                 MoneySharingHooks.SharedMoneyValue = 15;
 
                 #region InteractablesCredit
+
                 var interactableCredit = 200;
 
                 var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
@@ -44,20 +44,25 @@ namespace ShareSuite
 
                     // The flat creditModifier slightly adjust interactables based on the amount of players.
                     // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
-                    var creditModifier = (float)(0.95 + System.Math.Min(Run.instance.participatingPlayerCount, 8) * 0.05);
+                    var creditModifier =
+                        (float) (0.95 + System.Math.Min(Run.instance.participatingPlayerCount, 8) * 0.05);
 
                     // In addition to our flat modifier, we additionally introduce a stage modifier.
                     // This reduces player strength early game (as having more bodies gives a flat power increase early game).
-                    creditModifier = creditModifier * (float)System.Math.Max(1.0 + 0.1 * System.Math.Min(Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2, 3), 1.0);
+                    creditModifier = creditModifier * (float) System.Math.Max(
+                                         1.0 + 0.1 * System.Math.Min(
+                                             Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount -
+                                             2, 3), 1.0);
 
                     // Apply the transformation. It is of paramount importance that creditModifier == 1.0 for a 1p game.
-                    interactableCredit = (int)(component.sceneDirectorInteractibleCredits / creditModifier);
+                    interactableCredit = (int) (component.sceneDirectorInteractibleCredits / creditModifier);
                 }
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
-                #endregion  
+
+                #endregion
             };
         }
 
@@ -66,10 +71,12 @@ namespace ShareSuite
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
                 #region Itemsharing
+
                 if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
                     BossItems = ShareSuite.BossLootCredit.Value;
                 else
                     BossItems = Run.instance.participatingPlayerCount;
+
                 #endregion Itemsharing
 
                 orig(self, activator);

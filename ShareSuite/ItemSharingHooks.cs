@@ -24,6 +24,7 @@ namespace ShareSuite
                 var inventory = characterBody.inventory;
 
                 #region Sharedmoney
+
                 if (ShareSuite.MoneyIsShared.Value)
                 {
                     switch (self.costType)
@@ -63,9 +64,11 @@ namespace ShareSuite
                         }
                     }
                 }
+
                 #endregion
 
                 #region Cauldronfix
+
                 // If this is not a multi-player server or the fix is disabled, do the normal drop action
                 if (!GeneralHooks.IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
@@ -85,6 +88,7 @@ namespace ShareSuite
                     SendPickupMessage.Invoke(null,
                         new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
                 }
+
                 #endregion Cauldronfix
 
                 orig(self, activator);
@@ -124,6 +128,7 @@ namespace ShareSuite
                     orig(self, body, inventory);
                     return;
                 }
+
                 // Item to share
                 var item = self.pickupIndex.itemIndex;
 

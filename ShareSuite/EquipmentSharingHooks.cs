@@ -17,6 +17,7 @@ namespace ShareSuite
                 }
 
                 #region Sharedequipment
+
                 var equip = self.pickupIndex.equipmentIndex;
 
                 if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
@@ -36,6 +37,7 @@ namespace ShareSuite
                     }
 
                 orig(self, body, inventory);
+
                 #endregion
             };
         }
@@ -56,7 +58,7 @@ namespace ShareSuite
             SetEquipmentIndex(characterMaster.inventory, equip,
                 (uint) (characterMaster.inventory.activeEquipmentSlot + 1) % 2);
         }
-        
+
         /// <summary>
         /// This function is currently ineffective, but may be later extended to quickly set a validator
         /// on equipments to narrow them down to a set of ranges beyond just blacklisting.
@@ -68,7 +70,7 @@ namespace ShareSuite
             var equip = pickup.equipmentIndex;
             return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
         }
-        
+
         public static bool IsEquipment(EquipmentIndex index)
         {
             return EquipmentCatalog.allEquipment.Contains(index);

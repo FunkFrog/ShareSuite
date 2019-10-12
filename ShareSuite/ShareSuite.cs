@@ -19,6 +19,7 @@ namespace ShareSuite
     public class ShareSuite : BaseUnityPlugin
     {
         #region ConfigWrapper init
+
         public static ConfigWrapper<bool> ModIsEnabled,
             MoneyIsShared,
             WhiteItemsShared,
@@ -35,6 +36,7 @@ namespace ShareSuite
 
         public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
+
         #endregion
 
         public static HashSet<int> GetItemBlackList()
@@ -87,6 +89,7 @@ namespace ShareSuite
             };
 
             #region Hook registration
+
             // Register all the hooks
             GeneralHooks.OverrideBossScaling();
             GeneralHooks.OnPlaceTeleporter();
@@ -99,6 +102,7 @@ namespace ShareSuite
             MoneySharingHooks.BrittleCrownHook();
             MoneySharingHooks.SplitTpMoney();
             EquipmentSharingHooks.OnGrantEquipment();
+
             #endregion
         }
 
@@ -256,6 +260,7 @@ namespace ShareSuite
         }
 
         #region CommandParser
+
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
         private static void CcModIsEnabled(ConCommandArgs args)
@@ -434,6 +439,7 @@ namespace ShareSuite
             else
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
         }
+
         #endregion CommandParser
     }
 }
