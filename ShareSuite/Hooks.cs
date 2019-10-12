@@ -4,14 +4,13 @@ using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 namespace ShareSuite
 {
     public static class Hooks
     {
         public static int SharedMoneyValue;
-
+        public static bool TeleporterActive;
         private static int _bossItems = 1;
         // private static bool _sendPickup = true;
         
@@ -23,11 +22,12 @@ namespace ShareSuite
                 orig(self);
             };
         }
-        public static void SplitTpMoney()
+        public static void AdjustBossDrops()
         {
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
-                if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
+                if (ShareSuite.ModIsEnabled.Value 
+                    && ShareSuite.OverrideBossLootScalingEnabled.Value)
                 {
                     _bossItems = ShareSuite.BossLootCredit.Value;
                 }
@@ -36,10 +36,19 @@ namespace ShareSuite
                     _bossItems = Run.instance.participatingPlayerCount;
                 }
 
-                if (self.isCharged && ShareSuite.MoneyIsShared.Value)
+                orig(self, activator);
+            };
+        }
+
+        public static void SplitTpMoney()
+        {
+            On.RoR2.SceneExitController.Begin += (orig, self) =>
+            {
+                TeleporterActive = true;
+                if (ShareSuite.ModIsEnabled.Value
+                    || !ShareSuite.MoneyIsShared.Value)
                 {
                     var players = PlayerCharacterMasterController.instances.Count;
-                    SharedMoneyValue /= players;
                     foreach (var player in PlayerCharacterMasterController.instances)
                     {
                         player.master.money = (uint)
@@ -47,9 +56,14 @@ namespace ShareSuite
                     }
                 }
 
-                orig(self, activator);
+                if (ShareSuite.ExperimentalScaling.Value && Run.instance.stageClearCount == 0)
+                {
+                    Chat.AddMessage("Hey, thanks a ton for trying out ShareSuite's Experimental Scaling mode!");
+                    Chat.AddMessage(
+                        "If you like (or don't like) how this feels in comparison to normal, we'd love to hear your feedback!");
+                }
 
-                SharedMoneyValue = 0;
+                orig(self);
             };
         }
 
@@ -161,18 +175,42 @@ namespace ShareSuite
 
                 // This should run on every map, as it is required to fix shared money.
                 // Reset shared money value to the default (15) at the start of each round
+                TeleporterActive = false;
+                
                 SharedMoneyValue = 15;
 
-                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
-                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
+                // Hopfully a future proof method of determining the proper amount of credits for 1 player
+                // Consider using IL when BepInEx RC2 is released to clean up code
+                var interactableCredit = 0;
+                var creditBalance = (float)(0.85 + Run.instance.participatingPlayerCount * 0.15);
+                var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
-                if (goldshores || mysteryspace)
-                    return;
-
+                if (component)
+                {
+                    if (ShareSuite.ExperimentalScaling.Value)
+                    {
+                        interactableCredit = (int)(component.sceneDirectorInteractibleCredits / creditBalance);
+                        if (interactableCredit < 150 && interactableCredit != 0) interactableCredit = 150;
+                    }
+                    else
+                    {
+                        interactableCredit = component.sceneDirectorInteractibleCredits;
+                    }
+                    if (component.bonusInteractibleCreditObjects != null)
+                    {
+                        foreach (var bonusIntractableCreditObject in component.bonusInteractibleCreditObjects)
+                        {
+                            if (bonusIntractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
+                            {
+                                interactableCredit += bonusIntractableCreditObject.points;
+                            }
+                        }
+                    }
+                }
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
             };
         }
 

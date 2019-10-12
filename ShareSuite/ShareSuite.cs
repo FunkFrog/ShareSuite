@@ -15,7 +15,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.12.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.0")]
     public class ShareSuite : BaseUnityPlugin
     {
         public static ConfigWrapper<bool> ModIsEnabled,
@@ -30,7 +30,8 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
-            MoneyScalarEnabled;
+            MoneyScalarEnabled,
+            ExperimentalScaling;
 
         public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
@@ -61,7 +62,8 @@ namespace ShareSuite
         public void Update()
         {
             if (!NetworkServer.active
-                || !MoneyIsShared.Value) return;
+                || !MoneyIsShared.Value
+                || Hooks.TeleporterActive) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
@@ -93,6 +95,7 @@ namespace ShareSuite
             Hooks.ModifyGoldReward();
             Hooks.SplitTpMoney();
             Hooks.BrittleCrownHook();
+            Hooks.AdjustBossDrops();
             // Hooks.PickupFix();
         }
 
@@ -183,6 +186,12 @@ namespace ShareSuite
                 "Balance",
                 "DeadPlayersGetItems",
                 "Toggles item sharing for dead players.",
+                false);
+            
+            ExperimentalScaling = Config.Wrap(
+                "Balance",
+                "ExperimentalScaling",
+                "Experimental scaling mode that leaves less loot the more players are in the lobby. Requires OverridePlayerScalingEnabled to be set to true.",
                 false);
 
             OverridePlayerScalingEnabled = Config.Wrap(
@@ -426,6 +435,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
+        }
+        
+        // Experimental Scaling
+        [ConCommand(commandName = "ss_ExperimentalScaling", flags = ConVarFlags.None,
+            helpText = "Toggles the Experimental Scaling mode - Check the README on Thunderstore for more info!")]
+        private static void CcExperimentalScaling(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], ExperimentalScaling))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Boss loot scaling disable set to {ExperimentalScaling.Value}.");
         }
     }
 }
