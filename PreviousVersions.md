@@ -1,5 +1,8 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.10.2` 
+- Added Discord link to the README. Mod file is unchanged.
+
 `1.10.1` 
 - Update to R2API-2.1.15
 - Fixes bug involving boss drops not dropping the correct amount of loot.
