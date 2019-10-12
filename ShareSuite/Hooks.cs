@@ -163,16 +163,30 @@ namespace ShareSuite
                 // Reset shared money value to the default (15) at the start of each round
                 SharedMoneyValue = 15;
 
-                bool goldshores = SceneManager.GetActiveScene().name == "goldshores";
-                bool mysteryspace = SceneManager.GetActiveScene().name == "mysteryspace";
+                // Hopfully a future proof method of determining the proper amount of credits for 1 player
+                // Consider using IL when BepInEx RC2 is released to clean up code
+                int interactableCredit = 0;
+                ClassicStageInfo component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
-                if (goldshores || mysteryspace)
-                    return;
-
+                if (component)
+                {
+                    interactableCredit = component.sceneDirectorInteractibleCredits;
+                    if (component.bonusInteractibleCreditObjects != null)
+                    {
+                        for (int i = 0; i < component.bonusInteractibleCreditObjects.Length; i++)
+                        {
+                            ClassicStageInfo.BonusInteractibleCreditObject bonusInteractibleCreditObject = component.bonusInteractibleCreditObjects[i];
+                            if (bonusInteractibleCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
+                            {
+                                interactableCredit += bonusInteractibleCreditObject.points;
+                            }
+                        }
+                    }
+                }
 
                 // Set interactables budget to 200 * config player count (normal calculation)
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    self.SetFieldValue("interactableCredit", 200 * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
             };
         }
 
