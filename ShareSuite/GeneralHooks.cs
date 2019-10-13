@@ -54,11 +54,11 @@ namespace ShareSuite
                                              Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount -
                                              2, 3), 1.0);
 
-                    // Apply the transformation. It is of paramount importance that creditModifier == 1.0 for a 1p game.
-                    interactableCredit = (int) (component.sceneDirectorInteractibleCredits / creditModifier);
+                    // We must apply the transformation to interactableCredit otherwise bonusIntractableCreditObject will be overwritten.
+                    interactableCredit = (int) (interactableCredit / creditModifier);
                 }
 
-                // Set interactables budget to 200 * config player count (normal calculation)
+                // Set interactables budget to interactableCredit * config player count.
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
                     self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
 
