@@ -6,7 +6,7 @@ namespace ShareSuite
 {
     public static class MoneySharingHooks
     {
-        public static bool TeleporterActive;
+        public static bool MapTransitionActive;
         public static int SharedMoneyValue;
 
         public static void BrittleCrownHook()
@@ -132,7 +132,7 @@ namespace ShareSuite
         {
             On.RoR2.SceneExitController.Begin += (orig, self) =>
             {
-                TeleporterActive = true;
+                MapTransitionActive = true;
                 if (!ShareSuite.ModIsEnabled.Value
                     || !ShareSuite.MoneyIsShared.Value)
                 {
@@ -159,7 +159,7 @@ namespace ShareSuite
 
         public static void SetTeleporterActive(bool active)
         {
-            TeleporterActive = active;
+            MapTransitionActive = active;
         }
     }
 }

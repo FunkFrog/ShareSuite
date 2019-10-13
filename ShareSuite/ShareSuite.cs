@@ -67,7 +67,7 @@ namespace ShareSuite
         {
             if (!NetworkServer.active
                 || !MoneyIsShared.Value
-                || MoneySharingHooks.TeleporterActive) return;
+                || MoneySharingHooks.MapTransitionActive) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
