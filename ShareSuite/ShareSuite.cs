@@ -15,9 +15,11 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.2")]
     public class ShareSuite : BaseUnityPlugin
     {
+        #region ConfigWrapper init
+
         public static ConfigWrapper<bool> ModIsEnabled,
             MoneyIsShared,
             WhiteItemsShared,
@@ -30,11 +32,13 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
-            MoneyScalarEnabled,
-            ExperimentalScaling;
+            MoneyScalarEnabled;
 
-        public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
+        public static ConfigWrapper<int> BossLootCredit;
+        public static ConfigWrapper<double> InteractablesCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
+
+        #endregion
 
         public static HashSet<int> GetItemBlackList()
         {
@@ -63,14 +67,14 @@ namespace ShareSuite
         {
             if (!NetworkServer.active
                 || !MoneyIsShared.Value
-                || Hooks.TeleporterActive) return;
+                || MoneySharingHooks.MapTransitionActive) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
                 if (!playerCharacterMasterController.master.alive) continue;
-                if (playerCharacterMasterController.master.money != Hooks.SharedMoneyValue)
+                if (playerCharacterMasterController.master.money != MoneySharingHooks.SharedMoneyValue)
                 {
-                    playerCharacterMasterController.master.money = (uint) Hooks.SharedMoneyValue;
+                    playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
                 }
             }
         }
@@ -84,19 +88,23 @@ namespace ShareSuite
                 FrogtownInterface.Init(Config);
                 orig(self);
             };
+
+            #region Hook registration
+
             // Register all the hooks
-            Hooks.SharedMoneyValue = 0;
-            Hooks.OverrideBossScaling();
-            Hooks.OnGrantItem();
-            Hooks.OnGrantEquipment();
-            Hooks.OnShopPurchase();
-            Hooks.OnPurchaseDrop();
-            Hooks.OverrideInteractablesScaling();
-            Hooks.ModifyGoldReward();
-            Hooks.SplitTpMoney();
-            Hooks.BrittleCrownHook();
-            Hooks.AdjustBossDrops();
-            // Hooks.PickupFix();
+            GeneralHooks.OverrideBossScaling();
+            GeneralHooks.OnPlaceTeleporter();
+            GeneralHooks.OnTpInteraction();
+            ItemSharingHooks.OnGrantItem();
+            ItemSharingHooks.OnShopPurchase();
+            ItemSharingHooks.OnPurchaseDrop();
+            MoneySharingHooks.SharedMoneyValue = 0;
+            MoneySharingHooks.ModifyGoldReward();
+            MoneySharingHooks.BrittleCrownHook();
+            MoneySharingHooks.SplitTpMoney();
+            EquipmentSharingHooks.OnGrantEquipment();
+
+            #endregion
         }
 
         public class CommandHelper
@@ -187,12 +195,6 @@ namespace ShareSuite
                 "DeadPlayersGetItems",
                 "Toggles item sharing for dead players.",
                 false);
-            
-            ExperimentalScaling = Config.Wrap(
-                "Balance",
-                "ExperimentalScaling",
-                "Experimental scaling mode that leaves less loot the more players are in the lobby. Requires OverridePlayerScalingEnabled to be set to true.",
-                false);
 
             OverridePlayerScalingEnabled = Config.Wrap(
                 "Balance",
@@ -204,7 +206,7 @@ namespace ShareSuite
                 "Balance",
                 "InteractablesCredit",
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns.",
-                1);
+                1d);
 
             OverrideBossLootScalingEnabled = Config.Wrap(
                 "Balance",
@@ -228,7 +230,7 @@ namespace ShareSuite
                 "Settings",
                 "MoneyScalar",
                 "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1);
+                1d);
 
             ItemBlacklist = Config.Wrap(
                 "Settings",
@@ -257,6 +259,8 @@ namespace ShareSuite
                     return false;
             }
         }
+
+        #region CommandParser
 
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
@@ -436,16 +440,7 @@ namespace ShareSuite
             else
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
         }
-        
-        // Experimental Scaling
-        [ConCommand(commandName = "ss_ExperimentalScaling", flags = ConVarFlags.None,
-            helpText = "Toggles the Experimental Scaling mode - Check the README on Thunderstore for more info!")]
-        private static void CcExperimentalScaling(ConCommandArgs args)
-        {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], ExperimentalScaling))
-                Debug.Log("Invalid arguments.");
-            else
-                Debug.Log($"Boss loot scaling disable set to {ExperimentalScaling.Value}.");
-        }
+
+        #endregion CommandParser
     }
 }
