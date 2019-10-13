@@ -34,7 +34,8 @@ namespace ShareSuite
             OverrideBossLootScalingEnabled,
             MoneyScalarEnabled;
 
-        public static ConfigWrapper<int> InteractablesCredit, BossLootCredit, MoneyScalar;
+        public static ConfigWrapper<int> BossLootCredit;
+        public static ConfigWrapper<double> InteractablesCredit, MoneyScalar;
         public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
 
         #endregion
@@ -205,7 +206,7 @@ namespace ShareSuite
                 "Balance",
                 "InteractablesCredit",
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns.",
-                1);
+                1d);
 
             OverrideBossLootScalingEnabled = Config.Wrap(
                 "Balance",
@@ -229,7 +230,7 @@ namespace ShareSuite
                 "Settings",
                 "MoneyScalar",
                 "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1);
+                1d);
 
             ItemBlacklist = Config.Wrap(
                 "Settings",
