@@ -41,7 +41,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
     - When you pick up equipment, everyone gets it.
     - ***(TO-DO)*** When someone picks up equipment, they drop the one everyone currently has.
     - ***(TO-DO)*** When someone buys an equipment drone, everyone loses their equipment.
-    
+
+<img align="right" src="https://media.giphy.com/media/Su09ux5F0SfzD98GbV/giphy.gif" width="200">
+
 - Worried about the game becoming unbalanced? We've got you. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#balance)
     - Tuned to be balanced by default.
     - Built to feel like vanilla singleplayer; The mod scales to feel right with any amount of players, whether you're playing with 2 or 20.
