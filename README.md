@@ -17,7 +17,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
-### ![Features]
+<p align="center"> 
+<img src="https://i.imgur.com/6jCWYtn.png">
+</p>
 
 **Want a more detailed look at any of our features? Click the [*Show me more*] button next to the bullet!**
 
@@ -153,7 +155,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 #### Can I use this mod in quick play?
 ```We DO NOT condone use of this mod in any quick play or prismatic trial games. We will refuse any support for the use of this mod in Quick Play.```
 
-### ![To-Do](https://i.imgur.com/hOqXT4A.png "ShareSuite To-Do")
+<p align="center"> 
+<img src="https://i.imgur.com/hOqXT4A.png">
+</p>
 
 #### Known Bugs
 
@@ -175,7 +179,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
         - Remove all equipment upon purchase of equipment drone
     - Remove invalid items from the FrogTown equipment blacklist slider
 
-### ![Bug Reports & Suggestions](https://i.imgur.com/ssmfn9f.png "ShareSuite Bug Reports + Suggestions")
+<p align="center"> 
+<img src="https://i.imgur.com/ssmfn9f.png">
+</p>
 
 [![Bug Reports](https://img.shields.io/github/issues/FunkFrog/RoR2SharedItems/bug?label=Bug%20Reports&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/issues)[![Feature Requests](https://img.shields.io/github/issues/FunkFrog/RoR2SharedItems/enhancement?label=Feature%20Requests&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/issues)
 
@@ -185,8 +191,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - DM us on Discord at `FunkFrog#0864` or `Sipondo#5150`.
 - Make a new issue on our [GitHub Repo](https://github.com/FunkFrog/RoR2SharedItems).
 
-
-<img src="https://i.imgur.com/kvxSeNw.png")
+<p align="center"> 
+<img src="https://i.imgur.com/kvxSeNw.png">
+</p>
 
 **Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
 
@@ -194,13 +201,9 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
     - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
 - [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) `2.1.1`
 
-### ![Incompatible Mods](https://i.imgur.com/jDXbLYR.png "ShareSuite Incompatible Mods")
-
-**Creators of these mods: If you are open to collaborate with us, we'd love to work with you to resolve the conflict!**
-
-- *There are no incompatible updated mods we're currently aware of :)*
-
-### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
+<p align="center"> 
+<img src="https://i.imgur.com/5qt4b0r.png">
+</p>
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
