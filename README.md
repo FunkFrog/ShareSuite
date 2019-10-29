@@ -178,7 +178,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 ### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
 
-**Even though we do our best to provide you with a stable gaming experience, it is impossible for us to test how our mod interacts with every other mod out there. To the creators of other mods: If your mod conflicts with ours, please feel free to collaborate with us, we'd love to work with you to resolve the conflict!
+**Even though we do our best to provide you with a stable gaming experience, it is impossible for us to test how our mod interacts with every other mod out there. To the creators of other mods: If your mod conflicts with ours, please feel free to collaborate with us, we'd love to work with you to resolve the conflict!**
 
 **Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM us on Discord with the mod link + version tested and I'll add it to this list!**
 
