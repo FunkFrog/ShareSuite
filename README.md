@@ -1,5 +1,7 @@
 [//]: # ( Header imgur album: https://imgur.com/a/2uaeCao )
-<img align="center" src="https://i.imgur.com/4HTi92E.png">
+<p align="center"> 
+<img src="https://i.imgur.com/4HTi92E.png">
+</p>
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
