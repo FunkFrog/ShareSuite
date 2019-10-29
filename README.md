@@ -19,7 +19,8 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 **Want a more detailed look at any of our features? Click the [*Show me more*] button next to the bullet!**
 
-<img align="right" src="https://media.giphy.com/media/jpzc9YGSe1aDxjQRaN/giphy.gif" width="250" height="250">
+<img align="right" src="https://media.giphy.com/media/jpzc9YGSe1aDxjQRaN/giphy.gif" width="200">
+
 - Item Sharing — The main goal of this mod is to split items across all players evenly. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#item-sharing)
     - Any items that are picked up are given to all living members of your party.
     - By default, lunar items and items that provide bonuses for all members of the party are not shared.
