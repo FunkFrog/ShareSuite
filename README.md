@@ -178,17 +178,14 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 ### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
 
-**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
+**Even though we do our best to provide you with a stable gaming experience, it is impossible for us to test how our mod interacts with every other mod out there. To the creators of other mods: If your mod conflicts with ours, please feel free to collaborate with us, we'd love to work with you to resolve the conflict!**
+
+**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM us on Discord with the mod link + version tested and I'll add it to this list!**
 
 - [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.3.0`
     - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
 - [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) `2.1.1`
 
-### ![Incompatible Mods](https://i.imgur.com/jDXbLYR.png "ShareSuite Incompatible Mods")
-
-**Creators of these mods: If you are open to collaborate with us, we'd love to work with you to resolve the conflict!**
-
-- *There are no incompatible updated mods we're currently aware of :)*
 
 ### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
 
@@ -205,7 +202,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 ### `1.12.0`
 - Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
 - Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
-    - Thank you to Commie for helping me test and fix these bugs!
+    - Thank you to Commie for helping us test and fix these bugs!
 - Made improvements to the README's writing to make it sound less like a student who wanted to meet a sentence requirement on an essay.
     
 ### `1.11.0`
