@@ -195,7 +195,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 <img src="https://i.imgur.com/kvxSeNw.png">
 </p>
 
-**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
+**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, message us on Discord with the mod link + version tested and I'll add it to this list!**
 
 - [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.3.0`
     - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
