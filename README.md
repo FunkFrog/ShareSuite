@@ -60,14 +60,18 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Native config GUI integration with [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) v2.0.4+ (*[Preview of the GUI](https://i.imgur.com/muzxIsW.png)*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#gui)
     - Integration with the BepInEx config UI coming soon!
 
-### ![Installation Guide](https://i.imgur.com/6oHhqsV.png "ShareSuite Installation Guide")
+<p align="center"> 
+<img src="https://i.imgur.com/6oHhqsV.png">
+</p>
 
 - Install the latest version of **[R2API](https://thunderstore.io/package/tristanmcpherson/R2API/)** if you haven't already. 
 - Download and unzip the files with the download button above.
 - Place `ShareSuite.dll` in your BepInEx/plugins/ folder
 - Run the game and have a great time!
 
-### ![Configuration](https://i.imgur.com/XmCL1MI.png "ShareSuite Configuration")
+<p align="center"> 
+<img src="https://i.imgur.com/XmCL1MI.png">
+</p>
 
 1. **Make sure you run the game with the mod installed to generate the config file!**
 2. Navigate to `\Risk of Rain 2\BepInEx\config\`
@@ -112,8 +116,10 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Navigate to `\Risk of Rain 2\BepInEx\config\`
 - Delete `com.funkfrog_sipondo.sharesuite.cfg`
 - Start the game again. Upon boot, a fresh new config will be generated!
-    
-### ![FAQ](https://i.imgur.com/dL9L88y.png "ShareSuite FAQ")
+
+<p align="center"> 
+<img src="https://i.imgur.com/dL9L88y.png">
+</p>
 
 #### How do 3d printers and cauldrons work with this mod installed?
 ```3d printers and cauldrons add the item directly to your item pool. No item orb will drop, it will just appear in your inventory.```
@@ -180,7 +186,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Make a new issue on our [GitHub Repo](https://github.com/FunkFrog/RoR2SharedItems).
 
 
-### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
+<img src="https://i.imgur.com/kvxSeNw.png")
 
 **Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
 
