@@ -31,6 +31,9 @@ namespace ShareSuite
 
                 if (component)
                 {
+                    // Overwrite our base value with the actual amount of director credits.
+                    interactableCredit = component.sceneDirectorInteractibleCredits;
+
                     // We require playercount for several of the following computations. We don't want this to break with
                     // those crazy 'mega party mods', thus we clamp this value.
                     var clampPlayerCount = System.Math.Min(Run.instance.participatingPlayerCount, 8);
@@ -49,9 +52,8 @@ namespace ShareSuite
                     // We must apply the transformation to interactableCredit otherwise bonusIntractableCreditObject will be overwritten.
                     interactableCredit = (int) (interactableCredit / creditModifier);
                     
-                    // Fetch the amount of interactables we may play with. We have to do this after our first math block,
+                    // Fetch the amount of bonus interactables we may play with. We have to do this after our first math block,
                     // as we do not want to divide bonuscredits twice.
-                    interactableCredit = component.sceneDirectorInteractibleCredits;
                     if (component.bonusInteractibleCreditObjects != null)
                     {
                         foreach (var bonusInteractableCreditObject in component.bonusInteractibleCreditObjects)
