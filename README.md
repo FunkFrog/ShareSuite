@@ -39,16 +39,11 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - Worried about the game becoming unbalanced? We've got you. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#balance)
     - Tuned to be balanced by default.
     - Built to feel like vanilla singleplayer; The mod scales to feel right with any amount of players, whether you're playing with 2 or 20.
-    - Easily customizable — Want more boss loot? Easy! Want more chests? Righty-o, turn that scalar up.
+    - Easily customizable — Want more boss loot? Easy! Want more chests? Turn that scalar up!
 
 - Want red items to be unique? Hate the fact that everyone gets hooves? No worries, we've got a solution. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#customization)
     - Config options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*). 
     - Item and equipment blacklists also exist for disabling specific items you don't want shared.
-
-- Want the game to be harder when you're playing with friends? Turn on the Experimental Mode! (*`NEW`*)
-    - Scales the interactable spawns to be fewer when you have more players with you.
-    - Makes the game harder while still maintaining the core feel of ShareSuite.
-    - Works best with Money Sharing on!
 
 - The config file allows you to customize the mod down to the slightest detail. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#config)
     - See the **Configuration** section for more information!
