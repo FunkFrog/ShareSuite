@@ -22,26 +22,15 @@ namespace ShareSuite
                 MoneySharingHooks.SharedMoneyValue = 15;
 
                 #region InteractablesCredit
-
+                
+                // This is the standard amount of interactablesCredit we work with.
+                // Prior to the interactablesCredit overhaul this was the standard value for all runs.
                 var interactableCredit = 200;
 
                 var component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
                 if (component)
                 {
-                    // Fetch the amount of interactables we may play with.
-                    interactableCredit = component.sceneDirectorInteractibleCredits;
-                    if (component.bonusInteractibleCreditObjects != null)
-                    {
-                        foreach (var bonusIntractableCreditObject in component.bonusInteractibleCreditObjects)
-                        {
-                            if (bonusIntractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
-                            {
-                                interactableCredit += bonusIntractableCreditObject.points;
-                            }
-                        }
-                    }
-
                     // The flat creditModifier slightly adjust interactables based on the amount of players.
                     // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
                     var creditModifier =
@@ -56,6 +45,20 @@ namespace ShareSuite
 
                     // We must apply the transformation to interactableCredit otherwise bonusIntractableCreditObject will be overwritten.
                     interactableCredit = (int) (interactableCredit / creditModifier);
+                    
+                    // Fetch the amount of interactables we may play with. We have to do this after our first math block,
+                    // as we do not want to divide bonuscredits twice.
+                    interactableCredit = component.sceneDirectorInteractibleCredits;
+                    if (component.bonusInteractibleCreditObjects != null)
+                    {
+                        foreach (var bonusInteractableCreditObject in component.bonusInteractibleCreditObjects)
+                        {
+                            if (bonusInteractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
+                            {
+                                interactableCredit += bonusInteractableCreditObject.points / Run.instance.participatingPlayerCount;
+                            }
+                        }
+                    }
                 }
 
                 // Set interactables budget to interactableCredit * config player count.
@@ -71,7 +74,7 @@ namespace ShareSuite
             On.RoR2.TeleporterInteraction.OnInteractionBegin += (orig, self, activator) =>
             {
                 #region Itemsharing
-
+                // Helper function for Bossloot.
                 if (ShareSuite.ModIsEnabled.Value && ShareSuite.OverrideBossLootScalingEnabled.Value)
                     BossItems = ShareSuite.BossLootCredit.Value;
                 else
@@ -87,7 +90,6 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards += (orig, self) =>
             {
-                // TODO: Shouldn't there be a ss check here?
                 if (!ShareSuite.ModIsEnabled.Value)
                 {
                     orig(self);
@@ -101,7 +103,7 @@ namespace ShareSuite
 
         public static bool IsMultiplayer()
         {
-            // Check whether there are more then 1 players in the lobby
+            // Check whether the quantity of players in the lobby exceeds one.
             return PlayerCharacterMasterController.instances.Count > 1;
         }
     }
