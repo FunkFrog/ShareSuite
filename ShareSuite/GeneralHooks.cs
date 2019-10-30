@@ -31,10 +31,13 @@ namespace ShareSuite
 
                 if (component)
                 {
+                    // We require playercount for several of the following computations. We don't want this to break with
+                    // those crazy 'mega party mods', thus we clamp this value.
+                    var clampPlayerCount = System.Math.Min(Run.instance.participatingPlayerCount, 8);
+
                     // The flat creditModifier slightly adjust interactables based on the amount of players.
                     // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
-                    var creditModifier =
-                        (float) (0.95 + System.Math.Min(Run.instance.participatingPlayerCount, 8) * 0.05);
+                    var creditModifier = (float) (0.95 + clampPlayerCount * 0.05);
 
                     // In addition to our flat modifier, we additionally introduce a stage modifier.
                     // This reduces player strength early game (as having more bodies gives a flat power increase early game).
@@ -55,7 +58,7 @@ namespace ShareSuite
                         {
                             if (bonusInteractableCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
                             {
-                                interactableCredit += bonusInteractableCreditObject.points / Run.instance.participatingPlayerCount;
+                                interactableCredit += bonusInteractableCreditObject.points / clampPlayerCount;
                             }
                         }
                     }
