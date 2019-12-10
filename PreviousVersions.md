@@ -1,5 +1,11 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.10.3` 
+- Moved Discord link below Features list. 
+- Fixed incorrectly formatted horizontal rule. 
+- Fixed bug with Shared money keeping everyone at the same balance if a teammate died. 
+- What should I work on next? [Vote here!](https://www.strawpoll.me/18656636)
+
 `1.10.2` 
 - Added Discord link to the README. Mod file is unchanged.
 
