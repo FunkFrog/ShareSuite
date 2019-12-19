@@ -8,6 +8,7 @@ using BepInEx.Configuration;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
+using R2API.Utils;
 
 // ReSharper disable UnusedMember.Local
 
@@ -15,6 +16,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
+    [R2APISubmoduleDependency("CommandHelper")]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.2")]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -84,10 +86,10 @@ namespace ShareSuite
             InitWrap();
             On.RoR2.Console.Awake += (orig, self) =>
             {
-                CommandHelper.RegisterCommands(self);
                 FrogtownInterface.Init(Config);
                 orig(self);
             };
+            CommandHelper.AddToConsoleWhenReady();
 
             #region Hook registration
 
@@ -105,32 +107,6 @@ namespace ShareSuite
             EquipmentSharingHooks.OnGrantEquipment();
 
             #endregion
-        }
-
-        public class CommandHelper
-        {
-            public static void RegisterCommands(RoR2.Console self)
-            {
-                var types = typeof(CommandHelper).Assembly.GetTypes();
-                var catalog = self.GetFieldValue<IDictionary>("concommandCatalog");
-
-                foreach (var methodInfo in types.SelectMany(x =>
-                    x.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)))
-                {
-                    var customAttributes = methodInfo.GetCustomAttributes(false);
-                    foreach (var attribute in customAttributes.OfType<ConCommandAttribute>())
-                    {
-                        var conCommand = Reflection.GetNestedType<RoR2.Console>("ConCommand").Instantiate();
-
-                        conCommand.SetFieldValue("flags", attribute.flags);
-                        conCommand.SetFieldValue("helpText", attribute.helpText);
-                        conCommand.SetFieldValue("action", (RoR2.Console.ConCommandDelegate)
-                            Delegate.CreateDelegate(typeof(RoR2.Console.ConCommandDelegate), methodInfo));
-
-                        catalog[attribute.commandName.ToLower()] = conCommand;
-                    }
-                }
-            }
         }
 
         public void InitWrap()
