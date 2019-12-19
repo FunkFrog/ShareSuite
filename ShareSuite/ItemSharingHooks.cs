@@ -83,7 +83,7 @@ namespace ShareSuite
                     || self.costType == CostTypeIndex.GreenItem
                     || self.costType == CostTypeIndex.RedItem)
                 {
-                    var item = shop.CurrentPickupIndex().itemIndex;
+                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                     inventory.GiveItem(item);
                     SendPickupMessage.Invoke(null,
                         new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
@@ -130,7 +130,7 @@ namespace ShareSuite
                 }
 
                 // Item to share
-                var item = self.pickupIndex.itemIndex;
+                var item = PickupCatalog.GetPickupDef(self.pickupIndex).itemIndex;
 
                 if (!ShareSuite.GetItemBlackList().Contains((int) item)
                     && NetworkServer.active
@@ -180,11 +180,12 @@ namespace ShareSuite
 
         private static bool IsValidItemPickup(PickupIndex pickup)
         {
-            var item = pickup.itemIndex;
+            var def = PickupCatalog.GetPickupDef(pickup);
+            var item = def.itemIndex;
             return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
                    || IsGreenItem(item) && ShareSuite.GreenItemsShared.Value
                    || IsRedItem(item) && ShareSuite.RedItemsShared.Value
-                   || pickup.IsLunar() && ShareSuite.LunarItemsShared.Value
+                   || def.isLunar && ShareSuite.LunarItemsShared.Value
                    || IsBossItem(item) && ShareSuite.BossItemsShared.Value;
         }
     }

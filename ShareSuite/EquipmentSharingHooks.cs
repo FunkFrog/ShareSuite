@@ -18,7 +18,7 @@ namespace ShareSuite
 
                 #region Sharedequipment
 
-                var equip = self.pickupIndex.equipmentIndex;
+                var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
                 if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
                     && NetworkServer.active
@@ -33,7 +33,7 @@ namespace ShareSuite
                         if (player.inventory == inventory) continue;
 
                         player.inventory.SetEquipmentIndex(equip);
-                        self.NetworkpickupIndex = new PickupIndex(player.inventory.currentEquipmentIndex);
+                        self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(equip);
                     }
 
                 orig(self, body, inventory);
@@ -67,7 +67,7 @@ namespace ShareSuite
         /// <returns>True if the given PickupIndex validates, otherwise false.</returns>
         private static bool IsValidEquipmentPickup(PickupIndex pickup)
         {
-            var equip = pickup.equipmentIndex;
+            var equip = PickupCatalog.GetPickupDef(pickup).equipmentIndex;
             return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
         }
 
