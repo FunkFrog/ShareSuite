@@ -46,7 +46,7 @@ namespace ShareSuite
                 foreach (var player in PlayerCharacterMasterController.instances)
                 {
                     if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
-                    EffectManager.instance.SimpleImpactEffect(Resources.Load<GameObject>(
+                    EffectManager.SimpleImpactEffect(Resources.Load<GameObject>(
                             "Prefabs/Effects/ImpactEffects/CoinImpact"),
                         player.master.GetBody().corePosition, Vector3.up, true);
                 }
