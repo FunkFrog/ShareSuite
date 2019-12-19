@@ -155,38 +155,26 @@ namespace ShareSuite
             typeof(GenericPickupController).GetMethod("SendPickupMessage",
                 BindingFlags.NonPublic | BindingFlags.Static);
 
-        public static bool IsWhiteItem(ItemIndex index)
-        {
-            return ItemCatalog.tier1ItemList.Contains(index);
-        }
-
-        public static bool IsGreenItem(ItemIndex index)
-        {
-            return ItemCatalog.tier2ItemList.Contains(index);
-        }
-
-        public static bool IsRedItem(ItemIndex index)
-        {
-            return ItemCatalog.tier3ItemList.Contains(index);
-        }
-
-        public static bool IsBossItem(ItemIndex index)
-        {
-            return index == ItemIndex.Knurl
-                   || index == ItemIndex.SprintWisp
-                   || index == ItemIndex.TitanGoldDuringTP
-                   || index == ItemIndex.BeetleGland;
-        }
 
         private static bool IsValidItemPickup(PickupIndex pickup)
         {
-            var def = PickupCatalog.GetPickupDef(pickup);
-            var item = def.itemIndex;
-            return IsWhiteItem(item) && ShareSuite.WhiteItemsShared.Value
-                   || IsGreenItem(item) && ShareSuite.GreenItemsShared.Value
-                   || IsRedItem(item) && ShareSuite.RedItemsShared.Value
-                   || def.isLunar && ShareSuite.LunarItemsShared.Value
-                   || IsBossItem(item) && ShareSuite.BossItemsShared.Value;
+            var pickupdef = PickupCatalog.GetPickupDef(pickup);
+            var itemdef = ItemCatalog.GetItemDef(pickupdef.itemIndex);
+            switch (itemdef.tier)
+            {
+                case ItemTier.Tier1:
+                    return ShareSuite.WhiteItemsShared.Value;
+                case ItemTier.Tier2:
+                    return ShareSuite.GreenItemsShared.Value;
+                case ItemTier.Tier3:
+                    return ShareSuite.RedItemsShared.Value;
+                case ItemTier.Lunar:
+                    return ShareSuite.LunarItemsShared.Value;
+                case ItemTier.Boss:
+                    return ShareSuite.BossItemsShared.Value;
+                default:
+                    return false;
+            }
         }
     }
 }
