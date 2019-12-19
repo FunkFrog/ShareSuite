@@ -1,4 +1,5 @@
 using R2API;
+using R2API.Utils;
 using RoR2;
 
 namespace ShareSuite
@@ -68,7 +69,7 @@ namespace ShareSuite
 
                 // Set interactables budget to interactableCredit * config player count.
                 if (ShareSuite.OverridePlayerScalingEnabled.Value)
-                    self.SetFieldValue("interactableCredit", interactableCredit * ShareSuite.InteractablesCredit.Value);
+                    self.SetFieldValue<int>("interactableCredit", (int) (interactableCredit * ShareSuite.InteractablesCredit.Value));
 
                 #endregion
             };
