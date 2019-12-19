@@ -28,8 +28,8 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>..\libs\MonoMod.Utils.dll</HintPath>
     </Reference>
-      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\SteamApps\common\Risk of Rain 2\BepInEx\plugins\R2API\R2API.dll</HintPath>
     <Reference Include="R2API">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\SteamApps\common\Risk of Rain 2\BepInEx\plugins\R2API\R2API.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\libs\UnityEngine.dll</HintPath>
