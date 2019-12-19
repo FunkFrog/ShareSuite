@@ -81,7 +81,9 @@ namespace ShareSuite
                 // If the cost type is an item, give the user the item directly and send the pickup message
                 if (self.costType == CostTypeIndex.WhiteItem
                     || self.costType == CostTypeIndex.GreenItem
-                    || self.costType == CostTypeIndex.RedItem)
+                    || self.costType == CostTypeIndex.RedItem
+                    || self.costType == CostTypeIndex.BossItem
+                    || self.costType == CostTypeIndex.LunarItemOrEquipment)
                 {
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                     inventory.GiveItem(item);
