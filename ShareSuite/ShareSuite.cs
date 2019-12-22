@@ -13,7 +13,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [R2APISubmoduleDependency("CommandHelper")]
+    [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.3")]
     public class ShareSuite : BaseUnityPlugin
     {
