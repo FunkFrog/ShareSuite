@@ -31,7 +31,8 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
-            MoneyScalarEnabled;
+            MoneyScalarEnabled,
+            RandomizeSharedPickups;
 
         public static ConfigWrapper<int> BossLootCredit;
         public static ConfigWrapper<double> InteractablesCredit, MoneyScalar;
@@ -216,6 +217,12 @@ namespace ShareSuite
                 "EquipmentBlacklist",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names",
                 "");
+
+            RandomizeSharedPickups = Config.Wrap(
+                "Settings",
+                "RandomizeSharedPickups",
+                "When enabled each player (except the player who picked up the item) will get a radomized item of the same rarity.",
+                false);
         }
 
         private static bool TryParseIntoConfig<T>(string rawValue, ConfigWrapper<T> wrapper)
@@ -412,6 +419,17 @@ namespace ShareSuite
                 Debug.Log("Invalid arguments.");
             else
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
+        }
+
+        // InteractablesCredit
+        [ConCommand(commandName = "ss_RandomizeSharedPickups", flags = ConVarFlags.None,
+            helpText = "Randomizes pickups per player.")]
+        private static void CcRandomizeSharedPickups(ConCommandArgs args)
+        {
+            if (args.Count != 1 || !TryParseIntoConfig(args[0], RandomizeSharedPickups))
+                Debug.Log("Invalid arguments.");
+            else
+                Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
         }
 
         #endregion CommandParser
