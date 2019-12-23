@@ -1,5 +1,9 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.10.4` 
+- Fixed a similar bug as 1.10.3; Money will no longer stay above the highest amount of money a dead player has. (Thanks to Elysium for finding this!) 
+- Updated R2Api dependency to 2.1.16.
+
 `1.10.3` 
 - Moved Discord link below Features list. 
 - Fixed incorrectly formatted horizontal rule. 

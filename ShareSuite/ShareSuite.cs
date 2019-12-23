@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
+using R2API.Utils;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
-using R2API.Utils;
 
 // ReSharper disable UnusedMember.Local
 
@@ -16,7 +13,7 @@ namespace ShareSuite
 {
     [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.2")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.4")]
     [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
