@@ -221,7 +221,7 @@ namespace ShareSuite
             RandomizeSharedPickups = Config.Wrap(
                 "Settings",
                 "RandomizeSharedPickups",
-                "When enabled each player (except the player who picked up the item) will get a radomized item of the same rarity.",
+                "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity.",
                 false);
         }
 
