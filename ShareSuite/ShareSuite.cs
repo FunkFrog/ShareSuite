@@ -392,9 +392,7 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], OverrideBossLootScalingEnabled))
                 Debug.Log("Invalid arguments.");
             else
-            {
                 Debug.Log($"Boss loot scaling disable set to {OverrideBossLootScalingEnabled.Value}.");
-            }
         }
 
         // BossLootCredit
@@ -405,20 +403,18 @@ namespace ShareSuite
             if (args.Count != 1 || !TryParseIntoConfig(args[0], BossLootCredit))
                 Debug.Log("Invalid arguments.");
             else
-            {
                 Debug.Log($"Boss loot credit set to {BossLootCredit.Value}.");
-            }
         }
 
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
-            helpText = "Modifies whether boss loot should scale based on player count.")]
+            helpText = "Modifies whether items are shared to dead players.")]
         private static void CcDeadPlayersGetItems(ConCommandArgs args)
         {
             if (args.Count != 1 || !TryParseIntoConfig(args[0], DeadPlayersGetItems))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
+                Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
         }
 
         // InteractablesCredit
