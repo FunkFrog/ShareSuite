@@ -9,7 +9,7 @@ namespace ShareSuite
     public static class GeneralHooks
     {
         public static int BossItems = 1;
-        public static List<string> NoInteractibleOverrideScenes = new List<string>{ "bazaar" };
+        public static List<string> NoInteractibleOverrideScenes = new List<string>{ "MAP_BAZAAR_TITLE" };
 
         internal static void Hook()
         {
