@@ -66,6 +66,7 @@ namespace ShareSuite
         public void Update()
         {
             if (!NetworkServer.active
+                || !ModIsEnabled.Value
                 || !MoneyIsShared.Value
                 || MoneySharingHooks.MapTransitionActive) return;
 
