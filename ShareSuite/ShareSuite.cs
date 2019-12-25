@@ -82,10 +82,6 @@ namespace ShareSuite
         public ShareSuite()
         {
             InitConfig();
-            On.RoR2.Console.Awake += (orig, self) =>
-            {
-                orig(self);
-            };
             CommandHelper.AddToConsoleWhenReady();
 
             #region Hook registration
