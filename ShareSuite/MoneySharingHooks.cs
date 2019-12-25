@@ -73,11 +73,9 @@ namespace ShareSuite
                             MoneySharingHooks.SharedMoneyValue += (int)amount;
                             return;
                         }
-                    default:
-                        orig(self,activator);
-                        return;
                 }
             }
+            orig(self,activator);
 
             #endregion
         }
