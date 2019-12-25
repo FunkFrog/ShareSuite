@@ -11,7 +11,6 @@ using UnityEngine.Networking;
 
 namespace ShareSuite
 {
-    [BepInDependency("com.frogtown.shared", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.4")]
     [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
@@ -19,7 +18,7 @@ namespace ShareSuite
     {
         #region ConfigWrapper init
 
-        public static ConfigWrapper<bool> ModIsEnabled,
+        public static ConfigEntry<bool> ModIsEnabled,
             MoneyIsShared,
             WhiteItemsShared,
             GreenItemsShared,
@@ -33,10 +32,12 @@ namespace ShareSuite
             OverrideBossLootScalingEnabled,
             MoneyScalarEnabled;
 
-        public static ConfigWrapper<int> BossLootCredit;
-        public static ConfigWrapper<double> InteractablesCredit, MoneyScalar;
-        public static ConfigWrapper<string> ItemBlacklist, EquipmentBlacklist;
+        public static ConfigEntry<int> BossLootCredit;
+        public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
+        public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
+
+        private bool previouslyEnabled = false;
         #endregion
 
         public static HashSet<int> GetItemBlackList()
@@ -80,10 +81,9 @@ namespace ShareSuite
 
         public ShareSuite()
         {
-            InitWrap();
+            InitConfig();
             On.RoR2.Console.Awake += (orig, self) =>
             {
-                FrogtownInterface.Init(Config);
                 orig(self);
             };
             CommandHelper.AddToConsoleWhenReady();
@@ -91,141 +91,171 @@ namespace ShareSuite
             #region Hook registration
 
             // Register all the hooks
-            GeneralHooks.OverrideBossScaling();
-            GeneralHooks.OnPlaceTeleporter();
-            GeneralHooks.OnTpInteraction();
-            ItemSharingHooks.OnGrantItem();
-            ItemSharingHooks.OnShopPurchase();
-            ItemSharingHooks.OnPurchaseDrop();
+            ReloadHooks();
             MoneySharingHooks.SharedMoneyValue = 0;
-            MoneySharingHooks.ModifyGoldReward();
-            MoneySharingHooks.BrittleCrownHook();
-            MoneySharingHooks.SplitTpMoney();
-            EquipmentSharingHooks.OnGrantEquipment();
 
             #endregion
         }
 
-        public void InitWrap()
+        private void ReloadHooks(object _ = null, System.EventArgs __= null)
         {
-            ModIsEnabled = Config.Wrap(
-                "Settings",
-                "ModEnabled",
-                "Toggles mod.",
-                true);
-
-            MoneyIsShared = Config.Wrap(
-                "Settings",
-                "MoneyShared",
-                "Toggles money sharing.",
-                false);
-
-            WhiteItemsShared = Config.Wrap(
-                "Settings",
-                "WhiteItemsShared",
-                "Toggles item sharing for common items.",
-                true);
-
-            GreenItemsShared = Config.Wrap(
-                "Settings",
-                "GreenItemsShared",
-                "Toggles item sharing for rare items.",
-                true);
-
-            RedItemsShared = Config.Wrap(
-                "Settings",
-                "RedItemsShared",
-                "Toggles item sharing for legendary items.",
-                true);
-
-            EquipmentShared = Config.Wrap(
-                "Settings",
-                "EquipmentShared",
-                "Toggles item sharing for equipment.",
-                false);
-
-            LunarItemsShared = Config.Wrap(
-                "Settings",
-                "LunarItemsShared",
-                "Toggles item sharing for Lunar items.",
-                false);
-
-            BossItemsShared = Config.Wrap(
-                "Settings",
-                "BossItemsShared",
-                "Toggles item sharing for boss items.",
-                true);
-
-            PrinterCauldronFixEnabled = Config.Wrap(
-                "Balance",
-                "PrinterCauldronFix",
-                "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
-                " dropping it on the ground.",
-                true);
-
-            DeadPlayersGetItems = Config.Wrap(
-                "Balance",
-                "DeadPlayersGetItems",
-                "Toggles item sharing for dead players.",
-                false);
-
-            OverridePlayerScalingEnabled = Config.Wrap(
-                "Balance",
-                "OverridePlayerScaling",
-                "Toggles override of the scalar of interactables (chests, shrines, etc) that spawn in the world to your configured credit.",
-                true);
-
-            InteractablesCredit = Config.Wrap(
-                "Balance",
-                "InteractablesCredit",
-                "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns.",
-                1d);
-
-            OverrideBossLootScalingEnabled = Config.Wrap(
-                "Balance",
-                "OverrideBossLootScaling",
-                "Toggles override of the scalar of boss loot drops to your configured balance.",
-                true);
-
-            BossLootCredit = Config.Wrap(
-                "Balance",
-                "BossLootCredit",
-                "Specifies the amount of boss items dropped when boss drop override is true.",
-                1);
-
-            MoneyScalarEnabled = Config.Wrap(
-                "Settings",
-                "MoneyScalarEnabled",
-                "Toggles money scalar.",
-                false);
-
-            MoneyScalar = Config.Wrap(
-                "Settings",
-                "MoneyScalar",
-                "Modifies player count used in calculations of gold earned when money sharing is on.",
-                1d);
-
-            ItemBlacklist = Config.Wrap(
-                "Settings",
-                "ItemBlacklist",
-                "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names",
-                "53,60,82,86");
-
-            EquipmentBlacklist = Config.Wrap(
-                "Settings",
-                "EquipmentBlacklist",
-                "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names",
-                "");
+            if(previouslyEnabled && !ModIsEnabled.Value)
+            {
+                GeneralHooks.UnHook();
+                MoneySharingHooks.UnHook();
+                ItemSharingHooks.UnHook();
+                EquipmentSharingHooks.UnHook();
+                previouslyEnabled = false;
+            }
+            if (!previouslyEnabled && ModIsEnabled.Value)
+            {
+                previouslyEnabled = true;
+                GeneralHooks.Hook();
+                MoneySharingHooks.Hook();
+                ItemSharingHooks.Hook();
+                EquipmentSharingHooks.Hook();
+            }
         }
 
-        private static bool TryParseIntoConfig<T>(string rawValue, ConfigWrapper<T> wrapper)
+        private void InitConfig()
+        {
+            ModIsEnabled = Config.Bind(
+                "Settings",
+                "ModEnabled",
+                true,
+                "Toggles mod."
+                );
+            ModIsEnabled.SettingChanged += ReloadHooks;
+
+            MoneyIsShared = Config.Bind(
+                "Settings",
+                "MoneyShared",
+                true,
+                "Toggles money sharing."
+                );
+
+            WhiteItemsShared = Config.Bind(
+                "Settings",
+                "WhiteItemsShared",
+                true,
+                "Toggles item sharing for common items."
+                );
+
+            GreenItemsShared = Config.Bind(
+                "Settings",
+                "GreenItemsShared",
+                true,
+                "Toggles item sharing for rare items."
+                );
+
+            RedItemsShared = Config.Bind(
+                "Settings",
+                "RedItemsShared",
+                true,
+                "Toggles item sharing for legendary items."
+                );
+
+            EquipmentShared = Config.Bind(
+                "Settings",
+                "EquipmentShared",
+                false,
+                "Toggles item sharing for equipment."
+                );
+
+            LunarItemsShared = Config.Bind(
+                "Settings",
+                "LunarItemsShared",
+                false,
+                "Toggles item sharing for Lunar items."
+                );
+
+            BossItemsShared = Config.Bind(
+                "Settings",
+                "BossItemsShared",
+                true,
+                "Toggles item sharing for boss items."
+                );
+
+            PrinterCauldronFixEnabled = Config.Bind(
+                "Balance",
+                "PrinterCauldronFix",
+                true,
+                "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
+                " dropping it on the ground."
+                );
+
+            DeadPlayersGetItems = Config.Bind(
+                "Balance",
+                "DeadPlayersGetItems",
+                false,
+                "Toggles item sharing for dead players."
+                );
+
+            OverridePlayerScalingEnabled = Config.Bind(
+                "Balance",
+                "OverridePlayerScaling",
+                true,
+                "Toggles override of the scalar of interactables (chests, shrines, etc) that spawn in the world to your configured credit."
+                );
+
+            InteractablesCredit = Config.Bind(
+                "Balance",
+                "InteractablesCredit",
+                1d,
+                "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns."
+                );
+
+            OverrideBossLootScalingEnabled = Config.Bind(
+                "Balance",
+                "OverrideBossLootScaling",
+                true,
+                "Toggles override of the scalar of boss loot drops to your configured balance."
+                );
+
+            BossLootCredit = Config.Bind(
+                "Balance",
+                "BossLootCredit",
+                1,
+                "Specifies the amount of boss items dropped when boss drop override is true."
+                );
+
+            MoneyScalarEnabled = Config.Bind(
+                "Settings",
+                "MoneyScalarEnabled",
+                false,
+                "Toggles money scalar."
+                );
+
+            MoneyScalar = Config.Bind(
+                "Settings",
+                "MoneyScalar",
+                1D,
+                "Modifies player count used in calculations of gold earned when money sharing is on."
+                );
+
+            ItemBlacklist = Config.Bind(
+                "Settings",
+                "ItemBlacklist",
+                "53,60,82,86",
+                "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
+                );
+
+            EquipmentBlacklist = Config.Bind(
+                "Settings",
+                "EquipmentBlacklist",
+                "",
+                "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
+                );
+        }
+
+        private static bool TryParseIntoConfig<T>(string rawValue, ConfigEntry<T> wrapper)
         {
             switch (wrapper)
             {
-                case ConfigWrapper<bool> boolWrapper when bool.TryParse(rawValue, out bool result):
+                case ConfigEntry<bool> boolWrapper when bool.TryParse(rawValue, out bool result):
                     boolWrapper.Value = result;
                     return true;
-                case ConfigWrapper<int> intWrapper when int.TryParse(rawValue, out int result):
+                case ConfigEntry<int> intWrapper when int.TryParse(rawValue, out int result):
                     intWrapper.Value = result;
                     return true;
                 default:
@@ -234,6 +264,7 @@ namespace ShareSuite
         }
 
         #region CommandParser
+#pragma warning disable IDE0051 //Commands usually aren't called from code.
 
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
@@ -413,7 +444,7 @@ namespace ShareSuite
             else
                 Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
         }
-
+#pragma warning restore IDE0051
         #endregion CommandParser
     }
 }

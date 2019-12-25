@@ -7,150 +7,97 @@ namespace ShareSuite
 {
     public static class ItemSharingHooks
     {
-        public static void OnShopPurchase()
+        public static void UnHook()
         {
-            On.RoR2.PurchaseInteraction.OnInteractionBegin += (orig, self, activator) =>
+            On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
+            On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
+            On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
+        }
+        public static void Hook()
+        {
+            On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
+            On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
+            On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
+        }
+
+        private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig, GenericPickupController self, CharacterBody body, Inventory inventory)
+        {
+            var item = PickupCatalog.GetPickupDef(self.pickupIndex).itemIndex;
+
+            if (!ShareSuite.GetItemBlackList().Contains((int)item)
+                && NetworkServer.active
+                && IsValidItemPickup(self.pickupIndex)
+                && GeneralHooks.IsMultiplayer())
+                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                {
+                    // Ensure character is not original player that picked up item
+                    if (player.inventory == inventory) continue;
+
+                    // Do not reward dead players if not required
+                    if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
+
+                    player.inventory.GiveItem(item);
+                }
+
+            orig(self, body, inventory);
+        }
+
+        private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
+        {
+            if (!NetworkServer.active)
             {
-                if (!ShareSuite.ModIsEnabled.Value)
-                {
-                    orig(self, activator);
-                    return;
-                }
+                orig(self);
+                return;
+            }
 
-                // Return if you can't afford the item
-                if (!self.CanBeAffordedByInteractor(activator)) return;
+            var costType = self.GetComponent<PurchaseInteraction>().costType;
 
-                var characterBody = activator.GetComponent<CharacterBody>();
-                var inventory = characterBody.inventory;
+            if (!GeneralHooks.IsMultiplayer() // is not multiplayer
+                || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared
+                || !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix isn't enabled
+                || self.itemTier == ItemTier.Lunar
+                || costType == CostTypeIndex.Money)
+            {
+                orig(self);
+            }
+        }
 
-                #region Sharedmoney
+        private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
+        {
+            if (!self.CanBeAffordedByInteractor(activator)) return;
 
-                if (ShareSuite.MoneyIsShared.Value)
-                {
-                    switch (self.costType)
-                    {
-                        case CostTypeIndex.Money:
-                        {
-                            // Remove money from shared money pool
-                            orig(self, activator);
-                            MoneySharingHooks.SharedMoneyValue -= self.cost;
-                            return;
-                        }
+            var characterBody = activator.GetComponent<CharacterBody>();
+            var inventory = characterBody.inventory;
 
-                        case CostTypeIndex.PercentHealth:
-                        {
-                            // Share the damage taken from a sacrifice
-                            // as it generates shared money
-                            orig(self, activator);
-                            var teamMaxHealth = 0;
-                            foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
-                            {
-                                var charMaxHealth = playerCharacterMasterController.master.GetBody().maxHealth;
-                                if (charMaxHealth > teamMaxHealth)
-                                {
-                                    teamMaxHealth = (int) charMaxHealth;
-                                }
-                            }
+            
 
-                            var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
-                            var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
-                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
-                                                 shrineBloodBehavior.goldToPaidHpRatio);
+            #region Cauldronfix
 
-                            if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
-
-                            MoneySharingHooks.SharedMoneyValue += (int) amount;
-                            return;
-                        }
-                    }
-                }
-
-                #endregion
-
-                #region Cauldronfix
-
-                // If this is not a multi-player server or the fix is disabled, do the normal drop action
-                if (!GeneralHooks.IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
-                {
-                    orig(self, activator);
-                    return;
-                }
-
-                var shop = self.GetComponent<ShopTerminalBehavior>();
-
-                // If the cost type is an item, give the user the item directly and send the pickup message
-                if (self.costType == CostTypeIndex.WhiteItem
-                    || self.costType == CostTypeIndex.GreenItem
-                    || self.costType == CostTypeIndex.RedItem
-                    || self.costType == CostTypeIndex.BossItem
-                    || self.costType == CostTypeIndex.LunarItemOrEquipment)
-                {
-                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-                    inventory.GiveItem(item);
-                    SendPickupMessage.Invoke(null,
-                        new object[] {inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex()});
-                }
-
-                #endregion Cauldronfix
-
+            // If this is not a multi-player server or the fix is disabled, do the normal drop action
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
+            {
                 orig(self, activator);
-            };
-        }
+                return;
+            }
 
-        public static void OnPurchaseDrop()
-        {
-            On.RoR2.ShopTerminalBehavior.DropPickup += (orig, self) =>
+            var shop = self.GetComponent<ShopTerminalBehavior>();
+
+            // If the cost type is an item, give the user the item directly and send the pickup message
+            if (self.costType == CostTypeIndex.WhiteItem
+                || self.costType == CostTypeIndex.GreenItem
+                || self.costType == CostTypeIndex.RedItem
+                || self.costType == CostTypeIndex.BossItem
+                || self.costType == CostTypeIndex.LunarItemOrEquipment)
             {
-                if (!ShareSuite.ModIsEnabled.Value
-                    || !NetworkServer.active)
-                {
-                    orig(self);
-                    return;
-                }
+                var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
+                inventory.GiveItem(item);
+                SendPickupMessage.Invoke(null,
+                    new object[] { inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex() });
+            }
 
-                var costType = self.GetComponent<PurchaseInteraction>().costType;
+            #endregion Cauldronfix
 
-                if (!GeneralHooks.IsMultiplayer() // is not multiplayer
-                    || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared
-                    || !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix isn't enabled
-                    || self.itemTier == ItemTier.Lunar
-                    || costType == CostTypeIndex.Money)
-                {
-                    orig(self);
-                }
-            };
-        }
-
-        public static void OnGrantItem()
-        {
-            On.RoR2.GenericPickupController.GrantItem += (orig, self, body, inventory) =>
-            {
-                if (!ShareSuite.ModIsEnabled.Value)
-                {
-                    orig(self, body, inventory);
-                    return;
-                }
-
-                // Item to share
-                var item = PickupCatalog.GetPickupDef(self.pickupIndex).itemIndex;
-
-                if (!ShareSuite.GetItemBlackList().Contains((int) item)
-                    && NetworkServer.active
-                    && IsValidItemPickup(self.pickupIndex)
-                    && GeneralHooks.IsMultiplayer())
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
-                    {
-                        // Ensure character is not original player that picked up item
-                        if (player.inventory == inventory) continue;
-
-                        // Do not reward dead players if not required
-                        if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
-
-                        player.inventory.GiveItem(item);
-                    }
-
-                orig(self, body, inventory);
-            };
+            orig(self, activator);
         }
 
         private static readonly MethodInfo SendPickupMessage =
