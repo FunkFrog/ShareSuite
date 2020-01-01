@@ -29,6 +29,7 @@
       <HintPath>..\libs\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="R2API">
+      <HintPath>..\libs\R2API.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\libs\UnityEngine.dll</HintPath>
