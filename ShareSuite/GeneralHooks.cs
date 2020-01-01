@@ -15,7 +15,7 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin += overrideBoosLootScaling;
+            On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBoosLootScaling;
         }
 
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
@@ -28,13 +28,13 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin -= overrideBoosLootScaling;
+            On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBoosLootScaling;
         }
 
         /// <summary>
         /// // Helper function for Bossloot
         /// </summary>
-        private static void overrideBoosLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig, TeleporterInteraction self, Interactor activator)
+        private static void OverrideBoosLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig, TeleporterInteraction self, Interactor activator)
         {
             if (ShareSuite.OverrideBossLootScalingEnabled.Value)
                 BossItems = ShareSuite.BossLootCredit.Value;
