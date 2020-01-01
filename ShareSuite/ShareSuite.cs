@@ -30,8 +30,7 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
-            MoneyScalarEnabled,
-            RandomizeSharedPickups;
+            MoneyScalarEnabled;
 
         public static ConfigEntry<int> BossLootCredit;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -244,12 +243,6 @@ namespace ShareSuite
                 "",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
                 );
-            RandomizeSharedPickups = Config.Bind(
-                "Settings",
-                "RandomizeSharedPickups",
-                false,
-                "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity."
-                );
         }
 
         private static bool TryParseIntoConfig<T>(string rawValue, ConfigEntry<T> wrapper)
@@ -440,24 +433,13 @@ namespace ShareSuite
 
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
-            helpText = "Modifies whether items are shared to dead players.")]
+            helpText = "Modifies whether boss loot should scale based on player count.")]
         private static void CcDeadPlayersGetItems(ConCommandArgs args)
         {
             if (args.Count != 1 || !TryParseIntoConfig(args[0], DeadPlayersGetItems))
                 Debug.Log("Invalid arguments.");
             else
-                Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
-        }
-
-        //randomisepickups
-        [ConCommand(commandName = "ss_RandomizeSharedPickups", flags = ConVarFlags.None,
-           helpText = "Randomizes pickups per player.")]
-        private static void CcRandomizeSharedPickups(ConCommandArgs args)
-        {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], RandomizeSharedPickups))
-                Debug.Log("Invalid arguments.");
-            else
-                Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
+                Debug.Log($"Boss loot scaling disable set to {DeadPlayersGetItems.Value}.");
         }
 #pragma warning restore IDE0051
         #endregion CommandParser

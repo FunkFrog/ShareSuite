@@ -1,8 +1,6 @@
-using RoR2;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using RoR2;
 using UnityEngine.Networking;
 
 namespace ShareSuite
@@ -24,11 +22,9 @@ namespace ShareSuite
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig, GenericPickupController self, CharacterBody body, Inventory inventory)
         {
-            var item = PickupCatalog.GetPickupDef(self.pickupIndex);
-            var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
+            var item = PickupCatalog.GetPickupDef(self.pickupIndex).itemIndex;
 
-
-              if ((ShareSuite.RandomizeSharedPickups.Value || !ShareSuite.GetItemBlackList().Contains((int)item.itemIndex))
+            if (!ShareSuite.GetItemBlackList().Contains((int)item)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
@@ -40,21 +36,7 @@ namespace ShareSuite
                     // Do not reward dead players if not required
                     if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
-                    if (ShareSuite.RandomizeSharedPickups.Value)
-                    {
-                        var giveItem = GetRandomItemOfTier(itemDef.tier, item.itemIndex);
-                        var givePickupIndex = PickupCatalog.FindPickupIndex(giveItem);
-                        player.inventory.GiveItem(giveItem);
-                        // Alternative: Only show pickup text for yourself
-                        // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
-                        // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
-                        SendPickupMessage(player, givePickupIndex);
-                    }
-                    // Otherwise give everyone the same item
-                    else
-                    {
-                        player.inventory.GiveItem(item.itemIndex);
-                    }
+                    player.inventory.GiveItem(item);
                 }
 
             orig(self, body, inventory);
@@ -109,7 +91,8 @@ namespace ShareSuite
             {
                 var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                 inventory.GiveItem(item);
-                SendPickupMessage(inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex());
+                SendPickupMessage.Invoke(null,
+                    new object[] { inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex() });
             }
 
             #endregion Cauldronfix
@@ -117,61 +100,30 @@ namespace ShareSuite
             orig(self, activator);
         }
 
-        private delegate void SendPickupMessageDelegate(CharacterMaster master, PickupIndex pickupIndex);
+        private static readonly MethodInfo SendPickupMessage =
+            typeof(GenericPickupController).GetMethod("SendPickupMessage",
+                BindingFlags.NonPublic | BindingFlags.Static);
 
-        private static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate)System.Delegate.CreateDelegate(typeof(SendPickupMessageDelegate), typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static));
 
         private static bool IsValidItemPickup(PickupIndex pickup)
         {
             var pickupdef = PickupCatalog.GetPickupDef(pickup);
-            if (pickupdef.itemIndex != ItemIndex.None)
-            {
-                var itemdef = ItemCatalog.GetItemDef(pickupdef.itemIndex);
-                switch (itemdef.tier)
-                {
-                    case ItemTier.Tier1:
-                        return ShareSuite.WhiteItemsShared.Value;
-                    case ItemTier.Tier2:
-                        return ShareSuite.GreenItemsShared.Value;
-                    case ItemTier.Tier3:
-                        return ShareSuite.RedItemsShared.Value;
-                    case ItemTier.Lunar:
-                        return ShareSuite.LunarItemsShared.Value;
-                    case ItemTier.Boss:
-                        return ShareSuite.BossItemsShared.Value;
-                    default:
-                        return false;
-                }
-            }
-            if (pickupdef.equipmentIndex != EquipmentIndex.None)
-            {
-                // var equipdef = EquipmentCatalog.GetEquipmentDef(pickupdef.equipmentIndex);
-                // Optional further checks ...
-                return false;
-            }
-            return false;
-        }
-
-        private static ItemIndex GetRandomItemOfTier(ItemTier tier, ItemIndex orDefault)
-        {
-            switch (tier)
+            var itemdef = ItemCatalog.GetItemDef(pickupdef.itemIndex);
+            switch (itemdef.tier)
             {
                 case ItemTier.Tier1:
-                    return PickRandomOf(ItemCatalog.tier1ItemList);
+                    return ShareSuite.WhiteItemsShared.Value;
                 case ItemTier.Tier2:
-                    return PickRandomOf(ItemCatalog.tier2ItemList);
+                    return ShareSuite.GreenItemsShared.Value;
                 case ItemTier.Tier3:
-                    return PickRandomOf(ItemCatalog.tier3ItemList);
+                    return ShareSuite.RedItemsShared.Value;
                 case ItemTier.Lunar:
-                    return PickRandomOf(ItemCatalog.lunarItemList);
+                    return ShareSuite.LunarItemsShared.Value;
                 case ItemTier.Boss:
-                    return orDefault; // no boss item list, and also probably better anyway
+                    return ShareSuite.BossItemsShared.Value;
                 default:
-                    return orDefault;
+                    return false;
             }
         }
-
-        private static T PickRandomOf<T>(IList<T> collection) => collection[Random.Range(0, collection.Count)];
     }
 }
