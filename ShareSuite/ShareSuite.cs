@@ -252,21 +252,6 @@ namespace ShareSuite
                 );
         }
 
-        private static bool TryParseIntoConfig<T>(string rawValue, ConfigEntry<T> wrapper)
-        {
-            switch (wrapper)
-            {
-                case ConfigEntry<bool> boolWrapper when bool.TryParse(rawValue, out bool result):
-                    boolWrapper.Value = result;
-                    return true;
-                case ConfigEntry<int> intWrapper when int.TryParse(rawValue, out int result):
-                    intWrapper.Value = result;
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         #region CommandParser
 #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
@@ -274,10 +259,19 @@ namespace ShareSuite
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
         private static void CcModIsEnabled(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], ModIsEnabled))
-                Debug.Log("Invalid arguments.");
+            if(args.Count == 0)
+            {
+                Debug.Log(ModIsEnabled.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                ModIsEnabled.Value = valid.Value;
                 Debug.Log($"Mod status set to {ModIsEnabled.Value}.");
+            }
         }
 
         // MoneyIsShared
@@ -285,10 +279,19 @@ namespace ShareSuite
             helpText = "Modifies whether money is shared or not.")]
         private static void CcMoneyIsShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], MoneyIsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(MoneyIsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
-                Debug.Log($"Money sharing set to {MoneyIsShared.Value}.");
+            {
+                MoneyIsShared.Value = valid.Value;
+                Debug.Log($"Money sharing status set to {MoneyIsShared.Value}.");
+            }
         }
 
         // MoneyScalarEnabled
@@ -296,10 +299,19 @@ namespace ShareSuite
             helpText = "Modifies whether the money scalar is enabled.")]
         private static void CcMoneyScalarEnabled(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], MoneyScalarEnabled))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(MoneyScalarEnabled.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
-                Debug.Log($"Money scaling toggle set to {MoneyScalarEnabled.Value}.");
+            {
+                MoneyScalarEnabled.Value = valid.Value;
+                Debug.Log($"Money sharing scalar status set to {MoneyScalarEnabled.Value}.");
+            }
         }
 
         // MoneyScalar
@@ -307,10 +319,19 @@ namespace ShareSuite
             helpText = "Modifies percent of gold earned when money sharing is on.")]
         private static void CcMoneyScalar(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], MoneyScalar))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(MoneyScalar.Value);
+                return;
+            }
+            var valid = args.TryGetArgDouble(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to a number.");
             else
-                Debug.Log($"Money multiplier set to {MoneyScalar.Value}.");
+            {
+                MoneyScalar.Value = valid.Value;
+                Debug.Log($"Mod status set to {MoneyScalar.Value}.");
+            }
         }
 
         // WhiteItemsShared
@@ -318,10 +339,19 @@ namespace ShareSuite
             helpText = "Modifies whether white items are shared or not.")]
         private static void CcWhiteShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], WhiteItemsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(WhiteItemsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
-                Debug.Log($"White item sharing set to {WhiteItemsShared.Value}.");
+            {
+                WhiteItemsShared.Value = valid.Value;
+                Debug.Log($"White items sharing set to {WhiteItemsShared.Value}.");
+            }
         }
 
         // GreenItemsShared
@@ -329,10 +359,19 @@ namespace ShareSuite
             helpText = "Modifies whether green items are shared or not.")]
         private static void CcGreenShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], GreenItemsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(GreenItemsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
-                Debug.Log($"Green item sharing set to {GreenItemsShared.Value}.");
+            {
+                GreenItemsShared.Value = valid.Value;
+                Debug.Log($"Green items sharing set to {GreenItemsShared.Value}.");
+            }
         }
 
         // RedItemsShared
@@ -340,10 +379,19 @@ namespace ShareSuite
             helpText = "Modifies whether red items are shared or not.")]
         private static void CcRedShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], RedItemsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(RedItemsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                RedItemsShared.Value = valid.Value;
                 Debug.Log($"Red item sharing set to {RedItemsShared.Value}.");
+            }
         }
 
         // EquipmentShared
@@ -351,10 +399,19 @@ namespace ShareSuite
             helpText = "Modifies whether equipment is shared or not.")]
         private static void CcEquipmentShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], EquipmentShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(EquipmentShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                EquipmentShared.Value = valid.Value;
                 Debug.Log($"Equipment sharing set to {EquipmentShared.Value}.");
+            }
         }
 
         // LunarItemsShared
@@ -362,10 +419,19 @@ namespace ShareSuite
             helpText = "Modifies whether lunar items are shared or not.")]
         private static void CcLunarShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], LunarItemsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(LunarItemsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                LunarItemsShared.Value = valid.Value;
                 Debug.Log($"Lunar item sharing set to {LunarItemsShared.Value}.");
+            };
         }
 
         // BossItemsShared
@@ -373,10 +439,19 @@ namespace ShareSuite
             helpText = "Modifies whether boss items are shared or not.")]
         private static void CcBossShared(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], BossItemsShared))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(BossItemsShared.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                BossItemsShared.Value = valid.Value;
                 Debug.Log($"Boss item sharing set to {BossItemsShared.Value}.");
+            };
         }
 
         // PrinterCauldronFix
@@ -384,10 +459,19 @@ namespace ShareSuite
             helpText = "Modifies whether printers and cauldrons should not duplicate items.")]
         private static void CcPrinterCauldronFix(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], PrinterCauldronFixEnabled))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(PrinterCauldronFixEnabled.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                PrinterCauldronFixEnabled.Value = valid.Value;
                 Debug.Log($"Printer and cauldron fix set to {PrinterCauldronFixEnabled.Value}.");
+            };
         }
 
         // DisablePlayerScaling
@@ -395,10 +479,19 @@ namespace ShareSuite
             helpText = "Modifies whether interactable count should scale based on player count.")]
         private static void CcDisablePlayerScaling(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], OverridePlayerScalingEnabled))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(OverridePlayerScalingEnabled.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                OverridePlayerScalingEnabled.Value = valid.Value;
                 Debug.Log($"Player scaling disable set to {OverridePlayerScalingEnabled.Value}.");
+            }
         }
 
         // InteractablesCredit
@@ -406,10 +499,19 @@ namespace ShareSuite
             helpText = "Modifies amount of interactables when player scaling is overridden.")]
         private static void CcInteractablesCredit(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], InteractablesCredit))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(InteractablesCredit.Value);
+                return;
+            }
+            var valid = args.TryGetArgDouble(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to a number.");
             else
-                Debug.Log($"Interactables credit set to {InteractablesCredit.Value}.");
+            {
+                InteractablesCredit.Value = valid.Value;
+                Debug.Log($"Interactible credit set to {InteractablesCredit.Value}.");
+            }
         }
 
         // DisableBossLootScaling
@@ -417,10 +519,17 @@ namespace ShareSuite
             helpText = "Modifies whether boss loot should scale based on player count.")]
         private static void CcBossLoot(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], OverrideBossLootScalingEnabled))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(OverrideBossLootScalingEnabled.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
             {
+                OverrideBossLootScalingEnabled.Value = valid.Value;
                 Debug.Log($"Boss loot scaling disable set to {OverrideBossLootScalingEnabled.Value}.");
             }
         }
@@ -430,10 +539,17 @@ namespace ShareSuite
             helpText = "Modifies amount of boss item drops.")]
         private static void CcBossLootCredit(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], BossLootCredit))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(BossLootCredit.Value);
+                return;
+            }
+            var valid = args.TryGetArgInt(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to an integer number.");
             else
             {
+                BossLootCredit.Value = valid.Value;
                 Debug.Log($"Boss loot credit set to {BossLootCredit.Value}.");
             }
         }
@@ -443,10 +559,19 @@ namespace ShareSuite
             helpText = "Modifies whether items are shared to dead players.")]
         private static void CcDeadPlayersGetItems(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], DeadPlayersGetItems))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(DeadPlayersGetItems.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                DeadPlayersGetItems.Value = valid.Value;
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
+            }
         }
 
         //randomisepickups
@@ -454,10 +579,19 @@ namespace ShareSuite
            helpText = "Randomizes pickups per player.")]
         private static void CcRandomizeSharedPickups(ConCommandArgs args)
         {
-            if (args.Count != 1 || !TryParseIntoConfig(args[0], RandomizeSharedPickups))
-                Debug.Log("Invalid arguments.");
+            if (args.Count == 0)
+            {
+                Debug.Log(RandomizeSharedPickups.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
             else
+            {
+                RandomizeSharedPickups.Value = valid.Value;
                 Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
+            }
         }
 #pragma warning restore IDE0051
         #endregion CommandParser
