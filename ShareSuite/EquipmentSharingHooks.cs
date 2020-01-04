@@ -6,41 +6,44 @@ namespace ShareSuite
 {
     public static class EquipmentSharingHooks
     {
-        public static void OnGrantEquipment()
+        public static void UnHook()
         {
-            On.RoR2.GenericPickupController.GrantEquipment += (orig, self, body, inventory) =>
-            {
-                if (!ShareSuite.ModIsEnabled.Value)
+            On.RoR2.GenericPickupController.GrantEquipment -= OnGrantEquipment;
+        }
+        public static void Hook()
+        {
+            On.RoR2.GenericPickupController.GrantEquipment += OnGrantEquipment;
+        }
+
+        private static void OnGrantEquipment(On.RoR2.GenericPickupController.orig_GrantEquipment orig, GenericPickupController self, CharacterBody body, Inventory inventory)
+        {
+            #region Sharedequipment
+
+            var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
+
+            if (!ShareSuite.GetEquipmentBlackList().Contains((int)equip)
+                && NetworkServer.active
+                && IsValidEquipmentPickup(self.pickupIndex)
+                && GeneralHooks.IsMultiplayer())
+                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                    .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
                 {
-                    orig(self, body, inventory);
-                    return;
+                    SyncToolbotEquip(player, ref equip);
+
+                    // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                    if (player.inventory == inventory) continue;
+
+                    player.inventory.SetEquipmentIndex(equip);
+                    self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(equip);
                 }
 
-                #region Sharedequipment
+            orig(self, body, inventory);
 
-                var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
-
-                if (!ShareSuite.GetEquipmentBlackList().Contains((int) equip)
-                    && NetworkServer.active
-                    && IsValidEquipmentPickup(self.pickupIndex)
-                    && GeneralHooks.IsMultiplayer())
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                        .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
-                    {
-                        SyncToolbotEquip(player, ref equip);
-
-                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
-                        if (player.inventory == inventory) continue;
-
-                        player.inventory.SetEquipmentIndex(equip);
-                        self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(equip);
-                    }
-
-                orig(self, body, inventory);
-
-                #endregion
-            };
+            #endregion
         }
+
+
+       
 
         private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
         {
