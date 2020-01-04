@@ -1,5 +1,12 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.11.0`
+- Complete README.md refactor. It should be a lot nicer to look at and easier to navigate now!
+- Resolve issue where items would spawn on maps they weren't supposed to.
+- Re-worked the gold sharing system to resolve state issues that have been experienced.
+- Add Lepton Daisy and Halcyon Seed to the default unshared list as they provide buffs for everyone in the lobby and granting them to everyone makes them stronger. 
+    - If you'd like to update your config to match these changes, please add `,82,86` to the end of the Item Blacklist in your config!
+
 `1.10.4` 
 - Fixed a similar bug as 1.10.3; Money will no longer stay above the highest amount of money a dead player has. (Thanks to Elysium for finding this!) 
 - Updated R2Api dependency to 2.1.16.
