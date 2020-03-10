@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.13.4")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.14.0")]
     [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -174,6 +174,13 @@ namespace ShareSuite
                 "Toggles item sharing for boss items."
                 );
 
+            RandomizeSharedPickups = Config.Bind(
+                "Balance",
+                "RandomizeSharedPickups",
+                false,
+                "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity."
+            );
+            
             PrinterCauldronFixEnabled = Config.Bind(
                 "Balance",
                 "PrinterCauldronFix",
@@ -244,16 +251,10 @@ namespace ShareSuite
                 "",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
                 );
-            RandomizeSharedPickups = Config.Bind(
-                "Settings",
-                "RandomizeSharedPickups",
-                false,
-                "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity."
-                );
         }
 
         #region CommandParser
-#pragma warning disable IDE0051 //Commands usually aren't called from code.
+        #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
@@ -454,6 +455,26 @@ namespace ShareSuite
             };
         }
 
+        //randomisepickups
+        [ConCommand(commandName = "ss_RandomizeSharedPickups", flags = ConVarFlags.None,
+            helpText = "Randomizes pickups per player.")]
+        private static void CcRandomizeSharedPickups(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(RandomizeSharedPickups.Value);
+                return;
+            }
+            var valid = args.TryGetArgBool(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                RandomizeSharedPickups.Value = valid.Value;
+                Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
+            }
+        }
+        
         // PrinterCauldronFix
         [ConCommand(commandName = "ss_PrinterCauldronFix", flags = ConVarFlags.None,
             helpText = "Modifies whether printers and cauldrons should not duplicate items.")]
@@ -571,26 +592,6 @@ namespace ShareSuite
             {
                 DeadPlayersGetItems.Value = valid.Value;
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
-            }
-        }
-
-        //randomisepickups
-        [ConCommand(commandName = "ss_RandomizeSharedPickups", flags = ConVarFlags.None,
-           helpText = "Randomizes pickups per player.")]
-        private static void CcRandomizeSharedPickups(ConCommandArgs args)
-        {
-            if (args.Count == 0)
-            {
-                Debug.Log(RandomizeSharedPickups.Value);
-                return;
-            }
-            var valid = args.TryGetArgBool(0);
-            if (!valid.HasValue)
-                Debug.Log("Couldn't parse to boolean.");
-            else
-            {
-                RandomizeSharedPickups.Value = valid.Value;
-                Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
             }
         }
 #pragma warning restore IDE0051
