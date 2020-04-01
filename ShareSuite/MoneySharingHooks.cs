@@ -3,6 +3,7 @@ using System.Linq;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
+using static ShareSuite.MoneySharingHooks;
 
 namespace ShareSuite
 {
@@ -60,7 +61,7 @@ namespace ShareSuite
                         {
                             // Remove money from shared money pool
                             orig(self, activator);
-                            MoneySharingHooks.SharedMoneyValue -= self.cost;
+                            SharedMoneyValue -= self.cost;
                             return;
                         }
 
@@ -86,7 +87,7 @@ namespace ShareSuite
 
                             if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint)ShareSuite.MoneyScalar.Value;
 
-                            MoneySharingHooks.SharedMoneyValue += (int)amount;
+                            SharedMoneyValue += (int)amount;
                             return;
                         }
                 }

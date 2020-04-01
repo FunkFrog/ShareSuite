@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.1")]
     [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -75,11 +75,10 @@ namespace ShareSuite
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (!playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
-                if (playerCharacterMasterController.master.money != MoneySharingHooks.SharedMoneyValue)
-                {
-                    playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
-                }
+                if (!playerCharacterMasterController.master.hasBody) continue;
+                if (!playerCharacterMasterController.master.GetBody().healthComponent.alive) continue;
+                if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
+                playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
             }
         }
 

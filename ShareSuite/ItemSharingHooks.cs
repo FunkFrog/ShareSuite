@@ -45,8 +45,12 @@ namespace ShareSuite
                     // Ensure character is not original player that picked up item
                     if (player.inventory == inventory) continue;
 
+                    // Ensure body exists
+
+                    if (!player.hasBody) return;
+                    
                     // Do not reward dead players if not required
-                    if (!player.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                    if (!player.GetBody().healthComponent.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
@@ -158,7 +162,6 @@ namespace ShareSuite
             );
             cursor.Index++;
             cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.VoidFieldLootCredit.Value);
-            Debug.Log(il);
         }
 
         private delegate void SendPickupMessageDelegate(CharacterMaster master, PickupIndex pickupIndex);
