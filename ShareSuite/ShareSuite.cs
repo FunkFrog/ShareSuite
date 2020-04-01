@@ -95,7 +95,7 @@ namespace ShareSuite
             #endregion
         }
 
-        private void ReloadHooks(object _ = null, System.EventArgs __= null)
+        private void ReloadHooks(object _ = null, EventArgs __= null)
         {
             if(previouslyEnabled && !ModIsEnabled.Value)
             {
