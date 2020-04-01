@@ -26,7 +26,7 @@ namespace ShareSuite
                 && IsValidEquipmentPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                    .Where(p => p.hasBody && p.GetBody().healthComponent.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    .Where(p => !p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
                 {
                     SyncToolbotEquip(player, ref equip);
 

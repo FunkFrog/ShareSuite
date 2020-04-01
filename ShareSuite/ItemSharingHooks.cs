@@ -44,13 +44,9 @@ namespace ShareSuite
                 {
                     // Ensure character is not original player that picked up item
                     if (player.inventory == inventory) continue;
-
-                    // Ensure body exists
-
-                    if (!player.hasBody) return;
                     
                     // Do not reward dead players if not required
-                    if (!player.GetBody().healthComponent.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                    if (player.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {

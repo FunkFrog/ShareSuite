@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
@@ -75,8 +75,7 @@ namespace ShareSuite
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (!playerCharacterMasterController.master.hasBody) continue;
-                if (!playerCharacterMasterController.master.GetBody().healthComponent.alive) continue;
+                if (playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
                 if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
                 playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
             }
