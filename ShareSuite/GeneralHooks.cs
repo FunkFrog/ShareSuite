@@ -1,6 +1,5 @@
 using System;
 using R2API;
-using R2API.Utils;
 using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
