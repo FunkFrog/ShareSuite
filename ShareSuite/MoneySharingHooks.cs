@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -29,6 +30,21 @@ namespace ShareSuite
             On.RoR2.BarrelInteraction.OnInteractionBegin += ShareBarrelMoney;
             On.RoR2.SceneExitController.Begin += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
+        }
+
+        public static void AddMoneyExternal(int amount)
+        {
+            if (ShareSuite.MoneyIsShared.Value)
+            {
+                SharedMoneyValue += amount;
+            }
+            else
+            {
+                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                {
+                    player.money += (uint) amount;
+                }
+            }
         }
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, RoR2.PurchaseInteraction self, RoR2.Interactor activator)
@@ -170,6 +186,11 @@ namespace ShareSuite
 
                 orig(self, info);
 
+                if (!self.alive)
+                {
+                    return;
+                }
+                
                 var postDamageMoney = self.body.master.money;
 
                 // Ignore all of this if we do not actually have the item

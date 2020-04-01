@@ -26,7 +26,7 @@ namespace ShareSuite
                 && IsValidEquipmentPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                    .Where(p => p.alive || ShareSuite.DeadPlayersGetItems.Value))
+                    .Where(p => p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
                 {
                     SyncToolbotEquip(player, ref equip);
 
@@ -41,10 +41,7 @@ namespace ShareSuite
 
             #endregion
         }
-
-
-       
-
+        
         private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
         {
             if (!NetworkServer.active) return;

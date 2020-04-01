@@ -3,13 +3,14 @@ using R2API;
 using R2API.Utils;
 using RoR2;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ShareSuite
 {
     public static class GeneralHooks
     {
         public static int BossItems = 1;
-        public static List<string> NoInteractibleOverrideScenes = new List<string>{ "MAP_BAZAAR_TITLE" };
+        public static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
 
         internal static void Hook()
         {
@@ -34,7 +35,8 @@ namespace ShareSuite
         /// <summary>
         /// // Helper function for Bossloot
         /// </summary>
-        private static void OverrideBoosLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig, TeleporterInteraction self, Interactor activator)
+        private static void OverrideBoosLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
+            TeleporterInteraction self, Interactor activator)
         {
             if (ShareSuite.OverrideBossLootScalingEnabled.Value)
                 BossItems = ShareSuite.BossLootCredit.Value;
@@ -42,8 +44,7 @@ namespace ShareSuite
                 BossItems = Run.instance.participatingPlayerCount;
 
             orig(self, activator);
-            }
-
+        }
 
         public static bool IsMultiplayer()
         {
@@ -54,6 +55,8 @@ namespace ShareSuite
         private static void InteractibleCreditOverride(On.RoR2.SceneDirector.orig_PlaceTeleporter orig, SceneDirector self)
         {
             orig(self);
+
+            Debug.Log(SceneInfo.instance.sceneDef.nameToken);
 
             #region InteractablesCredit
 
@@ -70,7 +73,7 @@ namespace ShareSuite
 
                 // We require playercount for several of the following computations. We don't want this to break with
                 // those crazy 'mega party mods', thus we clamp this value.
-                var clampPlayerCount = System.Math.Min(Run.instance.participatingPlayerCount, 8);
+                var clampPlayerCount = Math.Min(Run.instance.participatingPlayerCount, 8);
 
                 // The flat creditModifier slightly adjust interactables based on the amount of players.
                 // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
@@ -78,8 +81,8 @@ namespace ShareSuite
 
                 // In addition to our flat modifier, we additionally introduce a stage modifier.
                 // This reduces player strength early game (as having more bodies gives a flat power increase early game).
-                creditModifier *= (float)System.Math.Max(
-                                        1.0 + 0.1 * System.Math.Min(
+                creditModifier *= (float)Math.Max(
+                                        1.0 + 0.1 * Math.Min(
                                             Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2,
                                             3)
                                         , 1.0);
@@ -102,8 +105,9 @@ namespace ShareSuite
             }
 
             // Set interactables budget to interactableCredit * config player count.
-            if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken) ))
-                self.SetFieldValue<int>("interactableCredit", (int)(interactableCredit * ShareSuite.InteractablesCredit.Value));
+            if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
+                    || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
+                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value);
 
             #endregion
         }

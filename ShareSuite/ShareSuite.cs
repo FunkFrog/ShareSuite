@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
@@ -12,7 +13,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.14.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.0")]
     [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -30,10 +31,11 @@ namespace ShareSuite
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
+            OverrideVoidFieldLootScalingEnabled,
             MoneyScalarEnabled,
             RandomizeSharedPickups;
 
-        public static ConfigEntry<int> BossLootCredit;
+        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
@@ -73,7 +75,7 @@ namespace ShareSuite
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (!playerCharacterMasterController.master.alive) continue;
+                if (!playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
                 if (playerCharacterMasterController.master.money != MoneySharingHooks.SharedMoneyValue)
                 {
                     playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
@@ -221,8 +223,22 @@ namespace ShareSuite
                 "Balance",
                 "BossLootCredit",
                 1,
-                "Specifies the amount of boss items dropped when boss drop override is true."
+                "Specifies the amount of boss items dropped when the boss drop override is true."
                 );
+            
+            OverrideVoidFieldLootScalingEnabled = Config.Bind(
+                "Balance",
+                "OverrideVoidLootScaling",
+                true,
+                "Toggles override of the scalar of Void Field loot drops to your configured balance."
+            );
+            
+            VoidFieldLootCredit = Config.Bind(
+                "Balance",
+                "VoidFieldLootCredit",
+                1,
+                "Specifies the amount of Void Fields items dropped when the Void Field scaling override is true."
+            );
 
             MoneyScalarEnabled = Config.Bind(
                 "Settings",
@@ -265,7 +281,7 @@ namespace ShareSuite
                 Debug.Log(ModIsEnabled.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -285,7 +301,7 @@ namespace ShareSuite
                 Debug.Log(MoneyIsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -305,7 +321,7 @@ namespace ShareSuite
                 Debug.Log(MoneyScalarEnabled.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -345,7 +361,7 @@ namespace ShareSuite
                 Debug.Log(WhiteItemsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -365,7 +381,7 @@ namespace ShareSuite
                 Debug.Log(GreenItemsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -385,7 +401,7 @@ namespace ShareSuite
                 Debug.Log(RedItemsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -405,7 +421,7 @@ namespace ShareSuite
                 Debug.Log(EquipmentShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -425,7 +441,7 @@ namespace ShareSuite
                 Debug.Log(LunarItemsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -445,7 +461,7 @@ namespace ShareSuite
                 Debug.Log(BossItemsShared.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -465,7 +481,7 @@ namespace ShareSuite
                 Debug.Log(RandomizeSharedPickups.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -485,7 +501,7 @@ namespace ShareSuite
                 Debug.Log(PrinterCauldronFixEnabled.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -505,7 +521,7 @@ namespace ShareSuite
                 Debug.Log(OverridePlayerScalingEnabled.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -545,7 +561,7 @@ namespace ShareSuite
                 Debug.Log(OverrideBossLootScalingEnabled.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -574,6 +590,58 @@ namespace ShareSuite
                 Debug.Log($"Boss loot credit set to {BossLootCredit.Value}.");
             }
         }
+        
+        // DisableVoidFieldLootScaling
+        [ConCommand(commandName = "ss_OverrideVoidFieldLoot", flags = ConVarFlags.None,
+            helpText = "Modifies whether Void Field loot should scale based on player count.")]
+        private static void CcVoidFieldLoot(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(OverrideVoidFieldLootScalingEnabled.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                if (OverrideVoidFieldLootScalingEnabled.Value != valid.Value)
+                {
+                    if (OverrideVoidFieldLootScalingEnabled.Value && !valid.Value)
+                    {
+                        IL.RoR2.ArenaMissionController.EndRound -= ItemSharingHooks.ArenaDropEnable;
+                    }
+                    else
+                    {
+                        IL.RoR2.ArenaMissionController.EndRound += ItemSharingHooks.ArenaDropEnable;
+                    }
+                }
+
+                OverrideVoidFieldLootScalingEnabled.Value = valid.Value;
+                Debug.Log($"Void Field loot scaling disable set to {OverrideVoidFieldLootScalingEnabled.Value}.");
+            }
+        }
+        
+        // VoidFieldLootCredit
+        [ConCommand(commandName = "ss_VoidFieldLootCredit", flags = ConVarFlags.None,
+            helpText = "Modifies amount of Void Field item drops.")]
+        private static void CcVoidFieldCredit(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(VoidFieldLootCredit.Value);
+                return;
+            }
+            var valid = args.TryGetArgInt(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to an integer number.");
+            else
+            {
+                VoidFieldLootCredit.Value = valid.Value;
+                Debug.Log($"Void Field loot credit set to {VoidFieldLootCredit.Value}.");
+            }
+        }
 
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
@@ -585,7 +653,8 @@ namespace ShareSuite
                 Debug.Log(DeadPlayersGetItems.Value);
                 return;
             }
-            var valid = args.TryGetArgBool(0);
+
+            var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
@@ -594,7 +663,19 @@ namespace ShareSuite
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
             }
         }
-#pragma warning restore IDE0051
+
+        private static bool? TryGetBool(string arg)
+        {
+            string[] posStr = {"yes", "true", "1"};
+            string[] negStr = {"no", "false", "0", "-1"};
+            
+            if (posStr.Contains(arg.ToLower())) return true;
+            if (negStr.Contains(arg.ToLower())) return false;
+
+            return new bool?();
+        }
+        
+        #pragma warning restore IDE0051
         #endregion CommandParser
     }
 }

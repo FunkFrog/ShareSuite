@@ -1,9 +1,13 @@
+using System;
 using RoR2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using UnityEngine;
 using UnityEngine.Networking;
+using Random = UnityEngine.Random;
 
 namespace ShareSuite
 {
@@ -14,12 +18,16 @@ namespace ShareSuite
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
+            On.RoR2.ScavBackpackBehavior.RollItem -= OnScavengerDrop;
+            IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
         }
         public static void Hook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
+            On.RoR2.ScavBackpackBehavior.RollItem += OnScavengerDrop;
+            IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
         }
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig, GenericPickupController self, CharacterBody body, Inventory inventory)
@@ -38,17 +46,28 @@ namespace ShareSuite
                     if (player.inventory == inventory) continue;
 
                     // Do not reward dead players if not required
-                    if (!player.alive && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                    if (!player.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
-                        var giveItem = GetRandomItemOfTier(itemDef.tier, item.itemIndex);
-                        var givePickupIndex = PickupCatalog.FindPickupIndex(giveItem);
-                        player.inventory.GiveItem(giveItem);
+                        var itemIsBlacklisted = true;
+                        var giveItem = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
+                        while (itemIsBlacklisted)
+                        {
+                            if (ShareSuite.GetItemBlackList().Contains((int) giveItem.itemIndex))
+                            {
+                                giveItem = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
+                            }
+                            else
+                            {
+                                itemIsBlacklisted = false;
+                            }
+                        }
+                        player.inventory.GiveItem(giveItem.itemIndex);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
-                        SendPickupMessage(player, givePickupIndex);
+                        SendPickupMessage(player, giveItem);
                     }
                     // Otherwise give everyone the same item
                     else
@@ -87,8 +106,6 @@ namespace ShareSuite
             var characterBody = activator.GetComponent<CharacterBody>();
             var inventory = characterBody.inventory;
 
-            
-
             #region Cauldronfix
 
             // If this is not a multi-player server or the fix is disabled, do the normal drop action
@@ -117,10 +134,37 @@ namespace ShareSuite
             orig(self, activator);
         }
 
+        private static void OnScavengerDrop(On.RoR2.ScavBackpackBehavior.orig_RollItem orig, ScavBackpackBehavior self)
+        {
+            //TODO Doesn't work. Current intended effect is to divide the rolled amount of drops by the amount of players, with a minimum of 2 items dropped from the pack
+            
+            /*double defaultDrops = EntityStates.ScavBackpack.Opening.maxItemDropCount;
+            var adjustedDrops = (int) Math.Floor(defaultDrops / Run.instance.participatingPlayerCount);
+            EntityStates.ScavBackpack.Opening.maxItemDropCount = adjustedDrops >= 2 ? adjustedDrops : 2;*/
+            orig(self);
+        }
+        
+        //Void Fields item fix
+        public static void ArenaDropEnable(ILContext il)
+        {
+            if (!ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) return;
+            var cursor = new ILCursor(il);
+
+            cursor.GotoNext(
+                x => x.MatchLdloc(1),
+                x => x.MatchStloc(out _),
+                x => x.MatchLdcR4(out _),
+                x => x.MatchLdloc(out _)
+            );
+            cursor.Index++;
+            cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.VoidFieldLootCredit.Value);
+            Debug.Log(il);
+        }
+
         private delegate void SendPickupMessageDelegate(CharacterMaster master, PickupIndex pickupIndex);
 
         private static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate)System.Delegate.CreateDelegate(typeof(SendPickupMessageDelegate), typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static));
+            (SendPickupMessageDelegate)Delegate.CreateDelegate(typeof(SendPickupMessageDelegate), typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static));
 
         private static bool IsValidItemPickup(PickupIndex pickup)
         {
@@ -140,6 +184,8 @@ namespace ShareSuite
                         return ShareSuite.LunarItemsShared.Value;
                     case ItemTier.Boss:
                         return ShareSuite.BossItemsShared.Value;
+                    case ItemTier.NoTier:
+                        break;
                     default:
                         return false;
                 }
@@ -153,18 +199,18 @@ namespace ShareSuite
             return false;
         }
 
-        private static ItemIndex GetRandomItemOfTier(ItemTier tier, ItemIndex orDefault)
+        private static PickupIndex GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
             {
                 case ItemTier.Tier1:
-                    return PickRandomOf(ItemCatalog.tier1ItemList);
+                    return PickRandomOf(Run.instance.availableTier1DropList);
                 case ItemTier.Tier2:
-                    return PickRandomOf(ItemCatalog.tier2ItemList);
+                    return PickRandomOf(Run.instance.availableTier2DropList);
                 case ItemTier.Tier3:
-                    return PickRandomOf(ItemCatalog.tier3ItemList);
+                    return PickRandomOf(Run.instance.availableTier3DropList);
                 case ItemTier.Lunar:
-                    return PickRandomOf(ItemCatalog.lunarItemList);
+                    return PickRandomOf(Run.instance.availableLunarDropList);
                 case ItemTier.Boss:
                     return orDefault; // no boss item list, and also probably better anyway
                 default:
