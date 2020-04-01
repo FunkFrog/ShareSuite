@@ -1,5 +1,11 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.12.0`
+- Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
+- Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
+    - Thank you to Commie for helping me test and fix these bugs!
+- Made improvements to the README's writing to make it sound less like a student who wanted to meet a sentence requirement on an essay.
+
 `1.11.0`
 - Complete README.md refactor. It should be a lot nicer to look at and easier to navigate now!
 - Resolve issue where items would spawn on maps they weren't supposed to.
