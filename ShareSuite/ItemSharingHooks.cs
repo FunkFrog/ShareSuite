@@ -2,10 +2,7 @@ using System;
 using RoR2;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
@@ -20,7 +17,9 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
             On.RoR2.ScavBackpackBehavior.RollItem -= OnScavengerDrop;
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
+            IL.RoR2.GenericPickupController.GrantItem -= RemoveDefaultPickupMessage;
         }
+
         public static void Hook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
@@ -28,15 +27,17 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
             On.RoR2.ScavBackpackBehavior.RollItem += OnScavengerDrop;
             IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
+            IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
         }
 
-        private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig, GenericPickupController self, CharacterBody body, Inventory inventory)
+        private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig,
+            GenericPickupController self, CharacterBody body, Inventory inventory)
         {
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
-
-
-              if ((ShareSuite.RandomizeSharedPickups.Value || !ShareSuite.GetItemBlackList().Contains((int)item.itemIndex))
+            
+            if ((ShareSuite.RandomizeSharedPickups.Value ||
+                 !ShareSuite.GetItemBlackList().Contains((int) item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
@@ -44,30 +45,35 @@ namespace ShareSuite
                 {
                     // Ensure character is not original player that picked up item
                     if (player.inventory == inventory) continue;
-                    
+
                     // Do not reward dead players if not required
                     if (player.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
                         var itemIsBlacklisted = true;
-                        var giveItem = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
+                        var giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier, item.pickupIndex));
                         while (itemIsBlacklisted)
                         {
                             if (ShareSuite.GetItemBlackList().Contains((int) giveItem.itemIndex))
                             {
-                                giveItem = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
+                                giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier, item.pickupIndex));
                             }
                             else
                             {
                                 itemIsBlacklisted = false;
                             }
                         }
+
                         player.inventory.GiveItem(giveItem.itemIndex);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
-                        SendPickupMessage(player, giveItem);
+
+                        // Legacy -- old normal pickup message handler
+                        //SendPickupMessage(player, giveItem);
+
+                        ChatHandler.SendPickupMessage(player, giveItem.pickupIndex);
                     }
                     // Otherwise give everyone the same item
                     else
@@ -76,7 +82,24 @@ namespace ShareSuite
                     }
                 }
 
+            ChatHandler.SendRichPickupMessage(body.master, item);
             orig(self, body, inventory);
+        }
+
+        public static void RemoveDefaultPickupMessage(ILContext il)
+        {
+            if (!ShareSuite.RichMessagesEnabled.Value) return;
+            var cursor = new ILCursor(il);
+            
+            cursor.GotoNext(
+                x => x.MatchLdarg(2),
+                x => x.MatchCallvirt(out _),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld(out _),
+                x => x.MatchCall(out _)
+            );
+
+            cursor.RemoveRange(5);
         }
 
         private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
@@ -99,7 +122,8 @@ namespace ShareSuite
             }
         }
 
-        private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, PurchaseInteraction self, Interactor activator)
+        private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
+            PurchaseInteraction self, Interactor activator)
         {
             if (!self.CanBeAffordedByInteractor(activator)) return;
 
@@ -126,7 +150,8 @@ namespace ShareSuite
             {
                 var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                 inventory.GiveItem(item);
-                SendPickupMessage(inventory.GetComponent<CharacterMaster>(), shop.CurrentPickupIndex());
+                ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
+                    shop.CurrentPickupIndex());
             }
 
             #endregion Cauldronfix
@@ -137,13 +162,13 @@ namespace ShareSuite
         private static void OnScavengerDrop(On.RoR2.ScavBackpackBehavior.orig_RollItem orig, ScavBackpackBehavior self)
         {
             //TODO Doesn't work. Current intended effect is to divide the rolled amount of drops by the amount of players, with a minimum of 2 items dropped from the pack
-            
+
             /*double defaultDrops = EntityStates.ScavBackpack.Opening.maxItemDropCount;
             var adjustedDrops = (int) Math.Floor(defaultDrops / Run.instance.participatingPlayerCount);
             EntityStates.ScavBackpack.Opening.maxItemDropCount = adjustedDrops >= 2 ? adjustedDrops : 2;*/
             orig(self);
         }
-        
+
         //Void Fields item fix
         public static void ArenaDropEnable(ILContext il)
         {
@@ -160,12 +185,7 @@ namespace ShareSuite
             cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.VoidFieldLootCredit.Value);
         }
 
-        private delegate void SendPickupMessageDelegate(CharacterMaster master, PickupIndex pickupIndex);
-
-        private static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate)Delegate.CreateDelegate(typeof(SendPickupMessageDelegate), typeof(GenericPickupController).GetMethod("SendPickupMessage", BindingFlags.NonPublic | BindingFlags.Static));
-
-        private static bool IsValidItemPickup(PickupIndex pickup)
+        public static bool IsValidItemPickup(PickupIndex pickup)
         {
             var pickupdef = PickupCatalog.GetPickupDef(pickup);
             if (pickupdef.itemIndex != ItemIndex.None)
@@ -189,12 +209,14 @@ namespace ShareSuite
                         return false;
                 }
             }
+
             if (pickupdef.equipmentIndex != EquipmentIndex.None)
             {
                 // var equipdef = EquipmentCatalog.GetEquipmentDef(pickupdef.equipmentIndex);
                 // Optional further checks ...
                 return false;
             }
+
             return false;
         }
 

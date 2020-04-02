@@ -27,6 +27,7 @@ namespace ShareSuite
             EquipmentShared,
             LunarItemsShared,
             BossItemsShared,
+            RichMessagesEnabled,
             PrinterCauldronFixEnabled,
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
@@ -40,7 +41,7 @@ namespace ShareSuite
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
 
-        private bool previouslyEnabled = false;
+        private bool _previouslyEnabled;
         #endregion
 
         public static HashSet<int> GetItemBlackList()
@@ -97,17 +98,17 @@ namespace ShareSuite
 
         private void ReloadHooks(object _ = null, EventArgs __= null)
         {
-            if(previouslyEnabled && !ModIsEnabled.Value)
+            if (_previouslyEnabled && !ModIsEnabled.Value)
             {
                 GeneralHooks.UnHook();
                 MoneySharingHooks.UnHook();
                 ItemSharingHooks.UnHook();
                 EquipmentSharingHooks.UnHook();
-                previouslyEnabled = false;
+                _previouslyEnabled = false;
             }
-            if (!previouslyEnabled && ModIsEnabled.Value)
+            if (!_previouslyEnabled && ModIsEnabled.Value)
             {
-                previouslyEnabled = true;
+                _previouslyEnabled = true;
                 GeneralHooks.Hook();
                 MoneySharingHooks.Hook();
                 ItemSharingHooks.Hook();
@@ -173,6 +174,13 @@ namespace ShareSuite
                 true,
                 "Toggles item sharing for boss items."
                 );
+            
+            RichMessagesEnabled = Config.Bind(
+                "Settings",
+                "RichMessagesEnabled",
+                true,
+                "Toggles rich item pickup messages."
+            );
 
             RandomizeSharedPickups = Config.Bind(
                 "Balance",
@@ -446,7 +454,7 @@ namespace ShareSuite
             {
                 LunarItemsShared.Value = valid.Value;
                 Debug.Log($"Lunar item sharing set to {LunarItemsShared.Value}.");
-            };
+            }
         }
 
         // BossItemsShared
@@ -466,7 +474,39 @@ namespace ShareSuite
             {
                 BossItemsShared.Value = valid.Value;
                 Debug.Log($"Boss item sharing set to {BossItemsShared.Value}.");
-            };
+            }
+        }
+        
+        // RichMessagesEnabled
+        [ConCommand(commandName = "ss_RichMessagesEnabled", flags = ConVarFlags.None,
+            helpText = "Modifies whether rich messages are enabled or not.")]
+        private static void CcMessagesEnabled(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(RichMessagesEnabled.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                if (RichMessagesEnabled.Value != valid.Value)
+                {
+                    if (RichMessagesEnabled.Value && !valid.Value)
+                    {
+                        IL.RoR2.GenericPickupController.GrantItem -= ItemSharingHooks.RemoveDefaultPickupMessage;
+                    }
+                    else
+                    {
+                        IL.RoR2.GenericPickupController.GrantItem += ItemSharingHooks.RemoveDefaultPickupMessage;
+                    }
+                }
+                
+                RichMessagesEnabled.Value = valid.Value;
+                Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
+            }
         }
 
         //randomisepickups
@@ -506,7 +546,7 @@ namespace ShareSuite
             {
                 PrinterCauldronFixEnabled.Value = valid.Value;
                 Debug.Log($"Printer and cauldron fix set to {PrinterCauldronFixEnabled.Value}.");
-            };
+            }
         }
 
         // DisablePlayerScaling

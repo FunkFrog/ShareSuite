@@ -1,9 +1,7 @@
-using System;
 using System.Linq;
 using RoR2;
 using UnityEngine;
 using UnityEngine.Networking;
-using static ShareSuite.MoneySharingHooks;
 
 namespace ShareSuite
 {
@@ -48,7 +46,8 @@ namespace ShareSuite
             }
         }
 
-        private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig, RoR2.PurchaseInteraction self, RoR2.Interactor activator)
+        private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
+            PurchaseInteraction self, Interactor activator)
         {
             if (!self.CanBeAffordedByInteractor(activator)) return;
             #region Sharedmoney
@@ -110,6 +109,7 @@ namespace ShareSuite
             foreach (var player in PlayerCharacterMasterController.instances)
             {
                 player.master.money = (uint)
+                    // ReSharper disable once PossibleLossOfFraction
                     Mathf.FloorToInt(player.master.money / players);
             }
             orig(self);
@@ -154,8 +154,8 @@ namespace ShareSuite
             SetTeleporterActive(false);
 
             // This should run on every map, as it is required to fix shared money.
-            // Reset shared money value to the default (15) at the start of each round
-            SharedMoneyValue = 15;
+            // Reset shared money value to the default (0) at the start of each round
+            SharedMoneyValue = 0;
 
             orig(self);
         }
