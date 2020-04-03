@@ -154,14 +154,15 @@ namespace ShareSuite
                 return;
             }
 
-            var characterBody = activator.GetComponent<CharacterBody>();
-            var inventory = characterBody.inventory;
             var shop = self.GetComponent<ShopTerminalBehavior>();
 
             #region Cauldronfix
 
             if (ShareSuite.PrinterCauldronFixEnabled.Value)
             {
+                var characterBody = activator.GetComponent<CharacterBody>();
+                var inventory = characterBody.inventory;
+                
                 if (self.costType == CostTypeIndex.WhiteItem
                     || self.costType == CostTypeIndex.GreenItem
                     || self.costType == CostTypeIndex.RedItem
@@ -183,7 +184,6 @@ namespace ShareSuite
 
             if (ShareSuite.EquipmentShared.Value)
             {
-                // If this is not a multi-player server or the fix is disabled, do the normal drop action
                 var rng = self.GetComponent<Xoroshiro128Plus>();
                 var itemIndex = ItemIndex.None;
 
