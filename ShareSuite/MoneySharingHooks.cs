@@ -176,11 +176,11 @@ namespace ShareSuite
         private static void GoldGatFireHook(On.EntityStates.GoldGat.GoldGatFire.orig_FireBullet orig, 
             GoldGatFire self)
         {
-//            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
-//            {
-//                orig(self);
-//                return;
-//            }
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
+            {
+                orig(self);
+                return;
+            }
 
 
             var bodyMaster = self.GetFieldValue<CharacterMaster>("bodyMaster");

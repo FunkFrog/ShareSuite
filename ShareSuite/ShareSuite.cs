@@ -83,7 +83,7 @@ namespace ShareSuite
             }
         }
 
-        public static double DefaultMaxScavItemDropCount = 0;
+        public static double DefaultMaxScavItemDropCount;
 
         public ShareSuite()
         {
