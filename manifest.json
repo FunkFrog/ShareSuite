@@ -1,10 +1,10 @@
 {
     "name": "ShareSuite",
-    "version_number": "1.13.0",
+    "version_number": "1.15.1",
     "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
     "description": "Share gear between members of your party - Highly Balanced - Completely Customisable",
     "dependencies": [
-        "bbepis-BepInExPack-2.0.0",
-        "tristanmcpherson-R2API-2.1.16"
+        "bbepis-BepInExPack-3.0.0",
+        "tristanmcpherson-R2API-2.3.7"
     ]
 }
