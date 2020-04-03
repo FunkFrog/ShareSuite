@@ -37,12 +37,19 @@ namespace ShareSuite
         {
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
+            var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
             
             if ((ShareSuite.RandomizeSharedPickups.Value ||
                  !ShareSuite.GetItemBlackList().Contains((int) item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
-                && GeneralHooks.IsMultiplayer())
+                && GeneralHooks.IsMultiplayer()) 
+            {
+                if (ShareSuite.RandomizeSharedPickups.Value)
+                {
+                    randomizedPlayerDict.Add(body.master, item);
+                }
+
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {
                     // Ensure character is not original player that picked up item
@@ -59,7 +66,8 @@ namespace ShareSuite
                         {
                             if (ShareSuite.GetItemBlackList().Contains((int) giveItem.itemIndex))
                             {
-                                giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier, item.pickupIndex));
+                                giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier,
+                                    item.pickupIndex));
                             }
                             else
                             {
@@ -75,7 +83,7 @@ namespace ShareSuite
                         // Legacy -- old normal pickup message handler
                         //SendPickupMessage(player, giveItem);
 
-                        ChatHandler.SendPickupMessage(player, giveItem.pickupIndex);
+                        randomizedPlayerDict.Add(player, giveItem);
                     }
                     // Otherwise give everyone the same item
                     else
@@ -83,6 +91,10 @@ namespace ShareSuite
                         player.inventory.GiveItem(item.itemIndex);
                     }
                 }
+                ChatHandler.SendRichRandomizedPickupMessage(body.master, item, randomizedPlayerDict);
+                orig(self, body, inventory);
+                return;
+            }
 
             ChatHandler.SendRichPickupMessage(body.master, item);
             orig(self, body, inventory);
@@ -136,53 +148,61 @@ namespace ShareSuite
         {
             if (!self.CanBeAffordedByInteractor(activator)) return;
 
-            var characterBody = activator.GetComponent<CharacterBody>();
-            var inventory = characterBody.inventory;
-            var shop = self.GetComponent<ShopTerminalBehavior>();
-            
-            #region Cauldronfix
-
-            // If this is not a multi-player server or the fix is disabled, do the normal drop action
-            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.PrinterCauldronFixEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer())
             {
                 orig(self, activator);
                 return;
             }
-            
-            var rng = self.GetComponent<Xoroshiro128Plus>();
 
-            var itemIndex = ItemIndex.None;
-            
-            var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
-            if (shop)
-            {
-                itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-            }
+            var characterBody = activator.GetComponent<CharacterBody>();
+            var inventory = characterBody.inventory;
+            var shop = self.GetComponent<ShopTerminalBehavior>();
 
-            var payCostResults = costTypeDef.PayCost(self.cost, 
-                activator, self.gameObject, rng, itemIndex);
-            
-            
-            foreach (var equipmentIndex in payCostResults.equipmentTaken)
-            {
-                //TODO fix equipment drones here
-            }
+            #region Cauldronfix
 
-            // If the cost type is an item, give the user the item directly and send the pickup message
-            if (self.costType == CostTypeIndex.WhiteItem
-                || self.costType == CostTypeIndex.GreenItem
-                || self.costType == CostTypeIndex.RedItem
-                || self.costType == CostTypeIndex.BossItem
-                || self.costType == CostTypeIndex.LunarItemOrEquipment)
+            if (ShareSuite.PrinterCauldronFixEnabled.Value)
             {
-                var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-                inventory.GiveItem(item);
-                ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
-                    shop.CurrentPickupIndex());
+                if (self.costType == CostTypeIndex.WhiteItem
+                    || self.costType == CostTypeIndex.GreenItem
+                    || self.costType == CostTypeIndex.RedItem
+                    || self.costType == CostTypeIndex.BossItem
+                    || self.costType == CostTypeIndex.LunarItemOrEquipment)
+                {
+                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
+                    inventory.GiveItem(item);
+                    ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
+                        shop.CurrentPickupIndex());
+                    orig(self, activator);
+                    return;
+                }
             }
 
             #endregion Cauldronfix
 
+            #region EquipDronefix
+
+            if (ShareSuite.EquipmentShared.Value)
+            {
+                // If this is not a multi-player server or the fix is disabled, do the normal drop action
+                var rng = self.GetComponent<Xoroshiro128Plus>();
+                var itemIndex = ItemIndex.None;
+
+                var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
+                if (shop)
+                {
+                    itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
+                }
+
+                var payCostResults = costTypeDef.PayCost(self.cost,
+                    activator, self.gameObject, rng, itemIndex);
+
+                foreach (var equipmentIndex in payCostResults.equipmentTaken)
+                {
+                    //TODO fix equipment drones here
+                }
+            }
+            #endregion EquipDronefix
+            
             orig(self, activator);
         }
 
