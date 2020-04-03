@@ -8,17 +8,18 @@ namespace ShareSuite
     public class ChatHandler
     {
         // ReSharper disable twice ArrangeTypeMemberModifiers
-        const string GrayColor = "#7e91af";
-        const string ErrorColor = "ff0000";
-        // Red / Blue / Yellow / Green / Orange / Cyan / Pink / Deep Purple
-        private static readonly string[] PlayerColors = {"bc2525", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea"};
+        private const string GrayColor = "7e91af";
+        private const string ErrorColor = "ff0000";
+        private const string NotSharingColor = "f07d6e";
+        // Red (previously bc2525) / Blue / Yellow / Green / Orange / Cyan / Pink / Deep Purple
+        private static readonly string[] PlayerColors = {"f23030", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea"};
 
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef)
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (PlayerCharacterMasterController.instances.Count == 1 || body == null
-                                                                     || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer() || body == null
+                                              || !ShareSuite.RichMessagesEnabled.Value)
             {
                 SendPickupMessage(player, pickupDef.pickupIndex);
                 return;
@@ -27,6 +28,18 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
+            
+            if (ShareSuite.GetItemBlackList().Contains((int) pickupDef.itemIndex)
+                || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
+            {
+                var singlePickupMessage =
+                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                    $"{pickupName ?? "???"}</color> <color=#{GrayColor}>for themself. </color>" +
+                    $"<color=#{NotSharingColor}>(Item Set to NOT be Shared)</color>";
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = singlePickupMessage});
+                return;
+            }
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
@@ -40,8 +53,8 @@ namespace ShareSuite
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (PlayerCharacterMasterController.instances.Count == 1 || body == null
-                                                                     || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer()  || body == null
+                                               || !ShareSuite.RichMessagesEnabled.Value)
             {
                 SendPickupMessage(player, index);
                 return;
@@ -82,7 +95,7 @@ namespace ShareSuite
                     var playerColor = GetPlayerColor(playerCharacterMasterController);
 
                     // If the player is alive OR dead and deadplayersgetitems is on, return their name
-                    return $" <color=#{GrayColor}>and</color> " + $"<color=#{playerColor}" +
+                    return $" <color=#{GrayColor}>and</color> " + $"<color=#{playerColor}>" +
                            playerCharacterMasterController.GetDisplayName() + "</color>";
                 }
 
@@ -106,9 +119,6 @@ namespace ShareSuite
                 // Get the player color
                 var playerColor = GetPlayerColor(playerCharacterMasterController);
 
-                // If the player is alive OR dead and deadplayersgetitems is on, add their name to returnStr
-                returnStr += $"<color=#{playerColor}" + playerCharacterMasterController.GetDisplayName() + "</color>";
-
                 // If the amount of players remaining is more then one (not the last)
                 if (eligiblePlayers > 1)
                 {
@@ -118,6 +128,11 @@ namespace ShareSuite
                 {
                     returnStr += $"<color=#{GrayColor}>, and</color> ";
                 }
+
+                eligiblePlayers--;
+                
+                // If the player is alive OR dead and deadplayersgetitems is on, add their name to returnStr
+                returnStr += $"<color=#{playerColor}>" + playerCharacterMasterController.GetDisplayName() + "</color>";
             }
 
             // Return the string

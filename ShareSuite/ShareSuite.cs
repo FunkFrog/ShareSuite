@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
@@ -13,8 +13,8 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.1")]
-    [R2APISubmoduleDependency("CommandHelper","ItemDropAPI")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.2")]
+    [R2APISubmoduleDependency("CommandHelper", "ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
         #region ConfigWrapper init
@@ -42,6 +42,7 @@ namespace ShareSuite
 
 
         private bool _previouslyEnabled;
+
         #endregion
 
         public static HashSet<int> GetItemBlackList()
@@ -82,10 +83,17 @@ namespace ShareSuite
             }
         }
 
+        public static double DefaultMaxScavItemDropCount = 0;
+
         public ShareSuite()
         {
             InitConfig();
             CommandHelper.AddToConsoleWhenReady();
+
+            //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
+
+            // Assign the amount of default max drops the scavenger gives.
+            DefaultMaxScavItemDropCount = EntityStates.ScavBackpack.Opening.maxItemDropCount;
 
             #region Hook registration
 
@@ -96,7 +104,7 @@ namespace ShareSuite
             #endregion
         }
 
-        private void ReloadHooks(object _ = null, EventArgs __= null)
+        private void ReloadHooks(object _ = null, EventArgs __ = null)
         {
             if (_previouslyEnabled && !ModIsEnabled.Value)
             {
@@ -106,6 +114,7 @@ namespace ShareSuite
                 EquipmentSharingHooks.UnHook();
                 _previouslyEnabled = false;
             }
+
             if (!_previouslyEnabled && ModIsEnabled.Value)
             {
                 _previouslyEnabled = true;
@@ -122,64 +131,67 @@ namespace ShareSuite
                 "Settings",
                 "ModEnabled",
                 true,
-                "Toggles mod."
-                );
+                "Toggles whether or not the mod is enabled. If turned off while in-game, it will unhook " +
+                "everything and reset the game to it's default behaviors."
+            );
             ModIsEnabled.SettingChanged += ReloadHooks;
 
             MoneyIsShared = Config.Bind(
                 "Settings",
                 "MoneyShared",
                 true,
-                "Toggles money sharing."
-                );
+                "Toggles money sharing between teammates. Every player gains money together and spends it " +
+                "from one central pool of money."
+            );
 
             WhiteItemsShared = Config.Bind(
                 "Settings",
                 "WhiteItemsShared",
                 true,
-                "Toggles item sharing for common items."
-                );
+                "Toggles item sharing for common (white color) items."
+            );
 
             GreenItemsShared = Config.Bind(
                 "Settings",
                 "GreenItemsShared",
                 true,
-                "Toggles item sharing for rare items."
-                );
+                "Toggles item sharing for rare (green color) items."
+            );
 
             RedItemsShared = Config.Bind(
                 "Settings",
                 "RedItemsShared",
                 true,
-                "Toggles item sharing for legendary items."
-                );
+                "Toggles item sharing for legendary (red color) items."
+            );
 
             EquipmentShared = Config.Bind(
                 "Settings",
                 "EquipmentShared",
                 false,
                 "Toggles item sharing for equipment."
-                );
+            );
 
             LunarItemsShared = Config.Bind(
                 "Settings",
                 "LunarItemsShared",
                 false,
-                "Toggles item sharing for Lunar items."
-                );
+                "Toggles item sharing for Lunar (blue color) items."
+            );
 
             BossItemsShared = Config.Bind(
                 "Settings",
                 "BossItemsShared",
                 true,
-                "Toggles item sharing for boss items."
-                );
-            
+                "Toggles item sharing for boss (yellow color) items."
+            );
+
             RichMessagesEnabled = Config.Bind(
                 "Settings",
                 "RichMessagesEnabled",
                 true,
-                "Toggles rich item pickup messages."
+                "Toggles detailed item pickup messages with information on who picked the item up and" +
+                " who all received the item."
             );
 
             RandomizeSharedPickups = Config.Bind(
@@ -188,57 +200,57 @@ namespace ShareSuite
                 false,
                 "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity."
             );
-            
+
             PrinterCauldronFixEnabled = Config.Bind(
                 "Balance",
                 "PrinterCauldronFix",
                 true,
                 "Toggles 3D printer and Cauldron item dupe fix by giving the item directly instead of" +
                 " dropping it on the ground."
-                );
+            );
 
             DeadPlayersGetItems = Config.Bind(
                 "Balance",
                 "DeadPlayersGetItems",
                 false,
-                "Toggles item sharing for dead players."
-                );
+                "Toggles whether or not dead players should get copies of picked up items."
+            );
 
             OverridePlayerScalingEnabled = Config.Bind(
                 "Balance",
                 "OverridePlayerScaling",
                 true,
                 "Toggles override of the scalar of interactables (chests, shrines, etc) that spawn in the world to your configured credit."
-                );
+            );
 
             InteractablesCredit = Config.Bind(
                 "Balance",
                 "InteractablesCredit",
                 1d,
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns."
-                );
+            );
 
             OverrideBossLootScalingEnabled = Config.Bind(
                 "Balance",
                 "OverrideBossLootScaling",
                 true,
                 "Toggles override of the scalar of boss loot drops to your configured balance."
-                );
+            );
 
             BossLootCredit = Config.Bind(
                 "Balance",
                 "BossLootCredit",
                 1,
                 "Specifies the amount of boss items dropped when the boss drop override is true."
-                );
-            
+            );
+
             OverrideVoidFieldLootScalingEnabled = Config.Bind(
                 "Balance",
                 "OverrideVoidLootScaling",
                 true,
                 "Toggles override of the scalar of Void Field loot drops to your configured balance."
             );
-            
+
             VoidFieldLootCredit = Config.Bind(
                 "Balance",
                 "VoidFieldLootCredit",
@@ -250,43 +262,48 @@ namespace ShareSuite
                 "Settings",
                 "MoneyScalarEnabled",
                 false,
-                "Toggles money scalar."
-                );
+                "Toggles the money scalar, set MoneyScalar to an amount to fine-tune the amount of gold " +
+                "you recieve."
+            );
 
             MoneyScalar = Config.Bind(
                 "Settings",
                 "MoneyScalar",
                 1D,
                 "Modifies player count used in calculations of gold earned when money sharing is on."
-                );
+            );
 
             ItemBlacklist = Config.Bind(
                 "Settings",
                 "ItemBlacklist",
                 "53,60,82,86",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
-                );
+            );
 
             EquipmentBlacklist = Config.Bind(
                 "Settings",
                 "EquipmentBlacklist",
                 "",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
-                );
+            );
         }
 
         #region CommandParser
-        #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
+#pragma warning disable IDE0051 //Commands usually aren't called from code.
+
+        //TODO Add more information when you send the commands with no args
+        
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
         private static void CcModIsEnabled(ConCommandArgs args)
         {
-            if(args.Count == 0)
+            if (args.Count == 0)
             {
                 Debug.Log(ModIsEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -307,11 +324,24 @@ namespace ShareSuite
                 Debug.Log(MoneyIsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
+                if (MoneyIsShared.Value != valid.Value)
+                {
+                    if (MoneyIsShared.Value && !valid.Value)
+                    {
+                        IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= MoneySharingHooks.RemoveGoldGatMoneyLine;
+                    }
+                    else
+                    {
+                        IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
+                    }
+                }
+
                 MoneyIsShared.Value = valid.Value;
                 Debug.Log($"Money sharing status set to {MoneyIsShared.Value}.");
             }
@@ -327,6 +357,7 @@ namespace ShareSuite
                 Debug.Log(MoneyScalarEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -347,6 +378,7 @@ namespace ShareSuite
                 Debug.Log(MoneyScalar.Value);
                 return;
             }
+
             var valid = args.TryGetArgDouble(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to a number.");
@@ -367,6 +399,7 @@ namespace ShareSuite
                 Debug.Log(WhiteItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -387,6 +420,7 @@ namespace ShareSuite
                 Debug.Log(GreenItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -407,6 +441,7 @@ namespace ShareSuite
                 Debug.Log(RedItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -427,6 +462,7 @@ namespace ShareSuite
                 Debug.Log(EquipmentShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -447,6 +483,7 @@ namespace ShareSuite
                 Debug.Log(LunarItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -467,6 +504,7 @@ namespace ShareSuite
                 Debug.Log(BossItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -476,7 +514,7 @@ namespace ShareSuite
                 Debug.Log($"Boss item sharing set to {BossItemsShared.Value}.");
             }
         }
-        
+
         // RichMessagesEnabled
         [ConCommand(commandName = "ss_RichMessagesEnabled", flags = ConVarFlags.None,
             helpText = "Modifies whether rich messages are enabled or not.")]
@@ -487,6 +525,7 @@ namespace ShareSuite
                 Debug.Log(RichMessagesEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -503,7 +542,7 @@ namespace ShareSuite
                         IL.RoR2.GenericPickupController.GrantItem += ItemSharingHooks.RemoveDefaultPickupMessage;
                     }
                 }
-                
+
                 RichMessagesEnabled.Value = valid.Value;
                 Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
             }
@@ -519,6 +558,7 @@ namespace ShareSuite
                 Debug.Log(RandomizeSharedPickups.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -528,7 +568,7 @@ namespace ShareSuite
                 Debug.Log($"Randomize pickups per player set to {RandomizeSharedPickups.Value}.");
             }
         }
-        
+
         // PrinterCauldronFix
         [ConCommand(commandName = "ss_PrinterCauldronFix", flags = ConVarFlags.None,
             helpText = "Modifies whether printers and cauldrons should not duplicate items.")]
@@ -539,6 +579,7 @@ namespace ShareSuite
                 Debug.Log(PrinterCauldronFixEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -559,6 +600,7 @@ namespace ShareSuite
                 Debug.Log(OverridePlayerScalingEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -579,6 +621,7 @@ namespace ShareSuite
                 Debug.Log(InteractablesCredit.Value);
                 return;
             }
+
             var valid = args.TryGetArgDouble(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to a number.");
@@ -599,6 +642,7 @@ namespace ShareSuite
                 Debug.Log(OverrideBossLootScalingEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -619,6 +663,7 @@ namespace ShareSuite
                 Debug.Log(BossLootCredit.Value);
                 return;
             }
+
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to an integer number.");
@@ -628,7 +673,7 @@ namespace ShareSuite
                 Debug.Log($"Boss loot credit set to {BossLootCredit.Value}.");
             }
         }
-        
+
         // DisableVoidFieldLootScaling
         [ConCommand(commandName = "ss_OverrideVoidFieldLoot", flags = ConVarFlags.None,
             helpText = "Modifies whether Void Field loot should scale based on player count.")]
@@ -639,6 +684,7 @@ namespace ShareSuite
                 Debug.Log(OverrideVoidFieldLootScalingEnabled.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -660,7 +706,7 @@ namespace ShareSuite
                 Debug.Log($"Void Field loot scaling disable set to {OverrideVoidFieldLootScalingEnabled.Value}.");
             }
         }
-        
+
         // VoidFieldLootCredit
         [ConCommand(commandName = "ss_VoidFieldLootCredit", flags = ConVarFlags.None,
             helpText = "Modifies amount of Void Field item drops.")]
@@ -671,6 +717,7 @@ namespace ShareSuite
                 Debug.Log(VoidFieldLootCredit.Value);
                 return;
             }
+
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to an integer number.");
@@ -706,14 +753,15 @@ namespace ShareSuite
         {
             string[] posStr = {"yes", "true", "1"};
             string[] negStr = {"no", "false", "0", "-1"};
-            
+
             if (posStr.Contains(arg.ToLower())) return true;
             if (negStr.Contains(arg.ToLower())) return false;
 
             return new bool?();
         }
-        
-        #pragma warning restore IDE0051
+
+#pragma warning restore IDE0051
+
         #endregion CommandParser
     }
 }

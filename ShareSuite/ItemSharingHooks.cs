@@ -15,9 +15,10 @@ namespace ShareSuite
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
-            On.RoR2.ScavBackpackBehavior.RollItem -= OnScavengerDrop;
+            On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.GenericPickupController.GrantItem -= RemoveDefaultPickupMessage;
+            On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
         }
 
         public static void Hook()
@@ -25,9 +26,10 @@ namespace ShareSuite
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
-            On.RoR2.ScavBackpackBehavior.RollItem += OnScavengerDrop;
+            On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
             IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
+            On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
         }
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig,
@@ -102,6 +104,13 @@ namespace ShareSuite
             cursor.RemoveRange(5);
         }
 
+        private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig, 
+            Chat.PlayerPickupChatMessage self)
+        {
+            self.pickupQuantity = Math.Max(1u, self.pickupQuantity); 
+            return orig(self);
+        }
+
         private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
         {
             if (!NetworkServer.active)
@@ -129,7 +138,8 @@ namespace ShareSuite
 
             var characterBody = activator.GetComponent<CharacterBody>();
             var inventory = characterBody.inventory;
-
+            var shop = self.GetComponent<ShopTerminalBehavior>();
+            
             #region Cauldronfix
 
             // If this is not a multi-player server or the fix is disabled, do the normal drop action
@@ -138,8 +148,25 @@ namespace ShareSuite
                 orig(self, activator);
                 return;
             }
+            
+            var rng = self.GetComponent<Xoroshiro128Plus>();
 
-            var shop = self.GetComponent<ShopTerminalBehavior>();
+            var itemIndex = ItemIndex.None;
+            
+            var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
+            if (shop)
+            {
+                itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
+            }
+
+            var payCostResults = costTypeDef.PayCost(self.cost, 
+                activator, self.gameObject, rng, itemIndex);
+            
+            
+            foreach (var equipmentIndex in payCostResults.equipmentTaken)
+            {
+                //TODO fix equipment drones here
+            }
 
             // If the cost type is an item, give the user the item directly and send the pickup message
             if (self.costType == CostTypeIndex.WhiteItem
@@ -159,13 +186,11 @@ namespace ShareSuite
             orig(self, activator);
         }
 
-        private static void OnScavengerDrop(On.RoR2.ScavBackpackBehavior.orig_RollItem orig, ScavBackpackBehavior self)
+        private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig, 
+            EntityStates.ScavBackpack.Opening self)
         {
-            //TODO Doesn't work. Current intended effect is to divide the rolled amount of drops by the amount of players, with a minimum of 2 items dropped from the pack
-
-            /*double defaultDrops = EntityStates.ScavBackpack.Opening.maxItemDropCount;
-            var adjustedDrops = (int) Math.Floor(defaultDrops / Run.instance.participatingPlayerCount);
-            EntityStates.ScavBackpack.Opening.maxItemDropCount = adjustedDrops >= 2 ? adjustedDrops : 2;*/
+            var adjustedDrops = (int) Math.Floor(ShareSuite.DefaultMaxScavItemDropCount / Run.instance.participatingPlayerCount);
+            EntityStates.ScavBackpack.Opening.maxItemDropCount = adjustedDrops >= 2 ? adjustedDrops : 2;
             orig(self);
         }
 
