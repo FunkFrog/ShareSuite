@@ -24,10 +24,10 @@
       <HintPath>..\libs\Mono.Cecil.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="MonoMod.RuntimeDetour, Version=19.11.5.1, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="MonoMod.RuntimeDetour">
       <HintPath>..\libs\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMod.Utils, Version=19.11.5.1, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="MonoMod.Utils">
       <HintPath>..\libs\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="R2API, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">

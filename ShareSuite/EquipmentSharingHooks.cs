@@ -21,7 +21,7 @@ namespace ShareSuite
 
             var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            if (!ShareSuite.GetEquipmentBlackList().Contains((int)equip)
+            if (!BlackList.HasEquipment(equip)
                 && NetworkServer.active
                 && IsValidEquipmentPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
@@ -41,7 +41,7 @@ namespace ShareSuite
 
             #endregion
         }
-        
+
         private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)
         {
             if (!NetworkServer.active) return;

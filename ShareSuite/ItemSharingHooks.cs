@@ -38,12 +38,12 @@ namespace ShareSuite
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
-            
+
             if ((ShareSuite.RandomizeSharedPickups.Value ||
-                 !ShareSuite.GetItemBlackList().Contains((int) item.itemIndex))
+                 !BlackList.HasItem(item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
-                && GeneralHooks.IsMultiplayer()) 
+                && GeneralHooks.IsMultiplayer())
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -56,24 +56,17 @@ namespace ShareSuite
                     if (player.inventory == inventory) continue;
 
                     // Do not reward dead players if not required
-                    if (player.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer()) continue;
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
-                        var itemIsBlacklisted = true;
-                        var giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier, item.pickupIndex));
-                        while (itemIsBlacklisted)
+                        var pickupIndex = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
+                        if (pickupIndex == null)
                         {
-                            if (ShareSuite.GetItemBlackList().Contains((int) giveItem.itemIndex))
-                            {
-                                giveItem = PickupCatalog.GetPickupDef(GetRandomItemOfTier(itemDef.tier,
-                                    item.pickupIndex));
-                            }
-                            else
-                            {
-                                itemIsBlacklisted = false;
-                            }
+                            // Could not find any not blacklisted item in that tier. You get nothing! Good day, sir!
+                            continue;
                         }
+                        var giveItem = PickupCatalog.GetPickupDef(pickupIndex.Value);
 
                         player.inventory.GiveItem(giveItem.itemIndex);
                         // Alternative: Only show pickup text for yourself
@@ -104,7 +97,7 @@ namespace ShareSuite
         {
             if (!ShareSuite.RichMessagesEnabled.Value) return;
             var cursor = new ILCursor(il);
-            
+
             cursor.GotoNext(
                 x => x.MatchLdarg(2),
                 x => x.MatchCallvirt(out _),
@@ -116,10 +109,10 @@ namespace ShareSuite
             cursor.RemoveRange(5);
         }
 
-        private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig, 
+        private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig,
             Chat.PlayerPickupChatMessage self)
         {
-            self.pickupQuantity = Math.Max(1u, self.pickupQuantity); 
+            self.pickupQuantity = Math.Max(1u, self.pickupQuantity);
             return orig(self);
         }
 
@@ -162,7 +155,7 @@ namespace ShareSuite
             {
                 var characterBody = activator.GetComponent<CharacterBody>();
                 var inventory = characterBody.inventory;
-                
+
                 if (self.costType == CostTypeIndex.WhiteItem
                     || self.costType == CostTypeIndex.GreenItem
                     || self.costType == CostTypeIndex.RedItem
@@ -202,11 +195,11 @@ namespace ShareSuite
                 }
             }
             #endregion EquipDronefix
-            
+
             orig(self, activator);
         }
 
-        private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig, 
+        private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
         {
             var adjustedDrops = (int) Math.Floor(ShareSuite.DefaultMaxScavItemDropCount / Run.instance.participatingPlayerCount);
@@ -265,25 +258,37 @@ namespace ShareSuite
             return false;
         }
 
-        private static PickupIndex GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
+        private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
             {
                 case ItemTier.Tier1:
-                    return PickRandomOf(Run.instance.availableTier1DropList);
+                    return PickRandomOf(BlackList.AvailableTier1DropList);
                 case ItemTier.Tier2:
-                    return PickRandomOf(Run.instance.availableTier2DropList);
+                    return PickRandomOf(BlackList.AvailableTier2DropList);
                 case ItemTier.Tier3:
-                    return PickRandomOf(Run.instance.availableTier3DropList);
+                    return PickRandomOf(BlackList.AvailableTier3DropList);
                 case ItemTier.Lunar:
-                    return PickRandomOf(Run.instance.availableLunarDropList);
+                    if (ShareSuite.LunarItemsRandomized.Value)
+                        return PickRandomOf(BlackList.AvailableLunarDropList);
+                    break;
                 case ItemTier.Boss:
-                    return orDefault; // no boss item list, and also probably better anyway
+                    if (ShareSuite.BossItemsRandomized.Value)
+                        return PickRandomOf(BlackList.AvailableBossDropList);
+                    break;
                 default:
-                    return orDefault;
+                    break;
             }
+            var pickupDef = PickupCatalog.GetPickupDef(orDefault);
+            if (BlackList.HasItem(pickupDef.itemIndex))
+                return null;
+            else
+                return orDefault;
         }
 
-        private static T PickRandomOf<T>(IList<T> collection) => collection[Random.Range(0, collection.Count)];
+        private static T? PickRandomOf<T>(IList<T> collection) where T : struct =>
+            collection.Count > 0
+            ? collection[Random.Range(0, collection.Count)]
+            : (T?) null;
     }
 }

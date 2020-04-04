@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
@@ -34,7 +34,9 @@ namespace ShareSuite
             OverrideBossLootScalingEnabled,
             OverrideVoidFieldLootScalingEnabled,
             MoneyScalarEnabled,
-            RandomizeSharedPickups;
+            RandomizeSharedPickups,
+            LunarItemsRandomized,
+            BossItemsRandomized;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -44,29 +46,6 @@ namespace ShareSuite
         private bool _previouslyEnabled;
 
         #endregion
-
-        public static HashSet<int> GetItemBlackList()
-        {
-            var blacklist = new HashSet<int>();
-            var rawPieces = ItemBlacklist.Value.Split(',');
-            foreach (var piece in rawPieces)
-            {
-                if (int.TryParse(piece, out var itemNum))
-                {
-                    blacklist.Add(itemNum);
-                }
-            }
-
-            return blacklist;
-        }
-
-        public static HashSet<int> GetEquipmentBlackList()
-        {
-            var blacklist = new HashSet<int>();
-            var rawPieces = EquipmentBlacklist.Value.Split(',');
-            foreach (var index in rawPieces.Select(x => int.TryParse(x, out var i) ? i : -1)) blacklist.Add(index);
-            return blacklist;
-        }
 
         public void Update()
         {
@@ -201,6 +180,20 @@ namespace ShareSuite
                 "When enabled each player (except the player who picked up the item) will get a randomized item of the same rarity."
             );
 
+            LunarItemsRandomized = Config.Bind(
+                "Balance",
+                "LunarItemsRandomized",
+                true,
+                "Toggles randomizing Lunar items in RandomizeSharedPickups mode."
+            );
+
+            BossItemsRandomized = Config.Bind(
+                "Balance",
+                "BossItemsRandomized",
+                false,
+                "Toggles randomizing Boss items in RandomizeSharedPickups mode."
+            );
+
             PrinterCauldronFixEnabled = Config.Bind(
                 "Balance",
                 "PrinterCauldronFix",
@@ -279,6 +272,7 @@ namespace ShareSuite
                 "53,60,82,86",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
+            ItemBlacklist.SettingChanged += (o, e) => BlackList.Recalculate();
 
             EquipmentBlacklist = Config.Bind(
                 "Settings",
@@ -286,6 +280,7 @@ namespace ShareSuite
                 "",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
+            EquipmentBlacklist.SettingChanged += (o, e) => BlackList.Recalculate();
         }
 
         #region CommandParser
@@ -293,7 +288,7 @@ namespace ShareSuite
 #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
         //TODO Add more information when you send the commands with no args
-        
+
         // ModIsEnabled
         [ConCommand(commandName = "ss_Enabled", flags = ConVarFlags.None, helpText = "Toggles mod.")]
         private static void CcModIsEnabled(ConCommandArgs args)
@@ -749,10 +744,48 @@ namespace ShareSuite
             }
         }
 
+        // ItemBlacklist
+        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
+            helpText = "Items (by index) that you do not want to share, comma separated.")]
+        private static void CcItemBlacklist(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(ItemBlacklist.Value);
+                return;
+            }
+
+            var list = string.Join(",",
+                from i in Enumerable.Range(0, args.Count)
+                select args.TryGetArgInt(i) into num
+                where num != null
+                select num.Value);
+            ItemBlacklist.Value = list;
+        }
+
+        // ItemBlacklist
+        [ConCommand(commandName = "ss_EquipmentBlacklist", flags = ConVarFlags.None,
+            helpText = "Equipment (by index) that you do not want to share, comma separated.")]
+        private static void CcEquipmentBlacklist(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(EquipmentBlacklist.Value);
+                return;
+            }
+
+            var list = string.Join(",",
+                from i in Enumerable.Range(0, args.Count)
+                select args.TryGetArgInt(i) into num
+                where num != null
+                select num.Value);
+            ItemBlacklist.Value = list;
+        }
+
         private static bool? TryGetBool(string arg)
         {
-            string[] posStr = {"yes", "true", "1"};
-            string[] negStr = {"no", "false", "0", "-1"};
+            string[] posStr = { "yes", "true", "1" };
+            string[] negStr = { "no", "false", "0", "-1" };
 
             if (posStr.Contains(arg.ToLower())) return true;
             if (negStr.Contains(arg.ToLower())) return false;
