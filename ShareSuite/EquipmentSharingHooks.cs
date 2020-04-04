@@ -21,7 +21,7 @@ namespace ShareSuite
 
             var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            if (!BlackList.HasEquipment(equip)
+            if (!Blacklist.HasEquipment(equip)
                 && NetworkServer.active
                 && IsValidEquipmentPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())

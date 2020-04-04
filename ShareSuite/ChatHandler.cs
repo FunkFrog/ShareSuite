@@ -33,7 +33,7 @@ namespace ShareSuite
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
 
-            if (BlackList.HasItem(pickupDef.itemIndex)
+            if (Blacklist.HasItem(pickupDef.itemIndex)
                 || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
             {
                 var singlePickupMessage =

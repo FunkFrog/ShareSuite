@@ -40,7 +40,7 @@ namespace ShareSuite
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
 
             if ((ShareSuite.RandomizeSharedPickups.Value ||
-                 !BlackList.HasItem(item.itemIndex))
+                 !Blacklist.HasItem(item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
@@ -263,24 +263,24 @@ namespace ShareSuite
             switch (tier)
             {
                 case ItemTier.Tier1:
-                    return PickRandomOf(BlackList.AvailableTier1DropList);
+                    return PickRandomOf(Blacklist.AvailableTier1DropList);
                 case ItemTier.Tier2:
-                    return PickRandomOf(BlackList.AvailableTier2DropList);
+                    return PickRandomOf(Blacklist.AvailableTier2DropList);
                 case ItemTier.Tier3:
-                    return PickRandomOf(BlackList.AvailableTier3DropList);
+                    return PickRandomOf(Blacklist.AvailableTier3DropList);
                 case ItemTier.Lunar:
                     if (ShareSuite.LunarItemsRandomized.Value)
-                        return PickRandomOf(BlackList.AvailableLunarDropList);
+                        return PickRandomOf(Blacklist.AvailableLunarDropList);
                     break;
                 case ItemTier.Boss:
                     if (ShareSuite.BossItemsRandomized.Value)
-                        return PickRandomOf(BlackList.AvailableBossDropList);
+                        return PickRandomOf(Blacklist.AvailableBossDropList);
                     break;
                 default:
                     break;
             }
             var pickupDef = PickupCatalog.GetPickupDef(orDefault);
-            if (BlackList.HasItem(pickupDef.itemIndex))
+            if (Blacklist.HasItem(pickupDef.itemIndex))
                 return null;
             else
                 return orDefault;

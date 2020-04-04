@@ -272,7 +272,7 @@ namespace ShareSuite
                 "53,60,82,86",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
-            ItemBlacklist.SettingChanged += (o, e) => BlackList.Recalculate();
+            ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
 
             EquipmentBlacklist = Config.Bind(
                 "Settings",
@@ -280,7 +280,7 @@ namespace ShareSuite
                 "",
                 "Equipment (by index) that you do not want to share, comma separated. Please find the indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
-            EquipmentBlacklist.SettingChanged += (o, e) => BlackList.Recalculate();
+            EquipmentBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
         }
 
         #region CommandParser
