@@ -1,0 +1,9 @@
+root = true
+
+[*.cs]
+end_of_line = lf
+
+indent_style = space
+indent_size = 4
+
+csharp_space_after_cast = true
