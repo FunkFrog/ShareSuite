@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
@@ -13,7 +12,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "1.15.2")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.0.0")]
     [R2APISubmoduleDependency("CommandHelper", "ItemDropAPI")]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -285,7 +284,7 @@ namespace ShareSuite
 
         #region CommandParser
 
-#pragma warning disable IDE0051 //Commands usually aren't called from code.
+        #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
         //TODO Add more information when you send the commands with no args
 
@@ -793,7 +792,7 @@ namespace ShareSuite
             return new bool?();
         }
 
-#pragma warning restore IDE0051
+        #pragma warning restore IDE0051
 
         #endregion CommandParser
     }

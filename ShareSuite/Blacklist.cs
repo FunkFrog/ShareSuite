@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ShareSuite
 {
-    public static class BlackList
+    public static class Blacklist
     {
         private static ItemMask _cachedAvailableItems;
 
