@@ -71,7 +71,7 @@ namespace ShareSuite
             return IsEquipment(equip) && ShareSuite.EquipmentShared.Value;
         }
 
-        public static bool IsEquipment(EquipmentIndex index)
+        private static bool IsEquipment(EquipmentIndex index)
         {
             return EquipmentCatalog.allEquipment.Contains(index);
         }
