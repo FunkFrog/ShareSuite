@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ShareSuite
 {
-    public class ChatHandler
+    public static class ChatHandler
     {
         // ReSharper disable twice ArrangeTypeMemberModifiers
         private const string GrayColor = "7e91af";

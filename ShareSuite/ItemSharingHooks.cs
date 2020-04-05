@@ -84,9 +84,13 @@ namespace ShareSuite
                         player.inventory.GiveItem(item.itemIndex);
                     }
                 }
-                ChatHandler.SendRichRandomizedPickupMessage(body.master, item, randomizedPlayerDict);
-                orig(self, body, inventory);
-                return;
+
+                if (ShareSuite.RandomizeSharedPickups.Value)
+                {
+                    ChatHandler.SendRichRandomizedPickupMessage(body.master, item, randomizedPlayerDict);
+                    orig(self, body, inventory);
+                    return;
+                }
             }
 
             ChatHandler.SendRichPickupMessage(body.master, item);
