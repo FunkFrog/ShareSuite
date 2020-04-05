@@ -8,8 +8,8 @@ namespace ShareSuite
 {
     public static class GeneralHooks
     {
-        public static int BossItems = 1;
-        public static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
+        private static int _bossItems = 1;
+        private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
             "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE" , "MAP_ARTIFACTWORLD_TITLE"};
 
         internal static void Hook()
@@ -28,7 +28,7 @@ namespace ShareSuite
         
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
         {
-            ItemDropAPI.BossDropParticipatingPlayerCount = BossItems;
+            ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
             orig(self);
         }
 
@@ -39,9 +39,9 @@ namespace ShareSuite
             TeleporterInteraction self, Interactor activator)
         {
             if (ShareSuite.OverrideBossLootScalingEnabled.Value)
-                BossItems = ShareSuite.BossLootCredit.Value;
+                _bossItems = ShareSuite.BossLootCredit.Value;
             else
-                BossItems = Run.instance.participatingPlayerCount;
+                _bossItems = Run.instance.participatingPlayerCount;
 
             orig(self, activator);
         }

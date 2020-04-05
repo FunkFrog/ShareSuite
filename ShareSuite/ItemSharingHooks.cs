@@ -193,9 +193,9 @@ namespace ShareSuite
                 var payCostResults = costTypeDef.PayCost(self.cost,
                     activator, self.gameObject, rng, itemIndex);
 
-                foreach (var equipmentIndex in payCostResults.equipmentTaken)
+                if (payCostResults.equipmentTaken.Count >= 1)
                 {
-                    //TODO fix equipment drones here
+                    EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
                 }
             }
             #endregion EquipDronefix
@@ -280,14 +280,11 @@ namespace ShareSuite
                     if (ShareSuite.BossItemsRandomized.Value)
                         return PickRandomOf(Blacklist.AvailableBossDropList);
                     break;
-                default:
-                    break;
             }
             var pickupDef = PickupCatalog.GetPickupDef(orDefault);
             if (Blacklist.HasItem(pickupDef.itemIndex))
                 return null;
-            else
-                return orDefault;
+            return orDefault;
         }
 
         private static T? PickRandomOf<T>(IList<T> collection) where T : struct =>

@@ -1,5 +1,6 @@
 using System.Linq;
 using RoR2;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ShareSuite
@@ -10,36 +11,80 @@ namespace ShareSuite
         {
             On.RoR2.GenericPickupController.GrantEquipment -= OnGrantEquipment;
         }
+
         public static void Hook()
         {
             On.RoR2.GenericPickupController.GrantEquipment += OnGrantEquipment;
         }
 
-        private static void OnGrantEquipment(On.RoR2.GenericPickupController.orig_GrantEquipment orig, GenericPickupController self, CharacterBody body, Inventory inventory)
+        private static void OnGrantEquipment(On.RoR2.GenericPickupController.orig_GrantEquipment orig,
+            GenericPickupController self, CharacterBody body, Inventory inventory)
         {
             #region Sharedequipment
 
             var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            if (!Blacklist.HasEquipment(equip)
-                && NetworkServer.active
-                && IsValidEquipmentPickup(self.pickupIndex)
-                && GeneralHooks.IsMultiplayer())
-                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                    .Where(p => !p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
+            if (NetworkServer.active && IsValidEquipmentPickup(self.pickupIndex) && GeneralHooks.IsMultiplayer())
+                if (!Blacklist.HasEquipment(equip))
                 {
-                    SyncToolbotEquip(player, ref equip);
+                    Debug.Log("item isn't on the blacklist so giving to everyone");
+                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                        .Where(p => !p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
+                    {
+                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                        if (!player.inventory) continue;
 
-                    // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
-                    if (player.inventory == inventory) continue;
+                        GivePlayerEquipment(self, player, equip);
 
-                    player.inventory.SetEquipmentIndex(equip);
-                    self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(equip);
+                        SyncToolbotEquip(player, ref equip);
+                    }
+                    
+                    orig(self, body, inventory);
+                    return;
+                }
+                else
+                {
+                    body.master.inventory.SetEquipmentIndex(equip);
+                    Object.Destroy(self.gameObject);
+                    return;
                 }
 
             orig(self, body, inventory);
 
             #endregion
+        }
+
+        private static void GivePlayerEquipment(GenericPickupController self,
+            CharacterMaster player, EquipmentIndex equip)
+        {
+            var inventory = player.inventory;
+
+            if (Blacklist.HasEquipment(inventory.currentEquipmentIndex))
+            {
+                if (!ShareSuite.DropBlacklistedEquipmentOnShare.Value) return;
+                var transform = player.GetBodyObject().transform;
+                var pickupIndex = PickupCatalog.FindPickupIndex(inventory.currentEquipmentIndex);
+
+                PickupDropletController.CreatePickupDroplet(pickupIndex, transform.position,
+                    transform.forward * 20f);
+            }
+
+            inventory.SetEquipmentIndex(equip);
+            self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(equip);
+        }
+
+        public static void RemoveAllUnBlacklistedEquipment()
+        {
+            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                .Where(p => ShareSuite.DeadPlayersGetItems.Value))
+            {
+                if (!player.inventory) return;
+
+                if (!Blacklist.HasEquipment(player.inventory.currentEquipmentIndex))
+                {
+                    player.inventory.SetEquipmentIndex(EquipmentIndex.None);
+                }
+            }
         }
 
         private static void SetEquipmentIndex(Inventory self, EquipmentIndex newEquipmentIndex, uint slot)

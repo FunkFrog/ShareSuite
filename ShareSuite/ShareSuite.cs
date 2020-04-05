@@ -27,6 +27,7 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             RichMessagesEnabled,
+            DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
             DeadPlayersGetItems,
             OverridePlayerScalingEnabled,
@@ -170,6 +171,15 @@ namespace ShareSuite
                 true,
                 "Toggles detailed item pickup messages with information on who picked the item up and" +
                 " who all received the item."
+            );
+            
+            DropBlacklistedEquipmentOnShare = Config.Bind(
+                "Balance",
+                "DropBlacklistedEquipmentOnShare",
+                false,
+                "Changes the way shared equipment handles blacklisted equipment. If true," +
+                " blacklisted equipment will be dropped on the ground once a new equipment is shared" +
+                ". If false, blacklisted equipment is left untouched when new equipment is shared."
             );
 
             RandomizeSharedPickups = Config.Bind(
@@ -541,6 +551,28 @@ namespace ShareSuite
                 Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
             }
         }
+        
+        //DropBlacklistedEquipmentOnShare
+        [ConCommand(commandName = "ss_DropBlacklistedEquipmentOnShare", flags = ConVarFlags.None,
+            helpText = "Changes the way shared equipment handles blacklisted equipment.")]
+        private static void CcDropBlacklistedEquipmentOnShare(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(DropBlacklistedEquipmentOnShare.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                DropBlacklistedEquipmentOnShare.Value = valid.Value;
+                Debug.Log($"Drop Blacklisted Equipment on Share set to {DropBlacklistedEquipmentOnShare.Value}.");
+            }
+        }
+
 
         //randomisepickups
         [ConCommand(commandName = "ss_RandomizeSharedPickups", flags = ConVarFlags.None,
@@ -743,43 +775,44 @@ namespace ShareSuite
             }
         }
 
-        // ItemBlacklist
-        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
-            helpText = "Items (by index) that you do not want to share, comma separated.")]
-        private static void CcItemBlacklist(ConCommandArgs args)
-        {
-            if (args.Count == 0)
-            {
-                Debug.Log(ItemBlacklist.Value);
-                return;
-            }
-
-            var list = string.Join(",",
-                from i in Enumerable.Range(0, args.Count)
-                select args.TryGetArgInt(i) into num
-                where num != null
-                select num.Value);
-            ItemBlacklist.Value = list;
-        }
-
-        // ItemBlacklist
-        [ConCommand(commandName = "ss_EquipmentBlacklist", flags = ConVarFlags.None,
-            helpText = "Equipment (by index) that you do not want to share, comma separated.")]
-        private static void CcEquipmentBlacklist(ConCommandArgs args)
-        {
-            if (args.Count == 0)
-            {
-                Debug.Log(EquipmentBlacklist.Value);
-                return;
-            }
-
-            var list = string.Join(",",
-                from i in Enumerable.Range(0, args.Count)
-                select args.TryGetArgInt(i) into num
-                where num != null
-                select num.Value);
-            ItemBlacklist.Value = list;
-        }
+//TODO re-introduce these as add/remove commands
+//        // ItemBlacklist
+//        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
+//            helpText = "Items (by index) that you do not want to share, comma separated.")]
+//        private static void CcItemBlacklist(ConCommandArgs args)
+//        {
+//            if (args.Count == 0)
+//            {
+//                Debug.Log(ItemBlacklist.Value);
+//                return;
+//            }
+//
+//            var list = string.Join(",",
+//                from i in Enumerable.Range(0, args.Count)
+//                select args.TryGetArgInt(i) into num
+//                where num != null
+//                select num.Value);
+//            ItemBlacklist.Value = list;
+//        }
+//
+//        // ItemBlacklist
+//        [ConCommand(commandName = "ss_EquipmentBlacklist", flags = ConVarFlags.None,
+//            helpText = "Equipment (by index) that you do not want to share, comma separated.")]
+//        private static void CcEquipmentBlacklist(ConCommandArgs args)
+//        {
+//            if (args.Count == 0)
+//            {
+//                Debug.Log(EquipmentBlacklist.Value);
+//                return;
+//            }
+//
+//            var list = string.Join(",",
+//                from i in Enumerable.Range(0, args.Count)
+//                select args.TryGetArgInt(i) into num
+//                where num != null
+//                select num.Value);
+//            ItemBlacklist.Value = list;
+//        }
 
         private static bool? TryGetBool(string arg)
         {
