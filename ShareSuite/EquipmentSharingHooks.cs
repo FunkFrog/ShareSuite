@@ -22,44 +22,42 @@ namespace ShareSuite
         {
             #region Sharedequipment
 
+            //TODO drop shared items when picking up blacklisted if only person who has it
+            
+            var originalEquip = body.inventory.currentEquipmentIndex;
             var equip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            if (NetworkServer.active && IsValidEquipmentPickup(self.pickupIndex) && GeneralHooks.IsMultiplayer())
-                if (!Blacklist.HasEquipment(equip))
-                {
-                    Debug.Log("item isn't on the blacklist so giving to everyone");
-                    foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                        .Where(p => !p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
-                    {
-                        // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
-                        if (!player.inventory) continue;
-
-                        GivePlayerEquipment(self, player, equip);
-
-                        SyncToolbotEquip(player, ref equip);
-                    }
-                    
-                    orig(self, body, inventory);
-                    return;
-                }
-                else
-                {
-                    body.master.inventory.SetEquipmentIndex(equip);
-                    Object.Destroy(self.gameObject);
-                    return;
-                }
-
+            if (Blacklist.HasEquipment(originalEquip))
+            {
+                body.inventory.SetEquipmentIndex(EquipmentIndex.None);
+            }
+            
             orig(self, body, inventory);
 
+            if (Blacklist.HasEquipment(equip)) return;
+            
+            if (!NetworkServer.active || !IsValidEquipmentPickup(self.pickupIndex) ||
+                !GeneralHooks.IsMultiplayer()) return;
+            Debug.Log("item isn't on the blacklist so giving to everyone");
+            foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
+                .Where(p => !p.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value))
+            {
+                // Sync Mul-T Equipment, but perform primary equipment pickup only for clients
+                if (!player.inventory || player == body.master) continue;
+
+                GivePlayerEquipment(self, player, equip, originalEquip);
+
+                SyncToolbotEquip(player, ref equip);
+            }
             #endregion
         }
 
         private static void GivePlayerEquipment(GenericPickupController self,
-            CharacterMaster player, EquipmentIndex equip)
+            CharacterMaster player, EquipmentIndex equip, EquipmentIndex oldEquip)
         {
             var inventory = player.inventory;
 
-            if (Blacklist.HasEquipment(inventory.currentEquipmentIndex))
+            if (Blacklist.HasEquipment(oldEquip))
             {
                 if (!ShareSuite.DropBlacklistedEquipmentOnShare.Value) return;
                 var transform = player.GetBodyObject().transform;
