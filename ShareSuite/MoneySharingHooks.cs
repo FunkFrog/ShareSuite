@@ -53,6 +53,11 @@ namespace ShareSuite
             }
         }
 
+        public static bool SharedMoneyEnabled()
+        {
+            return ShareSuite.MoneyIsShared.Value;
+        }
+
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
         {

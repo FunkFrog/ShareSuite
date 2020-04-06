@@ -195,10 +195,12 @@ namespace ShareSuite
 
                 if (payCostResults.equipmentTaken.Count >= 1)
                 {
+                    orig(self, activator);
                     EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
+                    return;
                 }
             }
-            #endregion EquipDronefix
+            #endregion
 
             orig(self, activator);
         }

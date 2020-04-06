@@ -69,7 +69,7 @@ namespace ShareSuite
             InitConfig();
             CommandHelper.AddToConsoleWhenReady();
 
-            //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
+            On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
             // Assign the amount of default max drops the scavenger gives.
             DefaultMaxScavItemDropCount = EntityStates.ScavBackpack.Opening.maxItemDropCount;

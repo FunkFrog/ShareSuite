@@ -207,10 +207,10 @@ namespace ShareSuite
             {
                 var master = playerCharacterMasterController.master;
                 // If they don't have a body or are the one who picked up the item, go to the next person
-                if (!master.hasBody || master.GetBody() == body) continue;
+                if (!master.inventory || master.GetBody() == body) continue;
 
                 // If the player is alive, add one to eligablePlayers
-                if (!master.IsDeadAndOutOfLivesServer())
+                if (!master.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value)
                 {
                     eligiblePlayers++;
                 }
