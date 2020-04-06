@@ -52,7 +52,7 @@ namespace ShareSuite
             }
             // If the old equipment was shared and the new one isn't, but the picker is the only one alive with the
             // shared equipment, drop it on the ground and return
-            else if (EquipmentShared(oldEquip) && !EquipmentShared(newEquip) && GetLivingPlayersWithEquipment(oldEquip) <= 1
+            else if (EquipmentShared(oldEquip) && !EquipmentShared(newEquip) && GetLivingPlayersWithEquipment(oldEquip) < 1
                       || !EquipmentShared(oldEquip) && !EquipmentShared(newEquip))
             {
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
@@ -154,7 +154,7 @@ namespace ShareSuite
             {
                 PickupDropletController.CreatePickupDroplet(pickupIndex, position,
                     new Vector3(
-                        Random.Range(-4f, 4f), 20f, Random.Range(-4f, 4f)));
+                        Random.Range(-200f, 200f), 50f, Random.Range(-200f, 200f)));
             }
         }
 
