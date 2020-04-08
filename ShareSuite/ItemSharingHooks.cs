@@ -16,9 +16,10 @@ namespace ShareSuite
             On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
+            On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
+
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.GenericPickupController.GrantItem -= RemoveDefaultPickupMessage;
-            On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
         }
 
         public static void Hook()
@@ -27,9 +28,10 @@ namespace ShareSuite
             On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
             On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
-            IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
-            IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
+
+            if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
+            if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
         }
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig,
@@ -99,7 +101,6 @@ namespace ShareSuite
 
         public static void RemoveDefaultPickupMessage(ILContext il)
         {
-            if (!ShareSuite.RichMessagesEnabled.Value) return;
             var cursor = new ILCursor(il);
 
             cursor.GotoNext(
@@ -216,7 +217,6 @@ namespace ShareSuite
         //Void Fields item fix
         public static void ArenaDropEnable(ILContext il)
         {
-            if (!ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) return;
             var cursor = new ILCursor(il);
 
             cursor.GotoNext(

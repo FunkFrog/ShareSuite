@@ -342,7 +342,7 @@ namespace ShareSuite
                     }
                     else
                     {
-                        IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
+                        if (GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
                     }
                 }
 

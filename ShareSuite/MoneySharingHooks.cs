@@ -1,4 +1,5 @@
 using System.Linq;
+using BepInEx.Configuration;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
 using RoR2;
@@ -22,6 +23,9 @@ namespace ShareSuite
             On.RoR2.SceneExitController.Begin -= SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
+            On.RoR2.Networking.GameNetworkManager.OnClientConnect -= GoldGatConnect;
+            On.RoR2.Networking.GameNetworkManager.OnClientDisconnect -= GoldGatDisconnect;
+
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
 
@@ -35,9 +39,11 @@ namespace ShareSuite
             On.RoR2.SceneExitController.Begin += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
-            IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
-        }
+            On.RoR2.Networking.GameNetworkManager.OnClientConnect += GoldGatConnect;
+            On.RoR2.Networking.GameNetworkManager.OnClientDisconnect += GoldGatDisconnect;
 
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
+        }
         public static void AddMoneyExternal(int amount)
         {
             if (ShareSuite.MoneyIsShared.Value)
@@ -209,6 +215,37 @@ namespace ShareSuite
             );
 
             cursor.RemoveRange(14);
+        }
+
+
+        private static void GoldGatDisconnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientDisconnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
+        {
+            var WasMultiplayer = GeneralHooks.IsMultiplayer();
+            orig(self, conn);
+            ToggleGoldGat(WasMultiplayer);
+        }
+
+        private static void GoldGatConnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientConnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
+        {
+            var WasMultiplayer = GeneralHooks.IsMultiplayer();
+            orig(self, conn);
+            ToggleGoldGat(WasMultiplayer);
+        }
+
+        private static void ToggleGoldGat(bool WasMultiplayer)
+        {
+            var IsMultiplayer = GeneralHooks.IsMultiplayer();
+            if (WasMultiplayer != IsMultiplayer)
+            {
+                if (ShareSuite.MoneyIsShared.Value && IsMultiplayer)
+                {
+                    IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
+                }
+                else
+                {
+                    IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
+                }
+            }
         }
 
         private static void BrittleCrownDamageHook(On.RoR2.HealthComponent.orig_TakeDamage orig, HealthComponent self,
