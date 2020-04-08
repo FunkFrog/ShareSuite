@@ -10,7 +10,7 @@ namespace ShareSuite
     {
         private static int _bossItems = 1;
         private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
-            "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE" , "MAP_ARTIFACTWORLD_TITLE"};
+            "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
 
         internal static void Hook()
         {
