@@ -8,6 +8,7 @@ namespace ShareSuite
 {
     public static class GeneralHooks
     {
+        private static int sacrificeCounter = 1;
         private static int _bossItems = 1;
         private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
             "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
@@ -17,6 +18,7 @@ namespace ShareSuite
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBoosLootScaling;
+            On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath += ReduceSacrificeDrops;
         }
 
         internal static void UnHook()
@@ -24,8 +26,20 @@ namespace ShareSuite
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBoosLootScaling;
+            On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath -= ReduceSacrificeDrops;
         }
-        
+
+        private static void ReduceSacrificeDrops(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnServerCharacterDeath orig, DamageReport damageReport)
+        {
+            sacrificeCounter += 1;
+
+            if (sacrificeCounter > PlayerCharacterMasterController.instances.Count)
+            {
+                sacrificeCounter = 1;
+                orig(damageReport);
+            }
+        }
+
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
         {
             ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;

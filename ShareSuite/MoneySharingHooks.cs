@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using BepInEx.Configuration;
 using EntityStates.GoldGat;
@@ -197,7 +198,7 @@ namespace ShareSuite
             var bodyMaster = self.GetFieldValue<CharacterMaster>("bodyMaster");
             var cost = (int)(GoldGatFire.baseMoneyCostPerBullet * 
                              (1f + (TeamManager.instance.GetTeamLevel(bodyMaster.teamIndex) - 1f) * 0.25f));
-            SharedMoneyValue -= cost;
+            SharedMoneyValue = Math.Max(SharedMoneyValue - cost, 0);
             orig(self);
         }
 
@@ -338,7 +339,7 @@ namespace ShareSuite
         private static void GiveAllScaledMoney(float goldReward)
         {
             //Apply gold rewards to shared money pool
-            SharedMoneyValue += (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward);
+            SharedMoneyValue += Math.Max((int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
         }
 
         public static void SetTeleporterActive(bool active)
