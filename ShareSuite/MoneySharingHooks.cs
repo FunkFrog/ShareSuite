@@ -339,7 +339,7 @@ namespace ShareSuite
         private static void GiveAllScaledMoney(float goldReward)
         {
             //Apply gold rewards to shared money pool
-            SharedMoneyValue += Math.Max((int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
+            SharedMoneyValue = Math.Max(SharedMoneyValue + (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
         }
 
         public static void SetTeleporterActive(bool active)
