@@ -3,20 +3,25 @@
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Frustrating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
+Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Aggravating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
-Multiplayer RoR2 games should be quick, wacky fun, but often have loot being stolen and power imbalances between players. Obviously, the best way to solve this issue is to remove the incentive to steal the loot in the first place!
+Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 1.15.1 (+1.15.0)    |
-|:----------------------------------:|
-| **PLEASE MAKE SURE YOU GET THE LATEST TEST BUILD OF R2API - SEE FULL CHANGELOG** |
-| **1.15.1 ADDRESSES A CRITICAL BUG THAT BREAKS ITEM/MONEY SHARING** |
-| Randomised drops are now only pulled from the currently available items |
-| Randomized drops will no longer include items on the sharing blacklist |
-| Fixed a bug concerning deaths by the Grovetender |
-| [Added an entrypoint for other mods to add money while Shared Money is on](https://github.com/FunkFrog/RoR2SharedItems/issues/67#issuecomment-606823289) |
-| Boolean commands now accept "Yes", "No", "True", "False", "1", "0", and "-1" |
-| **MAJOR** Introduction of Void Field Loot Scaling! Now you can customize how much loot you get per cell :)|
+|    Most Recent Update - 2.0.0    |
+|:--------------------------------:|
+| **MAJOR** Full completion of the Shared Equipment system |
+| **MAJOR** Addition of brand new shiny rich text messages |
+| ShareSuite gets an updated logo! |
+| Finally fix the bug with the crowdfunder desyncing shared money |
+| Scavenger now drops an appropriate amount of items for the runs |
+| Add another entrypoint for other mods to check the status of shared money |
+| Fixes a bug concerning Ghor's Tome not adding gold |
+| Fixes an issue with Sacrifice creating WAY too many dropped items |
+| Equipment Drones no longer desync Shared Equipment |
+| Adds a new config option to control how shared equipment handles blacklisted equips |
+| Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be |
+| Fixes an issue where picking up items would display [0] after the item |
+| Fixes an issue where randomized shared loot would sometimes crash the game |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -37,10 +42,11 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
     - When anyone spends money, it gets taken away from the group's money pool.
     - Now includes a gained money scalar — Want more money? Turn it up!
 
-- A shared equipment system — flutter like a group of butterflies or rain lightning from the sky, together. (*`NEW`*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#shared-equipment)
+- A shared equipment system — flutter like a group of butterflies or rain lightning from the sky, together. (*`RECENTLY UPDATED`*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#shared-equipment)
     - When you pick up equipment, everyone gets it.
-    - ***(TO-DO)*** When someone picks up equipment, they drop the one everyone currently has.
-    - ***(TO-DO)*** When someone buys an equipment drone, everyone loses their equipment.
+    - When someone picks up equipment, they drop the one everyone currently has.
+    - When someone buys an equipment drone, everyone loses their equipment.
+    - Handle blacklisted equipment in two ways: drop their item, or don't change it at all.
     
 - Worried about the game becoming unbalanced? We've got you. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#balance)
     - Tuned to be balanced by default.
@@ -51,7 +57,12 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
     - Config options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*). 
     - Item and equipment blacklists also exist for disabling specific items you don't want shared.
 
-- Worried about an early game power spike associated with everyone having items? We've got something in the works for that! (*`NEW`*)
+- Want to easy reference who got what item? Whether or not something's shared? Who got what when pickups are randomized? Custom chat messages are here for you! 
+    - Rich Chat Messages let you know who got an item (or who didn't!)
+    - Custom message for items that are set to not share, to remove ambiguity.
+    - Randomized pickups now display who got what - no more confusion about who got what.
+
+- Worried about an early game power spike associated with everyone having items? We've got something in the works for that!
     - Experimental Scaling mode is on its way to becoming the new default scaling mode for interactables
     - Starts players off with much fewer interactables on the first handful of rounds.
     - As players progress through the game, the penalty becomes less and less harsh. 
@@ -62,6 +73,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 - Native config GUI integration with [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) v2.0.4+ (*[Preview of the GUI](https://i.imgur.com/muzxIsW.png)*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#gui)
     - Integration with the BepInEx config UI coming soon!
+    - CURRENTLY DEFUNCT -- WORKING ON INTEGRATION WITH NEW UI NOW
 
 ### ![Installation Guide](https://i.imgur.com/6oHhqsV.png "ShareSuite Installation Guide")
 
@@ -88,32 +100,34 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 3. Press enter and you're done!
 
 ### Default Config Settings
-| Setting                    | Default Value |                     Command |
-| :------------------------- | :-----------: | --------------------------: |
-| Mod Enabled                |          True |                  ss_Enabled |
-| Money is Shared            |         False |            ss_MoneyIsShared |
-| White Items are Shared     |          True |         ss_WhiteItemsShared |
-| Green Items are Shared     |          True |         ss_GreenItemsShared |
-| Red Items are Shared       |          True |           ss_RedItemsShared |
-| Equipment is Shared        |         False |          ss_EquipmentShared |
-| Lunar Items are Shared     |         False |         ss_LunarItemsShared |
-| Boss Items are Shared      |          True |          ss_BossItemsShared |
-| Rich Messages Enabled      |          True |      ss_RichMessagesEnabled |
-| Randomized Item Sharing    |         False |   ss_RandomizeSharedPickups |
-| Dupe Fix                   |          True |       ss_PrinterCauldronFix |
-| Dead Players Get Items     |         False |      ss_DeadPlayersGetItems |
-| Override Player Scaling    |          True |    ss_OverridePlayerScaling |
-| Experimental Mode          |         False |         ss_ExperimentalMode |
-| Interactables Credit       |           1.0 |      ss_InteractablesCredit |
-| Override Boss Loot Scaling |          True |  ss_OverrideBossLootScaling |
-| Boss Loot Credit           |             1 |           ss_BossLootCredit |
-| Override Void Field Scaling|          True |    ss_OverrideVoidFieldLoot |
-| Void Field Loot Credit     |             1 |      ss_VoidFieldLootCredit |
-| Money Scalar Enabled       |         False |       ss_MoneyScalarEnabled |
-| EmulateSingleplayerMoney   |          True | ss_EmulateSingleplayerMoney |
-| Money Scalar               |           1.0 |              ss_MoneyScalar |
-| Item Blacklist             |   53,60,82,86 |                         N/A |
-| Equipment Blacklist        |         Empty |                         N/A |
+| Setting                    | Default Value |                            Command |
+| :------------------------- | :-----------: | ---------------------------------: |
+| Mod Enabled                |          True |                         ss_Enabled |
+| Money is Shared            |         False |                   ss_MoneyIsShared |
+| White Items are Shared     |          True |                ss_WhiteItemsShared |
+| Green Items are Shared     |          True |                ss_GreenItemsShared |
+| Red Items are Shared       |          True |                  ss_RedItemsShared |
+| Equipment is Shared        |         False |                 ss_EquipmentShared |
+| Lunar Items are Shared     |         False |                ss_LunarItemsShared |
+| Boss Items are Shared      |          True |                 ss_BossItemsShared |
+| Rich Messages Enabled      |          True |             ss_RichMessagesEnabled |
+| Drop BL Equip Mode         |          True | ss_DropBlacklistedEquipmentOnShare |
+| Randomized Item Sharing    |         False |          ss_RandomizeSharedPickups |
+| Dupe Fix                   |          True |              ss_PrinterCauldronFix |
+| Sacrifice Fix              |          True |             ss_SacrificeFixEnabled |
+| Dead Players Get Items     |         False |             ss_DeadPlayersGetItems |
+| Override Player Scaling    |          True |           ss_OverridePlayerScaling |
+| Experimental Mode          |         False |                ss_ExperimentalMode |
+| Interactables Credit       |           1.0 |             ss_InteractablesCredit |
+| Override Boss Loot Scaling |          True |         ss_OverrideBossLootScaling |
+| Boss Loot Credit           |             1 |                  ss_BossLootCredit |
+| Override Void Field Scaling|          True |           ss_OverrideVoidFieldLoot |
+| Void Field Loot Credit     |             1 |             ss_VoidFieldLootCredit |
+| Money Scalar Enabled       |         False |              ss_MoneyScalarEnabled |
+| Emulate Singleplayer Money |          True |        ss_EmulateSingleplayerMoney |
+| Money Scalar               |           1.0 |                     ss_MoneyScalar |
+| Item Blacklist             |   53,60,82,86 |                                N/A |
+| Equipment Blacklist        |         Empty |                                N/A |
 
 **Tip: Want to reset your config?**
 
@@ -160,10 +174,7 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 #### Known Bugs
 
-- Shared money's state is often inconsistent
-    - Crowdfunder de-syncs shared money
-- Equipment drones de-sync shared equipment
-- Scavenger drops too many items
+**None at the moment! :)**
 
 #### Features in Development
 
@@ -171,13 +182,8 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
     - Tune Experimental Mode to feel better
     - Add customizability to the difficulty of experimental mode
     - Rename the mode - send us suggestions in the Discord!
-- Custom Chat Messages
-- Item pickup cards for every player
-- Shared Equipment
-    - Shared Equipment feature completion
-        - Drop one equipment upon a character picking up a new one
-        - Remove all equipment upon purchase of equipment drone
-- Integrate with a new config UI (when it comes around)
+- Integrate with [new config manager](https://thunderstore.io/package/JackPendarvesRead/BepinexConfigurationManager/)
+- Merge with AutoItemPickup to add new ways to distribute items
 
 ### ![Bug Reports & Suggestions](https://i.imgur.com/ssmfn9f.png "ShareSuite Bug Reports + Suggestions")
 
@@ -189,12 +195,11 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 - DM us on Discord at `FunkFrog#0864` or `Sipondo#5150`.
 - Make a new issue on our [GitHub Repo](https://github.com/FunkFrog/RoR2SharedItems).
 
-
 ### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
 
 **Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
 
-- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.3.0`
+- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.4.0`
     - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
     
 ### ![Incompatible Mods](https://i.imgur.com/jDXbLYR.png "ShareSuite Incompatible Mods")
@@ -207,7 +212,35 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `1.15.1 + 1.15.0 (CURRENT)`
+### `2.0.0`
+- The mod turns 1 year old in a handful of days! Happy birthday, ShareSuite! Thank you, everyone, for your continued support of the mod <3
+- **MAJOR** Full completion of the Shared Equipment system
+    - Equipment Drones no longer de-sync Shared Equipment
+        - When purchased, everybody sharing the equipment with the player activating the drone has their equipment removed from their inventory
+        - If a blacklisted equipment is spent, only that equipment is used
+        - Blacklisted equipment are left alone if a shared equipment is used to purchase
+    - Adds a new config option to control how shared equipment handles blacklisted equips
+    - Blacklisted equipment are now handled in two toggleable modes:
+        - Drop Item Mode: If you have a blacklisted equipment, drop it next to you and get the new item
+        - Leave Alone Mode: If you have a blacklisted equipment, don't do anything to it
+- **MAJOR** Addition of brand new shiny rich text messages 
+    - Rich messages tell you who exactly got what
+    - The messages will state if an item isn't shared
+    - If randomized loot sharing is on, the message will tell who got what items
+- ShareSuite gets an updated logo!
+    - To celebrate one year of ShareSuite, we've now got an updated logo with new characters and items!
+- Finally fix the bug with the crowdfunder desyncing shared money
+    - Definitely didn't leave this uncorrected for a year.
+    - And we definitely didn't only get a bug report about 2 months ago. Nope!
+- Scavenger now drops an appropriate amount of items for the runs
+- Add another entrypoint for other mods to check the status of shared money
+- Fixes a bug concerning Ghor's Tome not adding gold
+- Fixes an issue with Sacrifice creating WAY too many dropped items
+- Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be
+- Fixes an issue where picking up items would display [0] after the item
+- Fixes an issue where randomized shared loot would sometimes crash the game
+
+### `1.15.1 + 1.15.0`
 - **1.15.1 ADDRESSES A CRITICAL BUG THAT BREAKS ITEM/MONEY SHARING**
 - Hello everyone! It's been a while, I hope you're all doing well and staying healthy during this rough time.
 - Make sure you grab the newest test build of R2API.dll and MMHOOK_Assembly-CSharp.dll from #r2api and #hook, respectively, [in the main modding discord!](https://discord.gg/5MbXZvd)
@@ -268,12 +301,5 @@ Multiplayer RoR2 games should be quick, wacky fun, but often have loot being sto
             - New money system gives the 2 players $50 - when a single player would receive $25 - resulting in an excess of money that feels imbalanced.
             - EmulateSingleplayerMoney will give the 2 players $34 - when a single player would receive $25 - resulting in the chests "costing the same". 
 
-### `1.13.1`
-- Changed the way the interactables scaling works to vary with maps - bigger maps will now feel appropriately filled out
-- Added a new Experimental Mode! (Future name may be Hardcore/Hard mode, we're not sure yet)
-    - Higher numbers of players reduces the amount of interactable spawns.
-    - Makes the game more difficult but feels fairer to play to some.
-    - Try it out and let us know how you feel on the [Discord](https://discord.gg/c7QnQeb)!
-- Fixed a critical bug with new shared money - you can now enter portals without soft-locking your run.
-
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
+
