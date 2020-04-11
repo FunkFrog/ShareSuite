@@ -61,7 +61,7 @@ namespace ShareSuite
             int amount;
             if (self.shouldScale)
             {
-                amount = (int) ((float) self.baseGoldReward * Mathf.Pow(RoR2.Run.instance.difficultyCoefficient, 1.25f));
+                amount = (int) (self.baseGoldReward * Mathf.Pow(Run.instance.difficultyCoefficient, 1.25f));
             }
             else
             {
@@ -70,7 +70,7 @@ namespace ShareSuite
 
             orig(self, other);
 
-            if (Reflection.GetFieldValue<bool>(self, "alive")) return;
+            if (self.GetFieldValue<bool>("alive")) return;
 
             // Collect reward from tome and put it into shared pool
             SharedMoneyValue += amount;
@@ -229,8 +229,7 @@ namespace ShareSuite
                 orig(self);
                 return;
             }
-
-
+            
             var bodyMaster = self.GetFieldValue<CharacterMaster>("bodyMaster");
             var cost = (int)(GoldGatFire.baseMoneyCostPerBullet * 
                              (1f + (TeamManager.instance.GetTeamLevel(bodyMaster.teamIndex) - 1f) * 0.25f));
@@ -257,31 +256,29 @@ namespace ShareSuite
 
         private static void GoldGatDisconnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientDisconnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
         {
-            var WasMultiplayer = GeneralHooks.IsMultiplayer();
+            var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
-            ToggleGoldGat(WasMultiplayer);
+            ToggleGoldGat(wasMultiplayer);
         }
 
         private static void GoldGatConnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientConnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
         {
-            var WasMultiplayer = GeneralHooks.IsMultiplayer();
+            var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
-            ToggleGoldGat(WasMultiplayer);
+            ToggleGoldGat(wasMultiplayer);
         }
 
-        private static void ToggleGoldGat(bool WasMultiplayer)
+        private static void ToggleGoldGat(bool wasMultiplayer)
         {
-            var IsMultiplayer = GeneralHooks.IsMultiplayer();
-            if (WasMultiplayer != IsMultiplayer)
+            var isMultiplayer = GeneralHooks.IsMultiplayer();
+            if (wasMultiplayer == isMultiplayer) return;
+            if (ShareSuite.MoneyIsShared.Value && isMultiplayer)
             {
-                if (ShareSuite.MoneyIsShared.Value && IsMultiplayer)
-                {
-                    IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
-                }
-                else
-                {
-                    IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
-                }
+                IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
+            }
+            else
+            {
+                IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
             }
         }
 

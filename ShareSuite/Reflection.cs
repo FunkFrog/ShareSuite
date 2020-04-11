@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ShareSuite
 {
-    public static class Reflection
+    internal static class Reflection
     {
         private static readonly BindingFlags _defaultFlags
             = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
