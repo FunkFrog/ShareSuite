@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BepInEx.Configuration;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
@@ -21,6 +22,7 @@ namespace ShareSuite
             On.RoR2.GlobalEventManager.OnHitEnemy -= BrittleCrownOnHitHook;
             On.RoR2.DeathRewards.OnKilledServer -= ShareKillMoney;
             On.RoR2.BarrelInteraction.OnInteractionBegin -= ShareBarrelMoney;
+            On.RoR2.MoneyPickup.OnTriggerStay -= ShareTomeMoney;
             On.RoR2.SceneExitController.Begin -= SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
@@ -37,6 +39,7 @@ namespace ShareSuite
             On.RoR2.GlobalEventManager.OnHitEnemy += BrittleCrownOnHitHook;
             On.RoR2.DeathRewards.OnKilledServer += ShareKillMoney;
             On.RoR2.BarrelInteraction.OnInteractionBegin += ShareBarrelMoney;
+            On.RoR2.MoneyPickup.OnTriggerStay += ShareTomeMoney;
             On.RoR2.SceneExitController.Begin += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
@@ -45,6 +48,39 @@ namespace ShareSuite
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
         }
+
+        private static void ShareTomeMoney(On.RoR2.MoneyPickup.orig_OnTriggerStay orig, MoneyPickup self, Collider other)
+        {
+            #region Sharedmoney
+            if (self.baseObject == null)
+            {
+                orig(self, other);
+                return;
+            }
+
+            int amount;
+            if (self.shouldScale)
+            {
+                amount = (int) ((float) self.baseGoldReward * Mathf.Pow(RoR2.Run.instance.difficultyCoefficient, 1.25f));
+            }
+            else
+            {
+                amount = self.baseGoldReward;
+            }
+
+            orig(self, other);
+
+            if (Reflection.GetFieldValue<bool>(self, "alive")) return;
+
+            // Collect reward from tome and put it into shared pool
+            SharedMoneyValue += amount;
+
+            if (!ShareSuite.MoneyScalarEnabled.Value
+                || !NetworkServer.active) return;
+            GiveAllScaledMoney(amount);
+            #endregion
+        }
+
         public static void AddMoneyExternal(int amount)
         {
             if (ShareSuite.MoneyIsShared.Value)

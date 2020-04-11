@@ -33,6 +33,7 @@ namespace ShareSuite
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
             OverrideVoidFieldLootScalingEnabled,
+            SacrificeFixEnabled,
             MoneyScalarEnabled,
             RandomizeSharedPickups,
             LunarItemsRandomized,
@@ -258,6 +259,13 @@ namespace ShareSuite
                 "VoidFieldLootCredit",
                 1,
                 "Specifies the amount of Void Fields items dropped when the Void Field scaling override is true."
+            );
+
+            SacrificeFixEnabled = Config.Bind(
+                "Balance",
+                "SacrificeFixEnabled",
+                true,
+                "Toggles the reduction in sacrifice loot drops to be balanced with shared items enabled."
             );
 
             MoneyScalarEnabled = Config.Bind(

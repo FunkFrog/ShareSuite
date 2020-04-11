@@ -8,6 +8,7 @@ namespace ShareSuite
 {
     public static class GeneralHooks
     {
+        private static int sacrificeOffset = 1;
         private static int sacrificeCounter = 1;
         private static int _bossItems = 1;
         private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
@@ -17,20 +18,34 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBoosLootScaling;
+            On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath += ReduceSacrificeDrops;
+            On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
         }
 
         internal static void UnHook()
-        {
+        {   
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBoosLootScaling;
+            On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath -= ReduceSacrificeDrops;
+            On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
+        }
+
+        private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
+        {
+            sacrificeOffset = 2;
+            orig(sceneDirector);
         }
 
         private static void ReduceSacrificeDrops(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnServerCharacterDeath orig, DamageReport damageReport)
         {
+            if (!ShareSuite.SacrificeFixEnabled.Value)
+            {
+                orig(damageReport);
+                return;
+            }
+
             sacrificeCounter += 1;
 
             if (sacrificeCounter > PlayerCharacterMasterController.instances.Count)
@@ -49,7 +64,7 @@ namespace ShareSuite
         /// <summary>
         /// // Helper function for Bossloot
         /// </summary>
-        private static void OverrideBoosLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
+        private static void OverrideBossLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
             TeleporterInteraction self, Interactor activator)
         {
             if (ShareSuite.OverrideBossLootScalingEnabled.Value)
@@ -118,12 +133,14 @@ namespace ShareSuite
                 }
             }
 
-            // Set interactables budget to interactableCredit * config player count.
+            // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
             if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
                     || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
-                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value);
+                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / sacrificeOffset);
 
             #endregion
-        }
+
+            sacrificeOffset = 1;
+    }
     }
 }
