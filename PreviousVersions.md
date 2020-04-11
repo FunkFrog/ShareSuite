@@ -1,5 +1,13 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.13.1`
+- Changed the way the interactables scaling works to vary with maps - bigger maps will now feel appropriately filled out
+- Added a new Experimental Mode! (Future name may be Hardcore/Hard mode, we're not sure yet)
+    - Higher numbers of players reduces the amount of interactable spawns.
+    - Makes the game more difficult but feels fairer to play to some.
+    - Try it out and let us know how you feel on the [Discord](https://discord.gg/c7QnQeb)!
+- Fixed a critical bug with new shared money - you can now enter portals without soft-locking your run.
+
 `1.12.0`
 - Fixed critical bug with new shared money logic - you should be able to gain money from killing enemies and opening capsules now.
 - Fixed critical bug with 3D printer/cauldron logic - they should now function properly with the dupe fix disabled.
