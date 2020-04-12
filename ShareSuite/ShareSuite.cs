@@ -49,8 +49,6 @@ namespace ShareSuite
 
         #endregion
 
-        internal static bool MultitudesIsHere;
-
         public void Update()
         {
             if (!NetworkServer.active
@@ -66,6 +64,9 @@ namespace ShareSuite
             }
         }
 
+        internal static bool MultitudesIsActive => _multitudesMultiplierConfig != null && _multitudesMultiplierConfig.Value != -1;
+        private static ConfigEntry<int> _multitudesMultiplierConfig;
+
         public static double DefaultMaxScavItemDropCount;
 
         public ShareSuite()
@@ -77,7 +78,7 @@ namespace ShareSuite
             {
                 if (pluginInfo.Value.Metadata.GUID.Equals("dev.wildbook.multitudes"))
                 {
-                    MultitudesIsHere = true;
+                    pluginInfo.Value.Instance.Config.TryGetEntry("Game", "Multiplier", out _multitudesMultiplierConfig);
                     break;
                 }
             }
@@ -641,7 +642,7 @@ namespace ShareSuite
             helpText = "Modifies whether interactable count should scale based on player count.")]
         private static void CcDisablePlayerScaling(ConCommandArgs args)
         {
-            if (MultitudesIsHere)
+            if (MultitudesIsActive)
                 Debug.Log("Please note that the Multitudes mod is currently active so this command doesnt have any effect currently.");
 
             if (args.Count == 0)
@@ -686,7 +687,7 @@ namespace ShareSuite
             helpText = "Modifies whether boss loot should scale based on player count.")]
         private static void CcBossLoot(ConCommandArgs args)
         {
-            if (MultitudesIsHere)
+            if (MultitudesIsActive)
                 Debug.Log("Please note that the Multitudes mod is currently active so this command doesnt have any effect currently.");
 
             if (args.Count == 0)
