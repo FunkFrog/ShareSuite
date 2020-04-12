@@ -64,7 +64,7 @@ namespace ShareSuite
             }
         }
 
-        internal static bool MultitudesIsActive => _multitudesMultiplierConfig != null && _multitudesMultiplierConfig.Value != -1;
+        internal static bool MultitudesIsActive => _multitudesMultiplierConfig != null && _multitudesMultiplierConfig.Value != 1;
         private static ConfigEntry<int> _multitudesMultiplierConfig;
 
         public static double DefaultMaxScavItemDropCount;
