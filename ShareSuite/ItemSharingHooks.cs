@@ -209,9 +209,18 @@ namespace ShareSuite
         private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
         {
-            var adjustedDrops = (int) Math.Floor(ShareSuite.DefaultMaxScavItemDropCount / Run.instance.participatingPlayerCount);
-            EntityStates.ScavBackpack.Opening.maxItemDropCount = adjustedDrops >= 2 ? adjustedDrops : 2;
             orig(self);
+            ShareSuite.DefaultMaxScavItemDropCount = Math.Max(EntityStates.ScavBackpack.Opening.maxItemDropCount, ShareSuite.DefaultMaxScavItemDropCount);
+            var chest = self.GetFieldValue<ChestBehavior>("chestBehavior");
+            if (chest.tier1Chance > 0.0f)
+            {
+                var adjustedDrops = Math.Max((int) Math.Ceiling((double) ShareSuite.DefaultMaxScavItemDropCount / Run.instance.participatingPlayerCount), 2);
+                EntityStates.ScavBackpack.Opening.maxItemDropCount = Math.Min(adjustedDrops, ShareSuite.DefaultMaxScavItemDropCount);
+            }
+            else
+            {
+                EntityStates.ScavBackpack.Opening.maxItemDropCount = ShareSuite.DefaultMaxScavItemDropCount;
+            }
         }
 
         //Void Fields item fix
