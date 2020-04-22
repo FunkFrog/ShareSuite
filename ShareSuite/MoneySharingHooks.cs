@@ -17,7 +17,7 @@ namespace ShareSuite
 
         internal static void UnHook()
         {
-            On.RoR2.SceneDirector.PlaceTeleporter -= ResetClassValues;
+            On.RoR2.SceneDirector.Start -= ResetClassValues;
             On.RoR2.HealthComponent.TakeDamage -= BrittleCrownDamageHook;
             On.RoR2.GlobalEventManager.OnHitEnemy -= BrittleCrownOnHitHook;
             On.RoR2.DeathRewards.OnKilledServer -= ShareKillMoney;
@@ -34,7 +34,7 @@ namespace ShareSuite
 
         internal static void Hook()
         {
-            On.RoR2.SceneDirector.PlaceTeleporter += ResetClassValues;
+            On.RoR2.SceneDirector.Start += ResetClassValues;
             On.RoR2.HealthComponent.TakeDamage += BrittleCrownDamageHook;
             On.RoR2.GlobalEventManager.OnHitEnemy += BrittleCrownOnHitHook;
             On.RoR2.DeathRewards.OnKilledServer += ShareKillMoney;
@@ -209,7 +209,7 @@ namespace ShareSuite
             #endregion
         }
 
-        private static void ResetClassValues(On.RoR2.SceneDirector.orig_PlaceTeleporter orig, SceneDirector self)
+        private static void ResetClassValues(On.RoR2.SceneDirector.orig_Start orig, SceneDirector self)
         {
             // Allow for money sharing triggers as teleporter is inactive
             SetTeleporterActive(false);
