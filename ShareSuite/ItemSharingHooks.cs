@@ -3,6 +3,7 @@ using RoR2;
 using System.Collections.Generic;
 using System.Linq;
 using MonoMod.Cil;
+using R2API.Utils;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
