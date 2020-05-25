@@ -7,21 +7,10 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 2.0.0    |
+|    Most Recent Update - 2.0.1    |
 |:--------------------------------:|
-| **MAJOR** Full completion of the Shared Equipment system |
-| **MAJOR** Addition of brand new shiny rich text messages |
-| ShareSuite gets an updated logo! |
-| Finally fix the bug with the crowdfunder desyncing shared money |
-| Scavenger now drops an appropriate amount of items for the runs |
-| Add another entrypoint for other mods to check the status of shared money |
-| Fixes a bug concerning Ghor's Tome not adding gold |
-| Fixes an issue with Sacrifice creating WAY too many dropped items |
-| Equipment Drones no longer desync Shared Equipment |
-| Adds a new config option to control how shared equipment handles blacklisted equips |
-| Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be |
-| Fixes an issue where picking up items would display [0] after the item |
-| Fixes an issue where randomized shared loot would sometimes crash the game |
+| Fixed an issue regarding Scavengers dropping less items than intended. |
+| Fixed an issue where other mods were unable to access shared money while inside the bazaar. |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -211,6 +200,11 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 ### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
+
+
+### `2.0.1`
+- Fixed an issue regarding Scavengers dropping less items than intended.
+- Fixed an issue where other mods were unable to access shared money while inside the bazaar.
 
 ### `2.0.0`
 - The mod turns 1 year old in a handful of days! Happy birthday, ShareSuite! Thank you, everyone, for your continued support of the mod <3
