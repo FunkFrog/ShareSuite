@@ -42,6 +42,9 @@ namespace ShareSuite
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
 
+            // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
+            var master = body?.master ?? inventory?.GetComponent<CharacterMaster>();
+
             if ((ShareSuite.RandomizeSharedPickups.Value ||
                  !Blacklist.HasItem(item.itemIndex))
                 && NetworkServer.active
@@ -50,7 +53,7 @@ namespace ShareSuite
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
-                    randomizedPlayerDict.Add(body.master, item);
+                    randomizedPlayerDict.Add(master, item);
                 }
 
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
@@ -90,13 +93,13 @@ namespace ShareSuite
 
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
-                    ChatHandler.SendRichRandomizedPickupMessage(body.master, item, randomizedPlayerDict);
+                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
                     orig(self, body, inventory);
                     return;
                 }
             }
 
-            ChatHandler.SendRichPickupMessage(body.master, item);
+            ChatHandler.SendRichPickupMessage(master, item);
             orig(self, body, inventory);
         }
 
