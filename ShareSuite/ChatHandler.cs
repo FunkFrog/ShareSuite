@@ -25,13 +25,14 @@ namespace ShareSuite
             if (!GeneralHooks.IsMultiplayer() || body == null
                                               || !ShareSuite.RichMessagesEnabled.Value)
             {
-                SendPickupMessage(player, pickupDef.pickupIndex);
+                if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, pickupDef.pickupIndex);
                 return;
             }
 
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
+            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex) + 1;
 
             if (Blacklist.HasItem(pickupDef.itemIndex)
                 || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
@@ -39,7 +40,7 @@ namespace ShareSuite
                 var singlePickupMessage =
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{pickupName ?? "???"}</color> <color=#{GrayColor}>for themself. </color>" +
+                    $"{pickupName ?? "???"} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
                     $"<color=#{NotSharingColor}>(Item Set to NOT be Shared)</color>";
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = singlePickupMessage});
                 return;
@@ -48,7 +49,7 @@ namespace ShareSuite
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                $"{pickupName ?? "???"}</color> <color=#{GrayColor}>for themself</color>" +
+                $"{pickupName ?? "???"} ({itemCount})</color> <color=#{GrayColor}>for themselves</color>" +
                 $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
         }
@@ -60,7 +61,7 @@ namespace ShareSuite
             if (!GeneralHooks.IsMultiplayer() || body == null
                                               || !ShareSuite.RichMessagesEnabled.Value)
             {
-                SendPickupMessage(player, index);
+                if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, index);
                 return;
             }
 
@@ -68,11 +69,12 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
+            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex) + 1;
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                $"{pickupName ?? "???"}</color><color=#{GrayColor}>.</color>";
+                $"{pickupName ?? "???"} ({itemCount})</color><color=#{GrayColor}>.</color>";
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
         }
 
@@ -81,7 +83,7 @@ namespace ShareSuite
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
-                SendPickupMessage(origPlayer, origPickup.pickupIndex);
+                if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(origPlayer, origPickup.pickupIndex);
                 return;
             }
 
@@ -101,6 +103,7 @@ namespace ShareSuite
                 var pickupColor = index.Value.baseColor;
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
+                var itemCount = index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex) + 1;
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
@@ -119,7 +122,7 @@ namespace ShareSuite
                     $"<color=#{playerColor}>{index.Key.playerCharacterMasterController.GetDisplayName()}</color> " +
                     $"<color=#{GrayColor}>got</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{pickupName ?? "???"}</color>";
+                    $"{pickupName ?? "???"} ({itemCount})</color>";
             }
 
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});

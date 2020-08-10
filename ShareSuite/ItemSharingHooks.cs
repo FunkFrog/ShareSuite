@@ -45,7 +45,7 @@ namespace ShareSuite
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? inventory?.GetComponent<CharacterMaster>();
 
-            if ((ShareSuite.RandomizeSharedPickups.Value ||
+            if ((//ShareSuite.RandomizeSharedPickups.Value ||
                  !Blacklist.HasItem(item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
