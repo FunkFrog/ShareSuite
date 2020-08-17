@@ -7,10 +7,11 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 2.0.1    |
+|    Most Recent Update - 2.1.0    |
 |:--------------------------------:|
-| Fixed an issue regarding Scavengers dropping less items than intended. |
-| Fixed an issue where other mods were unable to access shared money while inside the bazaar. |
+| Fixed an issue regarding scrappers sharing to everyone |
+| Fixed item picking messages printing twice when rich messages are disabled |
+| Updated the game for the 1.0 RoR2 update! |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -201,6 +202,10 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
+### `2.1.0 (CURRENT)`
+- Fixed an issue regarding scrappers sharing to everyone 
+- Fixed item picking messages printing twice when rich messages are disabled 
+- Updated the game for the 1.0 RoR2 update! 
 
 ### `2.0.1`
 - Fixed an issue regarding Scavengers dropping less items than intended.
@@ -277,23 +282,6 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
     - Should solve issue with chests not dropping items? (I haven't had any further issues)
 - Updated dependencies
 - Removed Frogtown Shared Mod Manager
-
-### `1.13.2`
-- Revision 2 of Experimental Scaling mode
-    - Greatly reduces the amount of interactables for the first x rounds - should help to combat the early-game spike in power that comes with everyone having the items.
-        - x = Players on team * 2
-    - Reduces less and less as you get closer to x rounds.
-    - Should feel better to play with as a whole - will no longer be branded as a 'hard mode' but rather the default scaling to balance the mod further.
-        - Will include a config option to disable it, but it will default to on
-- Support for decimal numbers in the config
-    - InteractablesCredit and MoneyScalar are the only scalars effected by this - please do not try to set BossLootCredit to anything other then an integer (whole) number!
-- Addition of EmulateSingleplayerMoney
-    - The new Shared Money mechanic is much more stable, however, we've noticed that it (~~actually works~~) doesn't have the same effect achieved with the old version of shared money
-    - EmulateSingleplayerMoney will scale the amount of money you receive back, adjusted for current prices, so that it feels the same as singleplayer would
-        - E.G. - A chest costs $25 in singleplayer. The same chest costs $34 with 2 players.
-            - Old money system would give the 2 players $25 - the same as a single player would receive - for a loss at no fault of the players.
-            - New money system gives the 2 players $50 - when a single player would receive $25 - resulting in an excess of money that feels imbalanced.
-            - EmulateSingleplayerMoney will give the 2 players $34 - when a single player would receive $25 - resulting in the chests "costing the same". 
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
