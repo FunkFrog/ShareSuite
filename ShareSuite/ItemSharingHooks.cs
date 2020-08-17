@@ -286,49 +286,6 @@ namespace ShareSuite
         }
 
 
-        private static void OnScrapperPurchase(On.RoR2.ScrapperController.orig_BeginScrapping orig, ScrapperController self, int intPickupIndex)
-        {
-            #region Cauldronfix
-            if (ShareSuite.PrinterCauldronFixEnabled.Value)
-            {
-                var interactor = GetInstanceField(typeof(ScrapperController), self, "interactor") as Interactor;
-
-                self.itemsEaten = 0;
-                var pickupIndex = new PickupIndex(intPickupIndex);
-                PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
-                if (pickupDef != null && interactor)
-                {
-                    //self.lastScrappedItemIndex = pickupDef.itemIndex;
-                    CharacterBody component = interactor.GetComponent<CharacterBody>();
-                    if (component && component.inventory)
-                    {
-                        int num = Mathf.Min(self.maxItemsToScrapAtATime, component.inventory.GetItemCount(pickupDef.itemIndex));
-                        if (num > 0)
-                        {
-                            component.inventory.RemoveItem(pickupDef.itemIndex, num);
-                            self.itemsEaten += num;
-                            for (int i = 0; i < num; i++)
-                            {
-                                component.inventory.GiveItem(pickupDef.itemIndex);
-                                ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
-                            }
-                        }
-                    }
-                }
-                if (self.esm)
-                {
-                    self.esm.SetNextState(new EntityStates.Scrapper.WaitToBeginScrapping());
-                }
-            }
-            else
-            {
-                orig(self, intPickupIndex);
-            }
-            #endregion
-
-        }
-
-
         private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
         {
