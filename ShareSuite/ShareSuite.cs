@@ -14,6 +14,7 @@ namespace ShareSuite
     [BepInDependency("com.bepis.r2api")]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.0.0")]
     [R2APISubmoduleDependency("CommandHelper", "ItemDropAPI")]
+    [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
     {
         #region ConfigWrapper init
