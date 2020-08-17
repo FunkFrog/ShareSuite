@@ -2,15 +2,19 @@ using System;
 using RoR2;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using MonoMod.Cil;
 using R2API.Utils;
+using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
+using EntityStates.Scrapper;
 
 namespace ShareSuite
 {
     public static class ItemSharingHooks
     {
+        public static bool itemLock = false;
         public static void UnHook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
@@ -18,6 +22,8 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
+            On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
+            On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.GenericPickupController.GrantItem -= RemoveDefaultPickupMessage;
@@ -30,9 +36,78 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
+            On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
+            On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
             if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
+        }
+
+        private static PickupIndex ItemLock(On.RoR2.PickupCatalog.orig_FindPickupIndex_string orig, string pickupName)
+        {
+            // This is a bit of a dubious hook, but it enables really nice interaction with the scrapper, where we add
+            // an item every time the scrapper finishes its animation.
+            #region Cauldronfix
+            if (itemLock)
+            {
+                itemLock = false;
+                return orig("This is not an item!");
+            }
+            return orig(pickupName);
+            #endregion
+        }
+
+        private static void ScrappingToIdle_OnEnter(On.EntityStates.Scrapper.ScrappingToIdle.orig_OnEnter orig, EntityStates.Scrapper.ScrappingToIdle self)
+        {
+            if (!(ShareSuite.PrinterCauldronFixEnabled.Value && NetworkServer.active && GeneralHooks.IsMultiplayer()))
+            {
+                orig(self);
+                return;
+            }
+
+            itemLock = true;
+            orig(self);
+
+            ScrapperController scrapperController = GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
+
+            Debug.Log(scrapperController);
+            if (scrapperController)
+            {
+                PickupIndex pickupIndex = PickupIndex.none;
+                ItemDef itemDef = ItemCatalog.GetItemDef(scrapperController.lastScrappedItemIndex);
+                if (itemDef != null)
+                {
+                    switch (itemDef.tier)
+                    {
+                        case ItemTier.Tier1:
+                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapWhite");
+                            break;
+                        case ItemTier.Tier2:
+                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapGreen");
+                            break;
+                        case ItemTier.Tier3:
+                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapRed");
+                            break;
+                        case ItemTier.Boss:
+                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapYellow");
+                            break;
+                    }
+                }
+                if (pickupIndex != PickupIndex.none)
+                {
+                    var interactor = GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
+                    Debug.Log("Interactor Established");
+
+                    PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+                    if (interactor)
+                    {
+                        CharacterBody component = interactor.GetComponent<CharacterBody>();
+                        component.inventory.GiveItem(pickupDef.itemIndex);
+                        ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
+                        scrapperController.itemsEaten -= 1;
+                    }
+                }
+            }
         }
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig,
@@ -210,6 +285,50 @@ namespace ShareSuite
             orig(self, activator);
         }
 
+
+        private static void OnScrapperPurchase(On.RoR2.ScrapperController.orig_BeginScrapping orig, ScrapperController self, int intPickupIndex)
+        {
+            #region Cauldronfix
+            if (ShareSuite.PrinterCauldronFixEnabled.Value)
+            {
+                var interactor = GetInstanceField(typeof(ScrapperController), self, "interactor") as Interactor;
+
+                self.itemsEaten = 0;
+                var pickupIndex = new PickupIndex(intPickupIndex);
+                PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+                if (pickupDef != null && interactor)
+                {
+                    //self.lastScrappedItemIndex = pickupDef.itemIndex;
+                    CharacterBody component = interactor.GetComponent<CharacterBody>();
+                    if (component && component.inventory)
+                    {
+                        int num = Mathf.Min(self.maxItemsToScrapAtATime, component.inventory.GetItemCount(pickupDef.itemIndex));
+                        if (num > 0)
+                        {
+                            component.inventory.RemoveItem(pickupDef.itemIndex, num);
+                            self.itemsEaten += num;
+                            for (int i = 0; i < num; i++)
+                            {
+                                component.inventory.GiveItem(pickupDef.itemIndex);
+                                ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
+                            }
+                        }
+                    }
+                }
+                if (self.esm)
+                {
+                    self.esm.SetNextState(new EntityStates.Scrapper.WaitToBeginScrapping());
+                }
+            }
+            else
+            {
+                orig(self, intPickupIndex);
+            }
+            #endregion
+
+        }
+
+
         private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
         {
@@ -302,9 +421,26 @@ namespace ShareSuite
             return orDefault;
         }
 
+        internal static object GetInstanceField(Type type, object instance, string fieldName)
+        {
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Static | BindingFlags.GetField;
+            FieldInfo field = type.GetField(fieldName, bindFlags);
+            return field.GetValue(instance);
+        }
+
+        internal static void SetInstanceField(Type type, object instance, string fieldName, object value)
+        {
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                | BindingFlags.Static;
+            FieldInfo field = type.GetField(fieldName, bindFlags);
+            field.SetValue(instance, value);
+        }
+
         private static T? PickRandomOf<T>(IList<T> collection) where T : struct =>
             collection.Count > 0
             ? collection[Random.Range(0, collection.Count)]
             : (T?) null;
     }
 }
+
