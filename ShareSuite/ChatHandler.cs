@@ -32,7 +32,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex) + 1;
+            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
 
             if (Blacklist.HasItem(pickupDef.itemIndex)
                 || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
@@ -69,7 +69,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex) + 1;
+            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
@@ -103,7 +103,7 @@ namespace ShareSuite
                 var pickupColor = index.Value.baseColor;
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
-                var itemCount = index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex) + 1;
+                var itemCount = index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {

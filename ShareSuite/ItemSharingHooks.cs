@@ -168,14 +168,14 @@ namespace ShareSuite
 
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
-                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
                     orig(self, body, inventory);
+                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
                     return;
                 }
             }
 
-            ChatHandler.SendRichPickupMessage(master, item);
             orig(self, body, inventory);
+            ChatHandler.SendRichPickupMessage(master, item);
         }
 
         public static void RemoveDefaultPickupMessage(ILContext il)
@@ -248,9 +248,9 @@ namespace ShareSuite
                 {
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                     inventory.GiveItem(item);
+                    orig(self, activator);
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
-                    orig(self, activator);
                     return;
                 }
             }
