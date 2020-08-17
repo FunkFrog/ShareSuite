@@ -1,5 +1,22 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.13.2`
+- Revision 2 of Experimental Scaling mode
+    - Greatly reduces the amount of interactables for the first x rounds - should help to combat the early-game spike in power that comes with everyone having the items.
+        - x = Players on team * 2
+    - Reduces less and less as you get closer to x rounds.
+    - Should feel better to play with as a whole - will no longer be branded as a 'hard mode' but rather the default scaling to balance the mod further.
+        - Will include a config option to disable it, but it will default to on
+- Support for decimal numbers in the config
+    - InteractablesCredit and MoneyScalar are the only scalars effected by this - please do not try to set BossLootCredit to anything other then an integer (whole) number!
+- Addition of EmulateSingleplayerMoney
+    - The new Shared Money mechanic is much more stable, however, we've noticed that it (~~actually works~~) doesn't have the same effect achieved with the old version of shared money
+    - EmulateSingleplayerMoney will scale the amount of money you receive back, adjusted for current prices, so that it feels the same as singleplayer would
+        - E.G. - A chest costs $25 in singleplayer. The same chest costs $34 with 2 players.
+            - Old money system would give the 2 players $25 - the same as a single player would receive - for a loss at no fault of the players.
+            - New money system gives the 2 players $50 - when a single player would receive $25 - resulting in an excess of money that feels imbalanced.
+            - EmulateSingleplayerMoney will give the 2 players $34 - when a single player would receive $25 - resulting in the chests "costing the same". 
+
 `1.13.1`
 - Changed the way the interactables scaling works to vary with maps - bigger maps will now feel appropriately filled out
 - Added a new Experimental Mode! (Future name may be Hardcore/Hard mode, we're not sure yet)
