@@ -38,7 +38,8 @@ namespace ShareSuite
             MoneyScalarEnabled,
             RandomizeSharedPickups,
             LunarItemsRandomized,
-            BossItemsRandomized;
+            BossItemsRandomized,
+            OverrideMultiplayerCheck; 
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -236,7 +237,7 @@ namespace ShareSuite
                 "OverrideBossLootScaling",
                 true,
                 "Toggles override of the scalar of boss loot drops to your configured balance."
-            );
+            );      
 
             BossLootCredit = Config.Bind(
                 "Balance",
@@ -250,6 +251,13 @@ namespace ShareSuite
                 "OverrideVoidLootScaling",
                 true,
                 "Toggles override of the scalar of Void Field loot drops to your configured balance."
+            );
+
+            OverrideMultiplayerCheck = Config.Bind(
+                "Debug",
+                "OverrideMultiplayerCheck",
+                false,
+                "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
 
             VoidFieldLootCredit = Config.Bind(

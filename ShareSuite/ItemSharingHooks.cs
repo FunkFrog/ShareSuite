@@ -210,9 +210,13 @@ namespace ShareSuite
 
             var costType = self.GetComponent<PurchaseInteraction>().costType;
 
+            //If is valid drop and dupe fix not enabled, true -> we want the item to pop
+            //if is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
+            //if is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop 
+            //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
+
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
-                || !IsValidItemPickup(self.CurrentPickupIndex()) // item is not shared
-                || !ShareSuite.PrinterCauldronFixEnabled.Value // dupe fix isn't enabled
+                || (!IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value) //if it's not a valid drop AND the dupe fix isn't enabled
                 || self.itemTier == ItemTier.Lunar
                 || costType == CostTypeIndex.Money)
             {
@@ -248,6 +252,7 @@ namespace ShareSuite
                 {
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
                     inventory.GiveItem(item);
+                    
                     orig(self, activator);
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
