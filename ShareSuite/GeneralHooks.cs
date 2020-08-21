@@ -78,7 +78,7 @@ namespace ShareSuite
         public static bool IsMultiplayer()
         {
             // Check whether the quantity of players in the lobby exceeds one.
-            return ShareSuite.OverrideMultiplayerCheck.Value || PlayerCharacterMasterController.instances.Count > 1; ;
+            return PlayerCharacterMasterController.instances.Count > 1;
         }
 
         private static void InteractibleCreditOverride(On.RoR2.SceneDirector.orig_PlaceTeleporter orig, SceneDirector self)
