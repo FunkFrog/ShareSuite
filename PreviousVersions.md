@@ -1,5 +1,12 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+
+`1.13.3`
+- Recompiled with latest versions of R2API and BepInEx
+    - Should solve issue with chests not dropping items? (I haven't had any further issues)
+- Updated dependencies
+- Removed Frogtown Shared Mod Manager
+
 `1.13.2`
 - Revision 2 of Experimental Scaling mode
     - Greatly reduces the amount of interactables for the first x rounds - should help to combat the early-game spike in power that comes with everyone having the items.
