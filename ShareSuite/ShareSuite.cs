@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.1.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.2.0")]
     [R2APISubmoduleDependency("CommandHelper", "ItemDropAPI")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -768,6 +768,27 @@ namespace ShareSuite
             }
         }
 
+        // Sacrifice Fix
+        [ConCommand(commandName = "ss_SacrificeFixEnabled", flags = ConVarFlags.None,
+            helpText = "Modifies whether items are shared to dead players.")]
+        private static void CcSacrificeFixEnabled(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(SacrificeFixEnabled.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                SacrificeFixEnabled.Value = valid.Value;
+                Debug.Log($"Sacrifice fix set to {SacrificeFixEnabled.Value}");
+            }
+        }
+        
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
             helpText = "Modifies whether items are shared to dead players.")]

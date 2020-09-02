@@ -48,11 +48,9 @@ namespace ShareSuite
 
             sacrificeCounter += 1;
 
-            if (sacrificeCounter > PlayerCharacterMasterController.instances.Count)
-            {
-                sacrificeCounter = 1;
-                orig(damageReport);
-            }
+            if (sacrificeCounter < 4 && sacrificeCounter <= PlayerCharacterMasterController.instances.Count) return;
+            sacrificeCounter = 1;
+            orig(damageReport);
         }
 
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)

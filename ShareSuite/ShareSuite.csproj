@@ -11,42 +11,41 @@
 
     <ItemGroup>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\libs\Assembly-CSharp.dll</HintPath>
+          <HintPath>..\Dependencies\Assembly-CSharp.dll</HintPath>
         </Reference>
-        <Reference Include="BepInEx">
-            <HintPath>..\libs\BepInEx.dll</HintPath>
-            <Private>false</Private>
+        <Reference Include="BepInEx, Version=5.3.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\BepInEx.dll</HintPath>
         </Reference>
         <Reference Include="MMHOOK_Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\libs\MMHOOK_Assembly-CSharp.dll</HintPath>
+          <HintPath>..\Dependencies\MMHOOK_Assembly-CSharp.dll</HintPath>
         </Reference>
-        <Reference Include="Mono.Cecil">
-            <HintPath>..\libs\Mono.Cecil.dll</HintPath>
-            <Private>false</Private>
+        <Reference Include="Mono.Cecil, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
+          <HintPath>..\Dependencies\Mono.Cecil.dll</HintPath>
         </Reference>
-        <Reference Include="MonoMod.RuntimeDetour">
-            <HintPath>..\libs\MonoMod.RuntimeDetour.dll</HintPath>
+        <Reference Include="MonoMod.RuntimeDetour, Version=20.8.3.5, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\MonoMod.RuntimeDetour.dll</HintPath>
         </Reference>
-        <Reference Include="MonoMod.Utils">
-            <HintPath>..\libs\MonoMod.Utils.dll</HintPath>
+        <Reference Include="MonoMod.Utils, Version=20.8.3.5, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\MonoMod.Utils.dll</HintPath>
         </Reference>
         <Reference Include="R2API, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\libs\R2API.dll</HintPath>
+          <HintPath>..\Dependencies\R2API.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine">
-            <HintPath>..\libs\UnityEngine.dll</HintPath>
-            <Private>false</Private>
+        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\UnityEngine.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.CoreModule">
-            <HintPath>..\libs\UnityEngine.CoreModule.dll</HintPath>
-            <Private>false</Private>
+        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.Networking">
             <HintPath>..\libs\UnityEngine.Networking.dll</HintPath>
             <Private>false</Private>
         </Reference>
+        <Reference Include="UnityEngine.Networking, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Dependencies\UnityEngine.Networking.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\libs\UnityEngine.PhysicsModule.dll</HintPath>
+          <HintPath>..\Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
     </ItemGroup>
 

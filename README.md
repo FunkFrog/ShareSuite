@@ -7,11 +7,10 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 2.1.0    |
+|    Most Recent Update - 2.2.0    |
 |:--------------------------------:|
-| Fixed an issue regarding scrappers sharing to everyone |
-| Fixed item picking messages printing twice when rich messages are disabled |
-| Updated the game for the 1.0 RoR2 update! |
+| Updated the mod to work with the latest patch |
+| Adjusted Sacrifice Fix for high player counts |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -202,7 +201,11 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `2.1.0 (CURRENT)`
+### `2.2.0 (CURRENT)`
+- Updated the mod to work with the latest patch
+- Adjusted the Sacrifice Fix to not drop extremely low amounts of items with more then 4 players in a lobby
+
+### `2.1.0`
 - Fixed an issue regarding scrappers sharing to everyone 
 - Fixed item picking messages printing twice when rich messages are disabled 
 - Updated the game for the 1.0 RoR2 update! 
@@ -276,12 +279,6 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 - Fixed issues with Cleansing Pool and Overgrown Chests
 - Fixed issues preventing the mod from working with the newest game version
 - Thanks to Harb for helping me get this out while I'm low on time! <3
-
-### `1.13.3`
-- Recompiled with latest versions of R2API and BepInEx
-    - Should solve issue with chests not dropping items? (I haven't had any further issues)
-- Updated dependencies
-- Removed Frogtown Shared Mod Manager
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 

@@ -6,10 +6,10 @@ namespace ShareSuite
 {
     public static class Blacklist
     {
-        private static ItemMask _cachedAvailableItems;
+        private static ItemMask _cachedAvailableItems = new ItemMask();
 
-        public static ItemMask _items = ItemMask.none;
-        public static EquipmentMask _equipment = EquipmentMask.none;
+        private static ItemMask _items = new ItemMask();
+        private static EquipmentMask _equipment = new EquipmentMask();
         private static readonly List<PickupIndex> _availableTier1DropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableTier2DropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableTier3DropList = new List<PickupIndex>();
@@ -24,33 +24,33 @@ namespace ShareSuite
 
         private static void LoadBlackListItems()
         {
-            _items = ItemMask.none;
+            _items = new ItemMask();
             foreach (var piece in ShareSuite.ItemBlacklist.Value.Split(','))
                 if (int.TryParse(piece.Trim(), out var itemIndex))
-                    _items.AddItem((ItemIndex) itemIndex);
+                    _items.Add((ItemIndex) itemIndex);
         }
 
         private static void LoadBlackListEquipment()
         {
-            _equipment = EquipmentMask.none;
+            _equipment = new EquipmentMask();
             foreach (var piece in ShareSuite.EquipmentBlacklist.Value.Split(','))
                 if (int.TryParse(piece.Trim(), out var equipmentIndex))
-                    _equipment.AddEquipment((EquipmentIndex) equipmentIndex);
+                    _equipment.Add((EquipmentIndex) equipmentIndex);
         }
 
         public static bool HasItem(ItemIndex itemIndex)
         {
             ValidateItemCache();
-            return _items.HasItem(itemIndex);
+            return _items.Contains(itemIndex);
         }
 
         public static bool HasEquipment(EquipmentIndex equipmentIndex)
         {
             ValidateItemCache();
-            return _equipment.HasEquipment(equipmentIndex);
+            return _equipment.Contains(equipmentIndex);
         }
 
-        public static void Recalculate() => _cachedAvailableItems = ItemMask.none;
+        public static void Recalculate() => _cachedAvailableItems = new ItemMask();
 
         private static void ValidateItemCache()
         {
@@ -59,14 +59,14 @@ namespace ShareSuite
                 Recalculate();
                 return;
             }
-
-            if (ItemMaskEquals(_cachedAvailableItems, Run.instance.availableItems))
+            
+            if (_cachedAvailableItems.Equals(Run.instance.availableItems))
                 return;
 
             _cachedAvailableItems = Run.instance.availableItems;
 
             // Available items have changed; recalculate available items minus blacklists
-
+            
             LoadBlackListItems();
             LoadBlackListEquipment();
 
@@ -83,7 +83,7 @@ namespace ShareSuite
                 availMinusBlack.AddRange(source.Where(pickupIndex =>
                 {
                     var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
-                    return !_items.HasItem(pickupDef.itemIndex);
+                    return pickupDef != null && !_items.Contains(pickupDef.itemIndex);
                 }));
             }
         }
@@ -95,8 +95,5 @@ namespace ShareSuite
             ValidateItemCache();
             return list;
         }
-
-        private static bool ItemMaskEquals(ItemMask first, ItemMask second)
-            => first.a == second.a && first.b == second.b;
     }
 }
