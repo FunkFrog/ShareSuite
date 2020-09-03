@@ -8,8 +8,8 @@ namespace ShareSuite
 {
     public static class GeneralHooks
     {
-        private static int sacrificeOffset = 1;
-        private static int sacrificeCounter = 1;
+        private static int _sacrificeOffset = 1;
+        private static int _sacrificeCounter = 1;
         private static int _bossItems = 1;
         private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
             "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
@@ -34,7 +34,7 @@ namespace ShareSuite
 
         private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
         {
-            sacrificeOffset = 2;
+            _sacrificeOffset = 2;
             orig(sceneDirector);
         }
 
@@ -46,10 +46,10 @@ namespace ShareSuite
                 return;
             }
 
-            sacrificeCounter += 1;
+            _sacrificeCounter += 1;
 
-            if (sacrificeCounter < 4 && sacrificeCounter <= PlayerCharacterMasterController.instances.Count) return;
-            sacrificeCounter = 1;
+            if (_sacrificeCounter < 4 && _sacrificeCounter <= PlayerCharacterMasterController.instances.Count) return;
+            _sacrificeCounter = 1;
             orig(damageReport);
         }
 
@@ -65,11 +65,7 @@ namespace ShareSuite
         private static void OverrideBossLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
             TeleporterInteraction self, Interactor activator)
         {
-            if (ShareSuite.OverrideBossLootScalingEnabled.Value)
-                _bossItems = ShareSuite.BossLootCredit.Value;
-            else
-                _bossItems = Run.instance.participatingPlayerCount;
-
+            _bossItems = ShareSuite.OverrideBossLootScalingEnabled.Value ? ShareSuite.BossLootCredit.Value : Run.instance.participatingPlayerCount;
             orig(self, activator);
         }
 
@@ -134,11 +130,11 @@ namespace ShareSuite
             // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
             if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
                     || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
-                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / sacrificeOffset);
+                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset);
 
             #endregion
 
-            sacrificeOffset = 1;
+            _sacrificeOffset = 1;
     }
     }
 }

@@ -14,7 +14,7 @@ namespace ShareSuite
 {
     public static class ItemSharingHooks
     {
-        public static bool itemLock = false;
+        private static bool _itemLock = false;
         public static void UnHook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
@@ -48,9 +48,9 @@ namespace ShareSuite
             // This is a bit of a dubious hook, but it enables really nice interaction with the scrapper, where we add
             // an item every time the scrapper finishes its animation.
             #region Cauldronfix
-            if (itemLock)
+            if (_itemLock)
             {
-                itemLock = false;
+                _itemLock = false;
                 return orig("This is not an item!");
             }
             return orig(pickupName);
@@ -65,7 +65,7 @@ namespace ShareSuite
                 return;
             }
 
-            itemLock = true;
+            _itemLock = true;
             orig(self);
 
             ScrapperController scrapperController = GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
@@ -93,20 +93,20 @@ namespace ShareSuite
                             break;
                     }
                 }
-                if (pickupIndex != PickupIndex.none)
-                {
-                    var interactor = GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
-                    Debug.Log("Interactor Established");
 
-                    PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
-                    if (interactor)
-                    {
-                        CharacterBody component = interactor.GetComponent<CharacterBody>();
-                        component.inventory.GiveItem(pickupDef.itemIndex);
-                        ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
-                        scrapperController.itemsEaten -= 1;
-                    }
-                }
+                if (pickupIndex == PickupIndex.none) return;
+                
+                var interactor = GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
+                Debug.Log("Interactor Established");
+
+                PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+                
+                if (!interactor) return;
+                
+                CharacterBody component = interactor.GetComponent<CharacterBody>();
+                component.inventory.GiveItem(pickupDef.itemIndex);
+                ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
+                scrapperController.itemsEaten -= 1;
             }
         }
 

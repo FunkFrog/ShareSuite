@@ -19,7 +19,8 @@ namespace ShareSuite
     {
         #region ConfigWrapper init
 
-        public static ConfigEntry<bool> ModIsEnabled,
+        public static ConfigEntry<bool> 
+            ModIsEnabled,
             MoneyIsShared,
             WhiteItemsShared,
             GreenItemsShared,
