@@ -104,9 +104,8 @@ namespace ShareSuite
                 if (!interactor) return;
                 
                 CharacterBody component = interactor.GetComponent<CharacterBody>();
-                component.inventory.GiveItem(pickupDef.itemIndex);
+                component.inventory.GiveItem(pickupDef.itemIndex, scrapperController.itemsEaten);
                 ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
-                scrapperController.itemsEaten -= 1;
             }
         }
 
