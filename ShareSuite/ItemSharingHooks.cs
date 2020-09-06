@@ -71,6 +71,7 @@ namespace ShareSuite
             ScrapperController scrapperController = GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
 
             Debug.Log(scrapperController);
+            Debug.Log(_itemLock);
             if (scrapperController)
             {
                 PickupIndex pickupIndex = PickupIndex.none;
@@ -102,7 +103,8 @@ namespace ShareSuite
                 PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
                 
                 if (!interactor) return;
-                
+
+                SetInstanceField(typeof(ScrappingToIdle), self, "foundValidScrap", true);
                 CharacterBody component = interactor.GetComponent<CharacterBody>();
                 component.inventory.GiveItem(pickupDef.itemIndex);
                 ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
