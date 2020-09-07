@@ -2,6 +2,7 @@
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
+using HarmonyLib;
 using R2API.Utils;
 using RoR2;
 using UnityEngine;
@@ -67,6 +68,7 @@ namespace ShareSuite
         }
 
         public static int DefaultMaxScavItemDropCount = 0;
+        private static Harmony harmony;
 
         public ShareSuite()
         {
@@ -76,6 +78,8 @@ namespace ShareSuite
             //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
             #region Hook registration
+
+            harmony = new Harmony("ShareSuite");
 
             // Register all the hooks
             ReloadHooks();
@@ -93,6 +97,7 @@ namespace ShareSuite
                 ItemSharingHooks.UnHook();
                 EquipmentSharingHooks.UnHook();
                 _previouslyEnabled = false;
+                harmony.UnpatchAll("ShareSuite");
             }
 
             if (!_previouslyEnabled && ModIsEnabled.Value)
@@ -102,6 +107,7 @@ namespace ShareSuite
                 MoneySharingHooks.Hook();
                 ItemSharingHooks.Hook();
                 EquipmentSharingHooks.Hook();
+                harmony.PatchAll(typeof(Patches));
             }
         }
 

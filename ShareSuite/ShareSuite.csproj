@@ -47,6 +47,9 @@
         <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\Dependencies\UnityEngine.PhysicsModule.dll</HintPath>
         </Reference>
+        <Reference Include="0Harmony">
+          <HintPath>..\Dependencies\0Harmony.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>
