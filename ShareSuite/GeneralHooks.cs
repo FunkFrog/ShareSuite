@@ -28,6 +28,7 @@ namespace ShareSuite
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
+            On.RoR2.Util.GetExpAdjustedDropChancePercent -= GetExpAdjustedDropChancePercent;
         }
 
         private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
