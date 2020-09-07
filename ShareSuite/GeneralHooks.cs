@@ -19,6 +19,7 @@ namespace ShareSuite
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
+            On.RoR2.Util.GetExpAdjustedDropChancePercent += GetExpAdjustedDropChancePercent;
         }
 
         internal static void UnHook()
@@ -117,6 +118,15 @@ namespace ShareSuite
             #endregion
 
             _sacrificeOffset = 1;
-    }
+        }
+
+        private static float GetExpAdjustedDropChancePercent(On.RoR2.Util.orig_GetExpAdjustedDropChancePercent orig, float baseChancePercent, GameObject characterBodyObject)
+        {
+            if (ShareSuite.SacrificeFixEnabled.Value)
+            {
+                baseChancePercent /= Math.Min(4, PlayerCharacterMasterController.instances.Count);
+            }
+            return orig(baseChancePercent, characterBodyObject);
+        }
     }
 }
