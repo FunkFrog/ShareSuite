@@ -7,10 +7,9 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 2.2.0    |
+|    Most Recent Update - 2.3.0    |
 |:--------------------------------:|
-| Updated the mod to work with the latest patch |
-| Adjusted Sacrifice Fix for high player counts |
+| Updated the Scrapper to function properly with the new update |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -201,7 +200,10 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `2.2.0 (CURRENT)`
+### `2.3.0 (CURRENT)`
+- Fixed a bug where scrapper wouldn't output the correct amount of scrap
+
+### `2.2.0`
 - Updated the mod to work with the latest patch
 - Adjusted the Sacrifice Fix to not drop extremely low amounts of items with more then 4 players in a lobby
 
@@ -273,12 +275,6 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
     - When enabled, each player (except the player who picked up the item) will get a randomized item of the same rarity.
     - Thank you to Splamy for PRing this feature!
 - Apologies for the rather late update, I've been caught up with family stuff for the holidays. I hope everyone had a great new years!
-
-### `1.13.4`
-- Updated dependencies
-- Fixed issues with Cleansing Pool and Overgrown Chests
-- Fixed issues preventing the mod from working with the newest game version
-- Thanks to Harb for helping me get this out while I'm low on time! <3
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
