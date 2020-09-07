@@ -1,5 +1,10 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.13.4`
+- Updated dependencies
+- Fixed issues with Cleansing Pool and Overgrown Chests
+- Fixed issues preventing the mod from working with the newest game version
+- Thanks to Harb for helping me get this out while I'm low on time! <3
 
 `1.13.3`
 - Recompiled with latest versions of R2API and BepInEx
