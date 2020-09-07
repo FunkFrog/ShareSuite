@@ -125,7 +125,7 @@ namespace ShareSuite
         {
             if (ShareSuite.SacrificeFixEnabled.Value)
             {
-                baseChancePercent /= Math.Min(4, PlayerCharacterMasterController.instances.Count);
+                baseChancePercent /= PlayerCharacterMasterController.instances.Count;
             }
             return orig(baseChancePercent, characterBodyObject);
         }
