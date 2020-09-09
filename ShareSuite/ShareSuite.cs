@@ -293,7 +293,7 @@ namespace ShareSuite
             ItemBlacklist = Config.Bind(
                 "Settings",
                 "ItemBlacklist",
-                "53,60,82,86",
+                "53,60,82,86,101",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
