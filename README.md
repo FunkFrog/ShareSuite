@@ -7,9 +7,9 @@ Have you ever had someone swoop in and steal that item you just bought? Ever acc
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
 
-|    Most Recent Update - 2.3.0    |
+|    Most Recent Update - 2.4.0    |
 |:--------------------------------:|
-| Updated the Scrapper to function properly with the new update |
+| Introduced a new Sacrifice system to combat poor drop rates |
 
 **If you'd like more info on this update, check the changelog at the bottom of the page!**
 
@@ -200,7 +200,11 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `2.3.0 (CURRENT)`
+### `2.4.0 (CURRENT)`
+- Introduces a new Sacrifice fix to fix poor drop rates with larger groups of people
+    - Thanks to raeon for the PR!
+
+### `2.3.0`
 - Fixed a bug where scrapper wouldn't output the correct amount of scrap
 
 ### `2.2.0`
@@ -264,17 +268,6 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
         - `ss_OverrideVoidFieldLoot <boolean>` enables or disables the scaling override
         - `ss_VoidFieldLootCredit <integer>` changes the amount of items each cell drops
         - And, as always, both of these commands are live-update (no restarts needed!)
-
-### `1.14.0`
-- Complete internal refactor of the codebase for increased maintainability - a HUGE thanks to Harb for this PR
-    - If you'd like more information on what exactly this entails, [Visit here](https://github.com/FunkFrog/RoR2SharedItems/pull/66).
-- Resolves issue where lunar equipment cannot be purchased
-- Incompatibility with BiggerBazaar resolved
-- Resolves issues with commands that use decimal numbers
-- **MAJOR** New Feature: Randomized Item Sharing
-    - When enabled, each player (except the player who picked up the item) will get a randomized item of the same rarity.
-    - Thank you to Splamy for PRing this feature!
-- Apologies for the rather late update, I've been caught up with family stuff for the holidays. I hope everyone had a great new years!
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
