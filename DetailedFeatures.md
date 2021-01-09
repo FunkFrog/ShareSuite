@@ -4,7 +4,7 @@
 - Items are given directly to everyone but the one who picked the item up, but we're working on changing that. Pick-up banners for everyone are on their way.
 - Dead members don't recieve the item, but you can easily change this with the `DeadPlayersGetItems` setting.
 
-# [3D Printer/Cauldron Compatibility](#3d-printer-cauldron-compatibility)
+# [3D Printer & Cauldron Compatibility](#3d-printer-cauldron-compatibility)
 - Each player may consume their own items to earn an item from the cauldron. These items are given directly to the purchaser so that it does not affect other players' items.
 - This can be disabled, though it WILL create a duplication glitch. 
 - Toggle it with the `PrinterCauldronFix` setting.
@@ -42,3 +42,6 @@
 - Configuration options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*).
 - Item and equipment blacklists also exist for disabling specific items.
 - Config file (*RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg*) allows you to customize the mod down to the slightest detail.
+
+# [Custom Chat Messages](#chat-messages)
+![Image of custom chat messages](https://funkfrog.me/hyLH2W47au.png)
