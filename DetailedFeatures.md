@@ -1,7 +1,7 @@
 # [Item Sharing](#item-sharing)
 - Any items anyone pick up are given to all living members of your party.
     - By default, lunar items and items that provide bonuses for all members of the party are not shared.
-- Items are given directly to everyone but the one who picked the item up, but we're working on changing that. Pick-up notifications for everyone are on their way.
+- Items are given directly to everyone but the one who picked the item up, but we're working on changing that. Pick-up banners for everyone are on their way.
 - Dead members don't recieve the item, but you can easily change this with the `DeadPlayersGetItems` setting.
 
 # [3D Printer/Cauldron Compatibility](#3d-printer-cauldron-compatibility)
@@ -33,12 +33,6 @@
     - This mod has been tediously balanced and we do everything we can to keep the experience as close to vanilla as possible. 
     - If you have any ideas of ways to improve this, please let us know!
     
-# [GUI](#gui)
-- Native config GUI integration with [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) v2.0.4+ (*[Preview of the GUI](https://i.imgur.com/muzxIsW.png)*)
-    - Once installed, press `shift + f10` to open the menu, and click the `settings` tab to manage the mod config
-- Integration with the BepInEx config UI coming soon!
-    - The newest versions of BepInExPack have built-in settings menus, and we'll be migrating to that platform as soon as it's available.
-
 # [Customization](#customization)
 - Toggleable scaling of boss drops and interactables (chests, capsules, etc) for balance
     - Tuned for highly balanced by default.
