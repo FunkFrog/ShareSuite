@@ -42,7 +42,7 @@ namespace ShareSuite
             BossItemsRandomized,
             OverrideMultiplayerCheck; 
 
-        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit;
+        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesBase;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
@@ -231,6 +231,13 @@ namespace ShareSuite
                 "InteractablesCredit",
                 1d,
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns."
+            );
+
+            InteractablesBase = Config.Bind(
+                "Balance",
+                "InteractablesBase",
+                0,
+                "If player scaling via this mod is enabled, the amount of base credit used for chest spawns (e.g. 100, can also be negative)."
             );
 
             OverrideBossLootScalingEnabled = Config.Bind(
@@ -670,6 +677,27 @@ namespace ShareSuite
             {
                 InteractablesCredit.Value = valid.Value;
                 Debug.Log($"Interactible credit set to {InteractablesCredit.Value}.");
+            }
+        }
+
+        // InteractablesBase
+        [ConCommand(commandName = "ss_InteractablesBase", flags = ConVarFlags.None,
+            helpText = "Modifies amount of interactables when player scaling is overridden.")]
+        private static void CcInteractablesBase(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(InteractablesBase.Value);
+                return;
+            }
+
+            var valid = args.TryGetArgInt(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to a number.");
+            else
+            {
+                InteractablesBase.Value = valid.Value;
+                Debug.Log($"Interactible base set to {InteractablesBase.Value}.");
             }
         }
 

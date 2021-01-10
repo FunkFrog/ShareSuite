@@ -3,6 +3,8 @@ using R2API;
 using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 namespace ShareSuite
 {
@@ -16,7 +18,8 @@ namespace ShareSuite
 
         internal static void Hook()
         {
-            On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
+            //On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
+            IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath += ReduceSacrificeDrops;
@@ -24,12 +27,27 @@ namespace ShareSuite
         }
 
         internal static void UnHook()
-        {   
-            On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
+        {
+            //On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
+            IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath -= ReduceSacrificeDrops;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
+        }
+
+        private static void BossGroup_DropRewards(ILContext il)
+        {
+             var cursor = new ILCursor(il);
+
+            cursor.GotoNext(
+                x => x.MatchLdloc(0),
+                x => x.MatchMul(),
+                x => x.MatchStloc(3),
+                x => x.MatchLdcR4(out _)
+            );
+            cursor.Index++;
+            cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
         }
 
         private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
@@ -53,11 +71,11 @@ namespace ShareSuite
             orig(damageReport);
         }
 
-        private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
-        {
-            ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
-            orig(self);
-        }
+        //private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
+        //{
+        //    ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
+        //    orig(self);
+        //}
 
         /// <summary>
         /// // Helper function for Bossloot
@@ -130,7 +148,7 @@ namespace ShareSuite
             // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
             if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
                     || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
-                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset);
+                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) + ShareSuite.InteractablesBase.Value;
 
             #endregion
 

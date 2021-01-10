@@ -53,7 +53,7 @@ namespace ShareSuite
         private static void ShareTomeMoney(On.RoR2.MoneyPickup.orig_OnTriggerStay orig, MoneyPickup self, Collider other)
         {
             #region Sharedmoney
-            if (self.baseObject == null)
+            if ((self.baseObject == null) || (!ShareSuite.MoneyIsShared.Value))
             {
                 orig(self, other);
                 return;
@@ -78,7 +78,7 @@ namespace ShareSuite
 
             if (!ShareSuite.MoneyScalarEnabled.Value
                 || !NetworkServer.active) return;
-            GiveAllScaledMoney(amount);
+            AddToSharedMoneyValue(amount);
             #endregion
         }
 
@@ -187,7 +187,7 @@ namespace ShareSuite
             if (!ShareSuite.MoneyScalarEnabled.Value
                 || !NetworkServer.active) return;
 
-            GiveAllScaledMoney(self.goldReward);
+            AddToSharedMoneyValue(self.goldReward);
 
             #endregion
         }
@@ -205,7 +205,7 @@ namespace ShareSuite
             if (!ShareSuite.MoneyScalarEnabled.Value
                 || !NetworkServer.active) return;
 
-            GiveAllScaledMoney(self.goldReward);
+            AddToSharedMoneyValue(self.goldReward);
 
             #endregion
         }
@@ -370,7 +370,7 @@ namespace ShareSuite
             #endregion
         }
 
-        private static void GiveAllScaledMoney(float goldReward)
+        private static void AddToSharedMoneyValue(float goldReward)
         {
             //Apply gold rewards to shared money pool
             SharedMoneyValue = Math.Max(SharedMoneyValue + (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
