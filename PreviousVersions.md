@@ -1,5 +1,26 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.15.1 + 1.15.0`
+- **1.15.1 ADDRESSES A CRITICAL BUG THAT BREAKS ITEM/MONEY SHARING**
+- Hello everyone! It's been a while, I hope you're all doing well and staying healthy during this rough time.
+- Make sure you grab the newest test build of R2API.dll and MMHOOK_Assembly-CSharp.dll from #r2api and #hook, respectively, [in the main modding discord!](https://discord.gg/5MbXZvd)
+- Fixed a few bugs concerning the ~~new~~ (3 month old) randomized shared loot
+    - Randomised drops are now only pulled from the currently available items, so you won't be able to get anything you haven't unlocked
+    - Randomized drops will no longer include items on the sharing blacklist
+- Fixed a bug concerning deaths by the Grovetender 
+- [Added an entrypoint for other mods to add money while Shared Money is on](https://github.com/FunkFrog/RoR2SharedItems/issues/67#issuecomment-606823289)
+    - Finally, I got around to adding a method to reflect into to add/remove money from the shared money pool. Click the link above to read more about how to use this. Thanks a ton, Harb!
+- Boolean commands are now more user friendly!
+    - "Yes", "True", and "1" now all work for affirmatives
+    - "No, "False", "0", and "-1" now all work for negatives
+    - **Case doesn't matter!**
+- **MAJOR** Introduction of Void Field Loot Scaling!
+    - Now you don't have to worry about the Void Fields netting an excessive amount of loot!
+    - Added two new commands
+        - `ss_OverrideVoidFieldLoot <boolean>` enables or disables the scaling override
+        - `ss_VoidFieldLootCredit <integer>` changes the amount of items each cell drops
+        - And, as always, both of these commands are live-update (no restarts needed!)
+
 `1.14.0`
 - Complete internal refactor of the codebase for increased maintainability - a HUGE thanks to Harb for this PR
     - If you'd like more information on what exactly this entails, [Visit here](https://github.com/FunkFrog/RoR2SharedItems/pull/66).
