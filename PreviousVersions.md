@@ -1,5 +1,21 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`1.14.0`
+- Complete internal refactor of the codebase for increased maintainability - a HUGE thanks to Harb for this PR
+    - If you'd like more information on what exactly this entails, [Visit here](https://github.com/FunkFrog/RoR2SharedItems/pull/66).
+- Resolves issue where lunar equipment cannot be purchased
+- Incompatibility with BiggerBazaar resolved
+- Resolves issues with commands that use decimal numbers
+- **MAJOR** New Feature: Randomized Item Sharing
+    - When enabled, each player (except the player who picked up the item) will get a randomized item of the same rarity.
+    - Thank you to Splamy for PRing this feature!
+- Apologies for the rather late update, I've been caught up with family stuff for the holidays. I hope everyone had a great new years!
+
+`1.13.4`
+- Updated dependencies
+- Fixed issues with Cleansing Pool and Overgrown Chests
+- Fixed issues preventing the mod from working with the newest game version
+- Thanks to Harb for helping me get this out while I'm low on time! <3
 
 `1.13.3`
 - Recompiled with latest versions of R2API and BepInEx

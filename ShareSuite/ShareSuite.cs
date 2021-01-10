@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.2.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.4.0")]
     [R2APISubmoduleDependency("CommandHelper", "ItemDropAPI")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -300,7 +300,7 @@ namespace ShareSuite
             ItemBlacklist = Config.Bind(
                 "Settings",
                 "ItemBlacklist",
-                "53,60,82,86",
+                "53,60,82,86,101",
                 "Items (by index) that you do not want to share, comma separated. Please find the item indices at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();

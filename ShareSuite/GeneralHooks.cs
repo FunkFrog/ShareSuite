@@ -11,7 +11,6 @@ namespace ShareSuite
     public static class GeneralHooks
     {
         private static int _sacrificeOffset = 1;
-        private static int _sacrificeCounter = 1;
         private static int _bossItems = 1;
         private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
             "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
@@ -22,8 +21,8 @@ namespace ShareSuite
             IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
-            On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath += ReduceSacrificeDrops;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
+            On.RoR2.Util.GetExpAdjustedDropChancePercent += GetExpAdjustedDropChancePercent;
         }
 
         internal static void UnHook()
@@ -32,8 +31,8 @@ namespace ShareSuite
             IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
-            On.RoR2.Artifacts.SacrificeArtifactManager.OnServerCharacterDeath -= ReduceSacrificeDrops;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
+            On.RoR2.Util.GetExpAdjustedDropChancePercent -= GetExpAdjustedDropChancePercent;
         }
 
         private static void BossGroup_DropRewards(ILContext il)
@@ -54,21 +53,6 @@ namespace ShareSuite
         {
             _sacrificeOffset = 2;
             orig(sceneDirector);
-        }
-
-        private static void ReduceSacrificeDrops(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnServerCharacterDeath orig, DamageReport damageReport)
-        {
-            if (!ShareSuite.SacrificeFixEnabled.Value)
-            {
-                orig(damageReport);
-                return;
-            }
-
-            _sacrificeCounter += 1;
-
-            if (_sacrificeCounter < 4 && _sacrificeCounter <= PlayerCharacterMasterController.instances.Count) return;
-            _sacrificeCounter = 1;
-            orig(damageReport);
         }
 
         //private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
@@ -153,6 +137,15 @@ namespace ShareSuite
             #endregion
 
             _sacrificeOffset = 1;
-    }
+        }
+
+        private static float GetExpAdjustedDropChancePercent(On.RoR2.Util.orig_GetExpAdjustedDropChancePercent orig, float baseChancePercent, GameObject characterBodyObject)
+        {
+            if (ShareSuite.SacrificeFixEnabled.Value)
+            {
+                baseChancePercent /= PlayerCharacterMasterController.instances.Count;
+            }
+            return orig(baseChancePercent, characterBodyObject);
+        }
     }
 }

@@ -5,65 +5,65 @@
 
 Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Aggravating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
-Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to solve this issue is to remove the incentive to hoard the loot in the first place!
+Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to resolve this issue is to remove the incentive to hoard loot in the first place!
 
-|    Most Recent Update - 2.2.0    |
+ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
+
+|    Most Recent Update - 2.4.0    |
 |:--------------------------------:|
-| Updated the mod to work with the latest patch |
-| Adjusted Sacrifice Fix for high player counts |
+| Introduced a new Sacrifice system to combat poor drop rates |
 
-**If you'd like more info on this update, check the changelog at the bottom of the page!**
+*If you'd like more info about this update, check the changelog at the bottom of the page!*
 
 ### ![Features](https://i.imgur.com/6jCWYtn.png "ShareSuite Features")
 
 **Want a more detailed look at any of our features? Click the [*Show me more*] button next to the bullet!**
 
+---
+
+**On-By-Default Systems**
+
 - Item Sharing — The main goal of this mod is to split items across all players evenly. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#item-sharing)
     - Any items that are picked up are given to all living members of your party.
     - By default, lunar items and items that provide bonuses for all members of the party are not shared.
     - You can also enable the option to give each member of your party a random item of the same tier you received, if that's more your style!
-    
-- Compatible with 3D Printers and Cauldrons — You get to customize your build with them. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#3d-printercauldron-compatibility)
-    - Any player using a printer or cauldron only changes THEIR items, leaving others to build as they please.
-    
-- A robust money sharing/spending system. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#money-sharing)
-    - When anyone gets money, it gets added to the group's money pool.
-    - When anyone spends money, it gets taken away from the group's money pool.
-    - Now includes a gained money scalar — Want more money? Turn it up!
-
-- A shared equipment system — flutter like a group of butterflies or rain lightning from the sky, together. (*`RECENTLY UPDATED`*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#shared-equipment)
-    - When you pick up equipment, everyone gets it.
-    - When someone picks up equipment, they drop the one everyone currently has.
-    - When someone buys an equipment drone, everyone loses their equipment.
-    - Handle blacklisted equipment in two ways: drop their item, or don't change it at all.
-    
+        
 - Worried about the game becoming unbalanced? We've got you. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#balance)
     - Tuned to be balanced by default.
     - Built to feel like vanilla singleplayer; The mod scales to feel right with any amount of players, whether you're playing with 2 or 20.
     - Easily customizable — Want more boss loot? Easy! Want more chests? Righty-o, turn that scalar up.
 
+- Compatible with 3D Printers and Cauldrons — You get to customize your build with them. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#3d-printercauldron-compatibility)
+    - Any player using a printer or cauldron only changes THEIR items, leaving others to build as they please.
+ 
+- Want to easily reference who got what item? Whether or not something's shared? Who got what when pickups are randomized? Custom chat messages are here for you! [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#chat-messages)
+    - Rich Chat Messages let you know who got an item (or who didn't!)
+    - Custom message for items that are set to not share, to remove ambiguity.
+    - Randomized pickups now display who got what - no more confusion over randomized drops.
+    
+---
+
+**Additional Systems**
+
+- A robust money sharing/spending system. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#money-sharing)
+    - When anyone gets money, it gets added to the group's money pool.
+    - When anyone spends money, it gets taken away from the group's money pool.
+    - Now includes a gained money scalar — Want more money? Turn it up!
+
+- A shared equipment system — flutter like a kaleidoscope of butterflies or rain lightning from the sky, together. (*`RECENTLY UPDATED`*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#shared-equipment)
+    - When you pick up equipment, everyone gets it.
+    - When someone picks up equipment, they drop the one everyone currently has.
+    - When someone buys an equipment drone, everyone loses their equipment.
+    - Handle blacklisted equipment in two ways: drop their item, or don't change it at all.
+    
 - Want red items to be unique? Hate the fact that everyone gets hooves? No worries, we've got a solution. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#customization)
     - Config options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*). 
     - Item and equipment blacklists also exist for disabling specific items you don't want shared.
 
-- Want to easy reference who got what item? Whether or not something's shared? Who got what when pickups are randomized? Custom chat messages are here for you! 
-    - Rich Chat Messages let you know who got an item (or who didn't!)
-    - Custom message for items that are set to not share, to remove ambiguity.
-    - Randomized pickups now display who got what - no more confusion about who got what.
-
-- Worried about an early game power spike associated with everyone having items? We've got something in the works for that!
-    - Experimental Scaling mode is on its way to becoming the new default scaling mode for interactables
-    - Starts players off with much fewer interactables on the first handful of rounds.
-    - As players progress through the game, the penalty becomes less and less harsh. 
-    - Works best with Money Sharing on!
-
 - The config file allows you to customize the mod down to the slightest detail. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#config)
     - See the **Configuration** section for more information!
 
-- Native config GUI integration with [SharedModLibrary](https://thunderstore.io/package/ToyDragon/SharedModLibrary/) v2.0.4+ (*[Preview of the GUI](https://i.imgur.com/muzxIsW.png)*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#gui)
-    - Integration with the BepInEx config UI coming soon!
-    - CURRENTLY DEFUNCT -- WORKING ON INTEGRATION WITH NEW UI NOW
-
+    
 ### ![Installation Guide](https://i.imgur.com/6oHhqsV.png "ShareSuite Installation Guide")
 
 - Install the latest version of **[R2API](https://thunderstore.io/package/tristanmcpherson/R2API/)** if you haven't already. 
@@ -131,7 +131,7 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 ```3d printers and cauldrons add the item directly to your item pool. No item orb will drop, it will just appear in your inventory.```
 
 #### Does this make the game easier? How do you balance it?
-```Technically, the game should be ever so slightly harder than vanilla this way. Either way, it should be extremely close to the original game's balance.```
+```Technically, the game should be ever so slightly harder than vanilla this way. Either way, it should be extremely close to the original game's difficulty.```
 
 ```We only spawn the amount of interactables that would be spawned for 1 player in a lobby of any size. Boss and Lunar items are not shared, along with items that provide buffs for everyone in the party. There are no ways to abuse this mod to dupe items. We cut player XP gained from money at the end of rounds to combat leveling faster. Teleporters only drop one item per boss killed. This mod has been tediously balanced and we do everything we can to keep the experience as close to vanilla as possible. If you have any ideas of ways to improve this, please let us know!```
 
@@ -139,14 +139,14 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 ```These items are shared, so they've been set to drop only 1 by default for balance. You can change this in the config with the Boss Loot Credit config option.```
 
 #### How do blood shrines work when share money is on?
-```The user who uses the shrine loses health, but the calculations for how much gold everyone receives is done based on the highest max health player in your party.```
+```The user who uses the shrine loses health, but the calculations for how much gold everyone receives is done based on the highest max health player in your party. This is to prevent calling the highest health player over to use the shrine for the maximum coin value.```
 
 #### I want to play this with my friends. Do they also need to install this mod?
-```Everyone having the same mods installed is always a good idea for stability, but is not required. This mod should still be fully functional if your friends only have BepInEx/R2API installed.```
+```Everyone having the same mods installed is always a good idea for stability, but is not required. This mod should still be fully functional if your friends only have BepInEx/R2API installed, or you have a Build ID changing mod to allow you to play with unmodded clients.```
 
 #### How do I play with my friends who don't have mods installed?
 ```Easy! Install a Build ID changing mod and play on!```
-**[Here's an easy link to get to the current Build ID mods!](https://thunderstore.io/?q=Build)**
+**[Here's an easy link to get to the current Build ID changing mod!](https://thunderstore.io/package/frostycpu/UnmoddedVersion/)**
 
 #### I want to play this mod with more than 4 players!
 ```Please combine with TooManyFriends. If you'd like to change the amount of boss drops or amount of chests, you can configure that in the config file.```
@@ -157,7 +157,7 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 ```New GUI-based configuration manager coming soon!```
 
 #### Can I use this mod in quick play?
-```We DO NOT condone use of this mod in any quick play or prismatic trial games. We will refuse any support for the use of this mod in Quick Play.```
+```We DO NOT condone use of this (or any) mod in any quick play or prismatic trial games. We will refuse any support for the use of this mod in Quick Play. Please do not ruin the game experience for others.```
 
 ### ![To-Do](https://i.imgur.com/hOqXT4A.png "ShareSuite To-Do")
 
@@ -167,12 +167,8 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 #### Features in Development
 
-- Experimental Mode - **Currently on development hiatus**
-    - Tune Experimental Mode to feel better
-    - Add customizability to the difficulty of experimental mode
-    - Rename the mode - send us suggestions in the Discord!
-- Integrate with [new config manager](https://thunderstore.io/package/JackPendarvesRead/BepinexConfigurationManager/)
-- Merge with AutoItemPickup to add new ways to distribute items
+- Item Pickup Banners for all players
+- Merge with AutoItemPickup to add new ways to distribute items (On Hiatus)
 
 ### ![Bug Reports & Suggestions](https://i.imgur.com/ssmfn9f.png "ShareSuite Bug Reports + Suggestions")
 
@@ -186,9 +182,9 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
 
-**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested and I'll add it to this list!**
+**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested (as well as any required settings changes) and I'll add it to this list!**
 
-- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.4.0`
+- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.5.2`
     - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
     
 ### ![Incompatible Mods](https://i.imgur.com/jDXbLYR.png "ShareSuite Incompatible Mods")
@@ -201,7 +197,14 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `2.2.0 (CURRENT)`
+### `2.4.0 (CURRENT)`
+- Introduces a new Sacrifice fix to fix poor drop rates with larger groups of people
+    - Thanks to raeon for the PR!
+
+### `2.3.0`
+- Fixed a bug where scrapper wouldn't output the correct amount of scrap
+
+### `2.2.0`
 - Updated the mod to work with the latest patch
 - Adjusted the Sacrifice Fix to not drop extremely low amounts of items with more then 4 players in a lobby
 
@@ -262,23 +265,6 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
         - `ss_OverrideVoidFieldLoot <boolean>` enables or disables the scaling override
         - `ss_VoidFieldLootCredit <integer>` changes the amount of items each cell drops
         - And, as always, both of these commands are live-update (no restarts needed!)
-
-### `1.14.0`
-- Complete internal refactor of the codebase for increased maintainability - a HUGE thanks to Harb for this PR
-    - If you'd like more information on what exactly this entails, [Visit here](https://github.com/FunkFrog/RoR2SharedItems/pull/66).
-- Resolves issue where lunar equipment cannot be purchased
-- Incompatibility with BiggerBazaar resolved
-- Resolves issues with commands that use decimal numbers
-- **MAJOR** New Feature: Randomized Item Sharing
-    - When enabled, each player (except the player who picked up the item) will get a randomized item of the same rarity.
-    - Thank you to Splamy for PRing this feature!
-- Apologies for the rather late update, I've been caught up with family stuff for the holidays. I hope everyone had a great new years!
-
-### `1.13.4`
-- Updated dependencies
-- Fixed issues with Cleansing Pool and Overgrown Chests
-- Fixed issues preventing the mod from working with the newest game version
-- Thanks to Harb for helping me get this out while I'm low on time! <3
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
