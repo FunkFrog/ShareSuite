@@ -9,9 +9,12 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|    Most Recent Update - 2.4.0    |
+|    Most Recent Update - 2.5.0    |
 |:--------------------------------:|
-| Introduced a new Sacrifice system to combat poor drop rates |
+| Resolved breaking issue regarding boss loot drops in future releases of r2api |
+| Resolved a minor issue with 3d printers |
+| Resolved a minor issue with Ghor's Tome |
+| Added a field "InteractablesOffset" to the scaling config allowing for more control over the game's balance |
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
 
@@ -108,6 +111,7 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 | Override Player Scaling    |          True |           ss_OverridePlayerScaling |
 | Experimental Mode          |         False |                ss_ExperimentalMode |
 | Interactables Credit       |           1.0 |             ss_InteractablesCredit |
+| Interactables Offset       |           0.0 |             ss_InteractablesOffset |
 | Override Boss Loot Scaling |          True |         ss_OverrideBossLootScaling |
 | Boss Loot Credit           |             1 |                  ss_BossLootCredit |
 | Override Void Field Scaling|          True |           ss_OverrideVoidFieldLoot |
@@ -197,7 +201,13 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
-### `2.4.0 (CURRENT)`
+### `2.5.0`
+- Resolved breaking issue regarding boss loot drops in future releases of r2api
+- Resolved a minor issue with 3d printers
+- Resolved a minor issue with Ghor's Tome
+- Added a field "InteractablesOffset" to the scaling config allowing for more control over the game's balance
+
+### `2.4.0`
 - Introduces a new Sacrifice fix to fix poor drop rates with larger groups of people
     - Thanks to raeon for the PR!
 
@@ -244,27 +254,6 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 - Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be
 - Fixes an issue where picking up items would display [0] after the item
 - Fixes an issue where randomized shared loot would sometimes crash the game
-
-### `1.15.1 + 1.15.0`
-- **1.15.1 ADDRESSES A CRITICAL BUG THAT BREAKS ITEM/MONEY SHARING**
-- Hello everyone! It's been a while, I hope you're all doing well and staying healthy during this rough time.
-- Make sure you grab the newest test build of R2API.dll and MMHOOK_Assembly-CSharp.dll from #r2api and #hook, respectively, [in the main modding discord!](https://discord.gg/5MbXZvd)
-- Fixed a few bugs concerning the ~~new~~ (3 month old) randomized shared loot
-    - Randomised drops are now only pulled from the currently available items, so you won't be able to get anything you haven't unlocked
-    - Randomized drops will no longer include items on the sharing blacklist
-- Fixed a bug concerning deaths by the Grovetender 
-- [Added an entrypoint for other mods to add money while Shared Money is on](https://github.com/FunkFrog/RoR2SharedItems/issues/67#issuecomment-606823289)
-    - Finally, I got around to adding a method to reflect into to add/remove money from the shared money pool. Click the link above to read more about how to use this. Thanks a ton, Harb!
-- Boolean commands are now more user friendly!
-    - "Yes", "True", and "1" now all work for affirmatives
-    - "No, "False", "0", and "-1" now all work for negatives
-    - **Case doesn't matter!**
-- **MAJOR** Introduction of Void Field Loot Scaling!
-    - Now you don't have to worry about the Void Fields netting an excessive amount of loot!
-    - Added two new commands
-        - `ss_OverrideVoidFieldLoot <boolean>` enables or disables the scaling override
-        - `ss_VoidFieldLootCredit <integer>` changes the amount of items each cell drops
-        - And, as always, both of these commands are live-update (no restarts needed!)
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 

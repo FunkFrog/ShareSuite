@@ -42,7 +42,7 @@ namespace ShareSuite
             BossItemsRandomized,
             OverrideMultiplayerCheck; 
 
-        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesBase;
+        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
@@ -233,11 +233,11 @@ namespace ShareSuite
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns."
             );
 
-            InteractablesBase = Config.Bind(
+            InteractablesOffset = Config.Bind(
                 "Balance",
-                "InteractablesBase",
+                "InteractablesOffset",
                 0,
-                "If player scaling via this mod is enabled, the amount of base credit used for chest spawns (e.g. 100, can also be negative)."
+                "If player scaling via this mod is enabled, the offset from base scaling for interactables credit (e.g. 100 would add 100 interactables credit (not 100 interactables), can also be negative)."
             );
 
             OverrideBossLootScalingEnabled = Config.Bind(
@@ -680,14 +680,14 @@ namespace ShareSuite
             }
         }
 
-        // InteractablesBase
-        [ConCommand(commandName = "ss_InteractablesBase", flags = ConVarFlags.None,
+        // InteractablesOffset
+        [ConCommand(commandName = "ss_InteractablesOffset", flags = ConVarFlags.None,
             helpText = "Modifies amount of interactables when player scaling is overridden.")]
-        private static void CcInteractablesBase(ConCommandArgs args)
+        private static void CcInteractablesOffset(ConCommandArgs args)
         {
             if (args.Count == 0)
             {
-                Debug.Log(InteractablesBase.Value);
+                Debug.Log(InteractablesOffset.Value);
                 return;
             }
 
@@ -696,8 +696,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to a number.");
             else
             {
-                InteractablesBase.Value = valid.Value;
-                Debug.Log($"Interactible base set to {InteractablesBase.Value}.");
+                InteractablesOffset.Value = valid.Value;
+                Debug.Log($"Interactible offset set to {InteractablesOffset.Value}.");
             }
         }
 

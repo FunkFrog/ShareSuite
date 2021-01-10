@@ -108,8 +108,8 @@ namespace ShareSuite
                 // This reduces player strength early game (as having more bodies gives a flat power increase early game).
                 creditModifier *= (float)Math.Max(
                                         1.0 + 0.1 * Math.Min(
-                                            Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2,
-                                            3)
+                                            Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2
+                                            , 3)
                                         , 1.0);
 
                 // We must apply the transformation to interactableCredit otherwise bonusIntractableCreditObject will be overwritten.
@@ -132,7 +132,7 @@ namespace ShareSuite
             // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
             if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
                     || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
-                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) + ShareSuite.InteractablesBase.Value;
+                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) + ShareSuite.InteractablesOffset.Value;
 
             #endregion
 
