@@ -26,16 +26,28 @@ namespace ShareSuite
         {
             _items = new ItemMask();
             foreach (var piece in ShareSuite.ItemBlacklist.Value.Split(','))
-                if (int.TryParse(piece.Trim(), out var itemIndex))
-                    _items.Add((ItemIndex) itemIndex);
+            {
+                // if (int.TryParse(piece.Trim(), out var itemIndex))
+                //     _items.Add((ItemIndex) itemIndex);
+                var item = ItemCatalog.FindItemIndex(piece);
+                if (item == ItemIndex.None) continue;
+
+                _items.Add(item);
+            }
         }
 
         private static void LoadBlackListEquipment()
         {
             _equipment = new EquipmentMask();
             foreach (var piece in ShareSuite.EquipmentBlacklist.Value.Split(','))
-                if (int.TryParse(piece.Trim(), out var equipmentIndex))
-                    _equipment.Add((EquipmentIndex) equipmentIndex);
+            {
+                // if (int.TryParse(piece.Trim(), out var equipmentIndex))
+                //     _equipment.Add((EquipmentIndex) equipmentIndex);
+                var equip = EquipmentCatalog.FindEquipmentIndex(piece);
+                if (equip == EquipmentIndex.None) continue;
+
+                _equipment.Add(equip);
+            }
         }
 
         public static bool HasItem(ItemIndex itemIndex)
