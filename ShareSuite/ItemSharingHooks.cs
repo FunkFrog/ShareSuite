@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
+using On.RoR2.Audio;
 
 namespace ShareSuite
 {
@@ -57,7 +58,7 @@ namespace ShareSuite
             #endregion
         }
 
-        private static void ScrappingToIdle_OnEnter(On.EntityStates.Scrapper.ScrappingToIdle.orig_OnEnter orig, EntityStates.Scrapper.ScrappingToIdle self)
+        private static void ScrappingToIdle_OnEnter(On.EntityStates.Scrapper.ScrappingToIdle.orig_OnEnter orig, ScrappingToIdle self)
         {
             if (!(ShareSuite.PrinterCauldronFixEnabled.Value && NetworkServer.active && GeneralHooks.IsMultiplayer()))
             {
@@ -268,23 +269,26 @@ namespace ShareSuite
 
             if (ShareSuite.EquipmentShared.Value)
             {
-                var rng = self.GetComponent<Xoroshiro128Plus>();
-                var itemIndex = ItemIndex.None;
-
-                var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
-                if (shop)
+                if (self.costType == CostTypeIndex.Equipment)
                 {
-                    itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-                }
-
-                var payCostResults = costTypeDef.PayCost(self.cost,
-                    activator, self.gameObject, rng, itemIndex);
-
-                if (payCostResults.equipmentTaken.Count >= 1)
-                {
-                    orig(self, activator);
-                    EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
-                    return;
+                    var rng = self.GetComponent<Xoroshiro128Plus>();
+                    var itemIndex = ItemIndex.None;
+            
+                    var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
+                    if (shop)
+                    {
+                        itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
+                    }
+            
+                    var payCostResults = costTypeDef.PayCost(self.cost,
+                        activator, self.gameObject, rng, itemIndex);
+            
+                    if (payCostResults.equipmentTaken.Count >= 1)
+                    {
+                        orig(self, activator);
+                        EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
+                        return;
+                    }
                 }
             }
             #endregion

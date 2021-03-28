@@ -105,8 +105,6 @@ namespace ShareSuite
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
         {
-            if (!self.CanBeAffordedByInteractor(activator)) return;
-
             #region Sharedmoney
 
             if (ShareSuite.MoneyIsShared.Value)
@@ -115,6 +113,7 @@ namespace ShareSuite
                 {
                     case CostTypeIndex.Money:
                     {
+                        if (self.cost > SharedMoneyValue) return;
                         // Remove money from shared money pool
                         orig(self, activator);
                         SharedMoneyValue -= self.cost;
@@ -319,7 +318,7 @@ namespace ShareSuite
             var postDamageMoney = self.body.master.money;
 
             // Ignore all of this if we do not actually have the item
-            if (body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+            if (body.inventory.GetItemCount(ItemCatalog.FindItemIndex("GoldOnHit")) <= 0) return;
 
             // Apply the calculation to the shared money pool
             SharedMoneyValue += (int) postDamageMoney - (int) preDamageMoney;
@@ -362,7 +361,7 @@ namespace ShareSuite
             var postDamageMoney = body.master.money;
 
             // Ignore all of this if we do not actually have the item
-            if (!body.inventory || body.inventory.GetItemCount(ItemIndex.GoldOnHit) <= 0) return;
+            if (!body.inventory || body.inventory.GetItemCount(ItemCatalog.FindItemIndex("GoldOnHit")) <= 0) return;
 
             // Apply the calculation to the shared money pool
             SharedMoneyValue += (int) postDamageMoney - (int) preDamageMoney;

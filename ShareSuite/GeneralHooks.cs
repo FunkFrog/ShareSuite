@@ -37,7 +37,7 @@ namespace ShareSuite
 
         private static void BossGroup_DropRewards(ILContext il)
         {
-             var cursor = new ILCursor(il);
+            var cursor = new ILCursor(il);
 
             cursor.GotoNext(
                 x => x.MatchLdloc(0),
