@@ -9,12 +9,14 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|    Most Recent Update - 2.5.0    |
+|    Most Recent Update - 2.5.1    |
 |:--------------------------------:|
-| Resolved breaking issue regarding boss loot drops in future releases of r2api |
-| Resolved a minor issue with 3d printers |
-| Resolved a minor issue with Ghor's Tome |
-| Added a field "InteractablesOffset" to the scaling config allowing for more control over the game's balance |
+| **!!! PLEASE READ !!!** |
+| The R2Api version of this mod will NOT WORK without an updated MMHOOK! |
+| Please read through the changelog at the bottom for instructions on how to update this! |
+| Please also read through the instructions on how to transfer your config files! |
+| Added compatibility for the EnigmaticThunder api |
+| Fixed a bug where you'd need 2x the price to purchase things when equipment sharing and shared money were on |
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
 
@@ -201,6 +203,53 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
+### `2.5.1`
+- Added support for EnigmaticThunder api
+- Fixed a bug where you'd need 2x the price to purchase things when equipment sharing and shared money were on
+- HOW TO UPDATE MMHOOK FOR R2API INSTALLATIONS
+    - Open your BepInEx/Plugins/R2Api folder
+        - If using a mod manager, you may have to uninstall R2Api & ShareSuite via the mod manager and then manually install the most recent version of r2api and ShareSuite
+    - Delete `MMHOOK_Assembly-CSharp.dll`
+    - Unzip the `New MMHOOK_Assembly-CSharp.dll for R2Api.zip` folder
+    - Place the new MMHOOK_Assembly-CSharp.dll in your BepInEx/Plugins/R2Api folder
+    - Delete the old `ShareSuite.dll` in your plugins folder
+    - Ensure you are **NOT** using EnigmaticThunder alongside R2Api with this installation type!!
+    - If you're updating from a previous install, follow the instructions to transfer your config below
+- HOW TO USE SHARESUITE WITH ENIGMATICTHUNDER
+    - Open your BepInEx/Plugins/ folder
+    - Delete `ShareSuite-R2.dll` or `ShareSuite.dll` if it was previously installed in your plugins folder
+        - If using a mod manager, you may have to uninstall ShareSuite and manually install it here
+    - Unzip the `ShareSuite - EnigmaticThunder Version.zip` folder
+    - Place `ShareSuite-ET.dll` in your plugins folder (or wherever `ShareSuite-R2.dll` or `ShareSuite.dll` previously was)
+    - Ensure you are **NOT** using R2Api alongside EnigmaticThunder with this installation type!!
+    - If you're updating from a previous install, follow the instructions to transfer your config below
+- HOW TO TRANSFER YOUR OLD CONFIG
+    - Run the game at least once with the new version installed to generate the new config
+    - Open `BepInEx/Config/com.funkfrog_sipondo.sharesuite.cfg` and `com.funkfrog_sipondo.sharesuite-r2.cfg` or `com.funkfrog_sipondo.sharesuite-et.cfg`
+    - Copy/Paste the entire config from `...sharesuite.cfg` into `...sharesuite-r2.cfg` or `...sharesuite-et.cfg` (whichever installation you're using)
+    - Follow the instructions on updating your blacklist to the new defaults as the old ones will NOT work
+- HOW TO UPDATE BLACKLISTS TO THE NEW DEFAULTS
+    - Open BepInEx/Config/com.funkfrog_sipondo.sharesuite.cfg
+    - Replace the numbers in `ItemBlacklist` (previously `53,60,82,86,101`) with `BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey`
+    - `EquipmentBlacklist` is empty by default
+    - To add items/equipment to these, use the "Code Names" on https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names.
+- STILL HAVING ISSUES?
+    - Where is my game installed?
+        - Open Steam
+        - Right click Risk of Rain 2
+        - Mouse over "Manage >"
+        - Click "Browse Local Files"
+    - R2API Version
+        - Are you sure you updated your MMHOOK dll?
+        - Are you sure you're not also using EnigmaticThunder?
+        - Have you tried without any mods besides R2Api and ShareSuite?
+    - EnigmaticThunder Version
+        - Are you sure you're not also using R2Api?
+        - Are you using any mods that rely on R2Api?
+    - **HELP!** I'm still having problems!
+        - Join our [Discord Server](https://discord.gg/c7QnQeb) and send your problem in #support, we'll help you as soon as we can!
+
+
 ### `2.5.0`
 - Resolved breaking issue regarding boss loot drops in future releases of r2api
 - Resolved a minor issue with 3d printers
@@ -226,34 +275,6 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 ### `2.0.1`
 - Fixed an issue regarding Scavengers dropping less items than intended.
 - Fixed an issue where other mods were unable to access shared money while inside the bazaar.
-
-### `2.0.0`
-- The mod turns 1 year old in a handful of days! Happy birthday, ShareSuite! Thank you, everyone, for your continued support of the mod <3
-- **MAJOR** Full completion of the Shared Equipment system
-    - Equipment Drones no longer de-sync Shared Equipment
-        - When purchased, everybody sharing the equipment with the player activating the drone has their equipment removed from their inventory
-        - If a blacklisted equipment is spent, only that equipment is used
-        - Blacklisted equipment are left alone if a shared equipment is used to purchase
-    - Adds a new config option to control how shared equipment handles blacklisted equips
-    - Blacklisted equipment are now handled in two toggleable modes:
-        - Drop Item Mode: If you have a blacklisted equipment, drop it next to you and get the new item
-        - Leave Alone Mode: If you have a blacklisted equipment, don't do anything to it
-- **MAJOR** Addition of brand new shiny rich text messages 
-    - Rich messages tell you who exactly got what
-    - The messages will state if an item isn't shared
-    - If randomized loot sharing is on, the message will tell who got what items
-- ShareSuite gets an updated logo!
-    - To celebrate one year of ShareSuite, we've now got an updated logo with new characters and items!
-- Finally fix the bug with the crowdfunder desyncing shared money
-    - Definitely didn't leave this uncorrected for a year.
-    - And we definitely didn't only get a bug report about 2 months ago. Nope!
-- Scavenger now drops an appropriate amount of items for the runs
-- Add another entrypoint for other mods to check the status of shared money
-- Fixes a bug concerning Ghor's Tome not adding gold
-- Fixes an issue with Sacrifice creating WAY too many dropped items
-- Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be
-- Fixes an issue where picking up items would display [0] after the item
-- Fixes an issue where randomized shared loot would sometimes crash the game
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
