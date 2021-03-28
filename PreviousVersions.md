@@ -1,5 +1,33 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`2.0.0`
+- The mod turns 1 year old in a handful of days! Happy birthday, ShareSuite! Thank you, everyone, for your continued support of the mod <3
+- **MAJOR** Full completion of the Shared Equipment system
+    - Equipment Drones no longer de-sync Shared Equipment
+        - When purchased, everybody sharing the equipment with the player activating the drone has their equipment removed from their inventory
+        - If a blacklisted equipment is spent, only that equipment is used
+        - Blacklisted equipment are left alone if a shared equipment is used to purchase
+    - Adds a new config option to control how shared equipment handles blacklisted equips
+    - Blacklisted equipment are now handled in two toggleable modes:
+        - Drop Item Mode: If you have a blacklisted equipment, drop it next to you and get the new item
+        - Leave Alone Mode: If you have a blacklisted equipment, don't do anything to it
+- **MAJOR** Addition of brand new shiny rich text messages 
+    - Rich messages tell you who exactly got what
+    - The messages will state if an item isn't shared
+    - If randomized loot sharing is on, the message will tell who got what items
+- ShareSuite gets an updated logo!
+    - To celebrate one year of ShareSuite, we've now got an updated logo with new characters and items!
+- Finally fix the bug with the crowdfunder desyncing shared money
+    - Definitely didn't leave this uncorrected for a year.
+    - And we definitely didn't only get a bug report about 2 months ago. Nope!
+- Scavenger now drops an appropriate amount of items for the runs
+- Add another entrypoint for other mods to check the status of shared money
+- Fixes a bug concerning Ghor's Tome not adding gold
+- Fixes an issue with Sacrifice creating WAY too many dropped items
+- Blacklist more maps for interactables scaling to prevent chests from going where they shouldn't be
+- Fixes an issue where picking up items would display [0] after the item
+- Fixes an issue where randomized shared loot would sometimes crash the game
+
 `1.15.1 + 1.15.0`
 - **1.15.1 ADDRESSES A CRITICAL BUG THAT BREAKS ITEM/MONEY SHARING**
 - Hello everyone! It's been a while, I hope you're all doing well and staying healthy during this rough time.
