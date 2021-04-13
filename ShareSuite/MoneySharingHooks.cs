@@ -216,12 +216,15 @@ namespace ShareSuite
 
             // This should run on every map, as it is required to fix shared money.
             // Reset shared money value to the default (0) at the start of each round
-            SharedMoneyValue = 0;
+            if (GeneralHooks.IsMultiplayer())
+            {
+                SharedMoneyValue = 0;
+            }
 
             orig(self);
         }
 
-        private static void GoldGatFireHook(On.EntityStates.GoldGat.GoldGatFire.orig_FireBullet orig, 
+        private static void GoldGatFireHook(On.EntityStates.GoldGat.GoldGatFire.orig_FireBullet orig,
             GoldGatFire self)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
@@ -229,9 +232,9 @@ namespace ShareSuite
                 orig(self);
                 return;
             }
-            
+
             var bodyMaster = self.GetFieldValue<CharacterMaster>("bodyMaster");
-            var cost = (int)(GoldGatFire.baseMoneyCostPerBullet * 
+            var cost = (int)(GoldGatFire.baseMoneyCostPerBullet *
                              (1f + (TeamManager.instance.GetTeamLevel(bodyMaster.teamIndex) - 1f) * 0.25f));
             SharedMoneyValue = Math.Max(SharedMoneyValue - cost, 0);
             orig(self);
@@ -240,7 +243,7 @@ namespace ShareSuite
         public static void RemoveGoldGatMoneyLine(ILContext il)
         {
             var cursor = new ILCursor(il);
-            
+
             cursor.GotoNext(
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(out _),
