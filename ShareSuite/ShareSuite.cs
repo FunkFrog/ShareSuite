@@ -19,7 +19,7 @@ namespace ShareSuite
     {
         #region ConfigWrapper init
 
-        public static ConfigEntry<bool> 
+        public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
             WhiteItemsShared,
@@ -40,7 +40,7 @@ namespace ShareSuite
             RandomizeSharedPickups,
             LunarItemsRandomized,
             BossItemsRandomized,
-            OverrideMultiplayerCheck; 
+            OverrideMultiplayerCheck;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -56,7 +56,8 @@ namespace ShareSuite
             if (!NetworkServer.active
                 || !ModIsEnabled.Value
                 || !MoneyIsShared.Value
-                || MoneySharingHooks.MapTransitionActive) return;
+                || MoneySharingHooks.MapTransitionActive
+                || !GeneralHooks.IsMultiplayer()) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
@@ -173,7 +174,7 @@ namespace ShareSuite
                 "Toggles detailed item pickup messages with information on who picked the item up and" +
                 " who all received the item."
             );
-            
+
             DropBlacklistedEquipmentOnShare = Config.Bind(
                 "Balance",
                 "DropBlacklistedEquipmentOnShare",
@@ -245,7 +246,7 @@ namespace ShareSuite
                 "OverrideBossLootScaling",
                 true,
                 "Toggles override of the scalar of boss loot drops to your configured balance."
-            );      
+            );
 
             BossLootCredit = Config.Bind(
                 "Balance",
@@ -573,7 +574,7 @@ namespace ShareSuite
                 Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
             }
         }
-        
+
         //DropBlacklistedEquipmentOnShare
         [ConCommand(commandName = "ss_DropBlacklistedEquipmentOnShare", flags = ConVarFlags.None,
             helpText = "Changes the way shared equipment handles blacklisted equipment.")]
@@ -817,7 +818,7 @@ namespace ShareSuite
                 Debug.Log($"Sacrifice fix set to {SacrificeFixEnabled.Value}");
             }
         }
-        
+
         // DeadPlayersGetItems
         [ConCommand(commandName = "ss_DeadPlayersGetItems", flags = ConVarFlags.None,
             helpText = "Modifies whether items are shared to dead players.")]
