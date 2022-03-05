@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using R2API.Utils;
 
 namespace ShareSuite
 {
@@ -17,8 +18,8 @@ namespace ShareSuite
 
         internal static void Hook()
         {
-            //On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
-            IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
+            On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
+            //IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
@@ -27,27 +28,34 @@ namespace ShareSuite
 
         internal static void UnHook()
         {
-            //On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
-            IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
+            On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
+            //IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
             On.RoR2.Util.GetExpAdjustedDropChancePercent -= GetExpAdjustedDropChancePercent;
         }
 
-        private static void BossGroup_DropRewards(ILContext il)
+        private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup group)
         {
-            var cursor = new ILCursor(il);
-
-            cursor.GotoNext(
-                x => x.MatchLdloc(0),
-                x => x.MatchMul(),
-                x => x.MatchStloc(3),
-                x => x.MatchLdcR4(out _)
-            );
-            cursor.Index++;
-            cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
+            group.scaleRewardsByPlayerCount = false;
+            group.bonusRewardCount += _bossItems;
+            orig(group);
         }
+        // Depricated
+        // private static void BossGroup_DropRewards(ILContext il)
+        // {
+        //     var cursor = new ILCursor(il);
+        //
+        //     cursor.GotoNext(
+        //         x => x.MatchLdloc(0),
+        //         x => x.MatchMul(),
+        //         x => x.MatchStloc(3),
+        //         x => x.MatchLdcR4(out _)
+        //     );
+        //     cursor.Index++;
+        //     cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
+        // }
 
         private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
         {

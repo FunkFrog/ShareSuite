@@ -17,7 +17,12 @@ namespace ShareSuite
         // Red (previously bc2525) / Blue / Yellow / Green / Orange / Cyan / Pink / Deep Purple
         private static readonly string[] PlayerColors =
             {"f23030", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea"};
-
+        
+        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig, 
+            CharacterMaster master, PickupIndex pickupIndex)
+        {
+            if (!ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
+        }
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef)
         {
             var body = player.hasBody ? player.GetBody() : null;

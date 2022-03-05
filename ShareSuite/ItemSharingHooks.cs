@@ -27,7 +27,7 @@ namespace ShareSuite
             On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
-            IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
+            //IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
         }
 
         public static void Hook()
@@ -41,7 +41,7 @@ namespace ShareSuite
             On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
-            if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.AttemptGrant += RemoveDefaultPickupMessage;
+            //if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.AttemptGrant += RemoveDefaultPickupMessage;
         }
 
         private static PickupIndex ItemLock(On.RoR2.PickupCatalog.orig_FindPickupIndex_string orig, string pickupName)
@@ -181,20 +181,21 @@ namespace ShareSuite
             ChatHandler.SendRichPickupMessage(master, item);
         }
 
-        public static void RemoveDefaultPickupMessage(ILContext il)
-        {
-            var cursor = new ILCursor(il);
-
-            cursor.GotoNext(
-                x => x.MatchLdarg(2),
-                x => x.MatchCallvirt(out _),
-                x => x.MatchLdarg(0),
-                x => x.MatchLdfld(out _),
-                x => x.MatchCall(out _)
-            );
-
-            cursor.RemoveRange(5);
-        }
+        // Depricated
+        // public static void RemoveDefaultPickupMessage(ILContext il)
+        // {
+        //     var cursor = new ILCursor(il);
+        //
+        //     cursor.GotoNext(
+        //         x => x.MatchLdarg(2),
+        //         x => x.MatchCallvirt(out _),
+        //         x => x.MatchLdarg(0),
+        //         x => x.MatchLdfld(out _),
+        //         x => x.MatchCall(out _)
+        //     );
+        //
+        //     cursor.RemoveRange(5);
+        // }
 
         private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig,
             Chat.PlayerPickupChatMessage self)

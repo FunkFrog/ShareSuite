@@ -9,6 +9,7 @@ using UnityEngine.Networking;
 
 // ReSharper disable UnusedMember.Local
 
+[assembly: HG.Reflection.SearchableAttribute.OptIn]
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
@@ -557,19 +558,7 @@ namespace ShareSuite
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
-            {
-                if (RichMessagesEnabled.Value != valid.Value)
-                {
-                    if (RichMessagesEnabled.Value && !valid.Value)
-                    {
-                        IL.RoR2.GenericPickupController.AttemptGrant -= ItemSharingHooks.RemoveDefaultPickupMessage;
-                    }
-                    else
-                    {
-                        IL.RoR2.GenericPickupController.AttemptGrant += ItemSharingHooks.RemoveDefaultPickupMessage;
-                    }
-                }
-
+            { 
                 RichMessagesEnabled.Value = valid.Value;
                 Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
             }
