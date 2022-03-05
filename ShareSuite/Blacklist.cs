@@ -86,8 +86,8 @@ namespace ShareSuite
                 (_availableTier1DropList, Run.instance.availableTier1DropList),
                 (_availableTier2DropList, Run.instance.availableTier2DropList),
                 (_availableTier3DropList, Run.instance.availableTier3DropList),
-                (_availableLunarDropList, Run.instance.availableLunarDropList),
-                (_availableBossDropList , Run.instance.availableBossDropList ),
+                (_availableLunarDropList, Run.instance.availableLunarItemDropList),
+                (_availableBossDropList , Run.instance.availableBossDropList),
             };
             foreach (var (availMinusBlack, source) in pairs)
             {
