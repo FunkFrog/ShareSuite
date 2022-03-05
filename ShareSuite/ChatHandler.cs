@@ -8,6 +8,15 @@ namespace ShareSuite
 {
     public static class ChatHandler
     {
+        public static void UnHook()
+        {
+            On.RoR2.GenericPickupController.SendPickupMessage -= RemoveDefaultPickupMessage;
+        }
+
+        public static void Hook()
+        {
+            On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
+        }
         // ReSharper disable twice ArrangeTypeMemberModifiers
         private const string GrayColor = "7e91af";
         private const string ErrorColor = "ff0000";

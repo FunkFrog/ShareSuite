@@ -94,6 +94,7 @@ namespace ShareSuite
                 MoneySharingHooks.UnHook();
                 ItemSharingHooks.UnHook();
                 EquipmentSharingHooks.UnHook();
+                ChatHandler.UnHook();
                 _previouslyEnabled = false;
             }
 
@@ -104,6 +105,7 @@ namespace ShareSuite
                 MoneySharingHooks.Hook();
                 ItemSharingHooks.Hook();
                 EquipmentSharingHooks.Hook();
+                ChatHandler.Hook();
             }
         }
 
