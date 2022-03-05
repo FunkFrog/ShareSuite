@@ -27,8 +27,8 @@ namespace ShareSuite
             On.RoR2.SceneExitController.Begin -= SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
-            On.RoR2.Networking.GameNetworkManager.OnClientConnect -= GoldGatConnect;
-            On.RoR2.Networking.GameNetworkManager.OnClientDisconnect -= GoldGatDisconnect;
+            On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
+            On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -44,8 +44,8 @@ namespace ShareSuite
             On.RoR2.SceneExitController.Begin += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
-            On.RoR2.Networking.GameNetworkManager.OnClientConnect += GoldGatConnect;
-            On.RoR2.Networking.GameNetworkManager.OnClientDisconnect += GoldGatDisconnect;
+            On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
+            On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
         }
@@ -254,14 +254,14 @@ namespace ShareSuite
         }
 
 
-        private static void GoldGatDisconnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientDisconnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
+        private static void GoldGatDisconnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientDisconnect orig, RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
         {
             var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
             ToggleGoldGat(wasMultiplayer);
         }
 
-        private static void GoldGatConnect(On.RoR2.Networking.GameNetworkManager.orig_OnClientConnect orig, RoR2.Networking.GameNetworkManager self, NetworkConnection conn)
+        private static void GoldGatConnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientConnect orig, RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
         {
             var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
