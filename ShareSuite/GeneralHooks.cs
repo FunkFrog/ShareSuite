@@ -39,7 +39,7 @@ namespace ShareSuite
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup group)
         {
             group.scaleRewardsByPlayerCount = false;
-            group.bonusRewardCount += _bossItems;
+            group.bonusRewardCount = _bossItems - 1; // Rewards are 1 + bonusRewardCount
             orig(group);
         }
         // Depricated
