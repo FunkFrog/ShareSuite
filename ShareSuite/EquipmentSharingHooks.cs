@@ -10,22 +10,22 @@ namespace ShareSuite
     {
         public static void UnHook()
         {
-            On.RoR2.GenericPickupController.GrantEquipment -= OnGrantEquipment;
+            On.RoR2.GenericPickupController.AttemptGrant -= OnGrantEquipment;
         }
 
         public static void Hook()
         {
-            On.RoR2.GenericPickupController.GrantEquipment += OnGrantEquipment;
+            On.RoR2.GenericPickupController.AttemptGrant += OnGrantEquipment;
         }
 
-        private static void OnGrantEquipment(On.RoR2.GenericPickupController.orig_GrantEquipment orig,
-            GenericPickupController self, CharacterBody body, Inventory inventory)
+        private static void OnGrantEquipment(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
+            GenericPickupController self, CharacterBody body)
         {
             #region Sharedequipment
             
             if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
             {
-                orig(self, body, inventory);
+                orig(self, body);
                 return;
             }
 
@@ -38,7 +38,7 @@ namespace ShareSuite
             ChatHandler.SendPickupMessage(body.master, self.pickupIndex);
             
             // Give the equipment to the picker 
-            inventory.SetEquipmentIndex(newEquip);
+            body.inventory.SetEquipmentIndex(newEquip);
             
             // Destroy the object
             Object.Destroy(self.gameObject);

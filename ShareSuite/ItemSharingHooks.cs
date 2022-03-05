@@ -20,28 +20,28 @@ namespace ShareSuite
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
-            On.RoR2.GenericPickupController.GrantItem -= OnGrantItem;
+            On.RoR2.GenericPickupController.AttemptGrant -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
             On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
             On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
-            IL.RoR2.GenericPickupController.GrantItem -= RemoveDefaultPickupMessage;
+            IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
         }
 
         public static void Hook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
-            On.RoR2.GenericPickupController.GrantItem += OnGrantItem;
+            On.RoR2.GenericPickupController.AttemptGrant += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
             On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
             On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value) IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
-            if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.GrantItem += RemoveDefaultPickupMessage;
+            if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.AttemptGrant += RemoveDefaultPickupMessage;
         }
 
         private static PickupIndex ItemLock(On.RoR2.PickupCatalog.orig_FindPickupIndex_string orig, string pickupName)
@@ -113,15 +113,15 @@ namespace ShareSuite
             }
         }
 
-        private static void OnGrantItem(On.RoR2.GenericPickupController.orig_GrantItem orig,
-            GenericPickupController self, CharacterBody body, Inventory inventory)
+        private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
+            GenericPickupController self, CharacterBody body)
         {
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
 
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
-            var master = body?.master ?? inventory?.GetComponent<CharacterMaster>();
+            var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
             if ((//ShareSuite.RandomizeSharedPickups.Value ||
                  !Blacklist.HasItem(item.itemIndex))
@@ -137,7 +137,7 @@ namespace ShareSuite
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {
                     // Ensure character is not original player that picked up item
-                    if (player.inventory == inventory) continue;
+                    if (body != null && player.inventory == body.inventory) continue;
 
                     // Do not reward dead players if not required
                     if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer()) continue;
@@ -171,13 +171,13 @@ namespace ShareSuite
 
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
-                    orig(self, body, inventory);
+                    orig(self, body);
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
                     return;
                 }
             }
 
-            orig(self, body, inventory);
+            orig(self, body);
             ChatHandler.SendRichPickupMessage(master, item);
         }
 

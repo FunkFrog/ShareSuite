@@ -562,11 +562,11 @@ namespace ShareSuite
                 {
                     if (RichMessagesEnabled.Value && !valid.Value)
                     {
-                        IL.RoR2.GenericPickupController.GrantItem -= ItemSharingHooks.RemoveDefaultPickupMessage;
+                        IL.RoR2.GenericPickupController.AttemptGrant -= ItemSharingHooks.RemoveDefaultPickupMessage;
                     }
                     else
                     {
-                        IL.RoR2.GenericPickupController.GrantItem += ItemSharingHooks.RemoveDefaultPickupMessage;
+                        IL.RoR2.GenericPickupController.AttemptGrant += ItemSharingHooks.RemoveDefaultPickupMessage;
                     }
                 }
 
