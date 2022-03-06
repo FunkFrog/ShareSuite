@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
-using Console = System.Console;
 
 namespace ShareSuite
 {

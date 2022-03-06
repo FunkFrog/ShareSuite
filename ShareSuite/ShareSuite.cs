@@ -44,7 +44,7 @@ namespace ShareSuite
             BossItemsRandomized,
             VoidItemsRandomized,
             OverrideMultiplayerCheck,
-            Viewed;
+            ViewedStartupMessage;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -288,7 +288,14 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-
+            
+            ViewedStartupMessage = Config.Bind(
+                "Debug",
+                "ViewedStartupMessage",
+                false,
+                "Keeps track of whether or not you've seen the boot message the first time. Prevents spam."
+            );
+            
             VoidFieldLootCredit = Config.Bind(
                 "Balance",
                 "VoidFieldLootCredit",

@@ -11,14 +11,18 @@ namespace ShareSuite
         public static void UnHook()
         {
             On.RoR2.GenericPickupController.SendPickupMessage -= RemoveDefaultPickupMessage;
+            On.RoR2.Chat.SendPlayerConnectedMessage -= SendIntroMessage;
         }
 
         public static void Hook()
         {
             On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
+            On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
         // ReSharper disable twice ArrangeTypeMemberModifiers
         private const string GrayColor = "7e91af";
+        private const string RedColor = "ed4c40";
+        private const string LinkColor = "5cb1ed";
         private const string ErrorColor = "ff0000";
 
         private const string NotSharingColor = "f07d6e";
@@ -26,7 +30,35 @@ namespace ShareSuite
         // Red (previously bc2525) / Blue / Yellow / Green / Orange / Cyan / Pink / Deep Purple
         private static readonly string[] PlayerColors =
             {"f23030", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea"};
-        
+
+        public static void SendIntroMessage(On.RoR2.Chat.orig_SendPlayerConnectedMessage orig, NetworkUser user)
+        {
+            orig(user);
+
+            if (ShareSuite.ViewedStartupMessage.Value) return;
+            else ShareSuite.ViewedStartupMessage.Value = true;
+
+            var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
+                                         + $"<color=#{GrayColor}> display again!) </color>";
+            var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>" 
+                          + $"<color=#{RedColor}>ShareSuite 2.6</color><color=#{GrayColor}>! We're currently"
+                          + " trying to get a better idea of how people use our mod. If you wouldn't mind taking 2 minutes to"
+                          + $" fill out this form, it would be </color><color=#{RedColor}>invaluable</color>" 
+                          + $"<color=#{GrayColor}> in helping us improve the mod!</color>";
+            var linkMessage = $"<color=#{LinkColor}>https://tinyurl.com/sharesuite</color>    <color=#{GrayColor}>(Type into browser)</color>";
+            var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
+            
+            var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
+            timer.Elapsed += delegate
+            {
+                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = notRepeatedMessage});
+                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = message});
+                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = linkMessage});
+                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = clickChatBox});
+            };
+            timer.AutoReset = false;
+            timer.Start();
+        }
         public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig, 
             CharacterMaster master, PickupIndex pickupIndex)
         {
