@@ -111,7 +111,7 @@ namespace ShareSuite
         {
             #region Sharedmoney
 
-            if (ShareSuite.MoneyIsShared.Value)
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
             {
                 switch (self.costType)
                 {
