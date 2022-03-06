@@ -1,5 +1,9 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`2.0.1`
+- Fixed an issue regarding Scavengers dropping less items than intended.
+- Fixed an issue where other mods were unable to access shared money while inside the bazaar.
+
 `2.0.0`
 - The mod turns 1 year old in a handful of days! Happy birthday, ShareSuite! Thank you, everyone, for your continued support of the mod <3
 - **MAJOR** Full completion of the Shared Equipment system
