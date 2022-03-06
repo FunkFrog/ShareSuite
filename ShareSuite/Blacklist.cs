@@ -10,12 +10,14 @@ namespace ShareSuite
 
         private static ItemMask _items = new ItemMask();
         private static EquipmentMask _equipment = new EquipmentMask();
+
         // ReSharper disable InconsistentNaming
         private static readonly List<PickupIndex> _availableTier1DropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableTier2DropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableTier3DropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableLunarDropList = new List<PickupIndex>();
         private static readonly List<PickupIndex> _availableBossDropList = new List<PickupIndex>();
+
         private static readonly List<PickupIndex> _availableVoidDropList = new List<PickupIndex>();
         // ReSharper enable InconsistentNaming
 
@@ -75,14 +77,14 @@ namespace ShareSuite
                 Recalculate();
                 return;
             }
-            
+
             if (_cachedAvailableItems.Equals(Run.instance.availableItems))
                 return;
 
             _cachedAvailableItems = Run.instance.availableItems;
 
             // Available items have changed; recalculate available items minus blacklists
-            
+
             LoadBlackListItems();
             LoadBlackListEquipment();
 
@@ -92,13 +94,14 @@ namespace ShareSuite
                 .Concat(Run.instance.availableVoidTier3DropList)
                 .Concat(Run.instance.availableVoidBossDropList);
 
-            var pairs = new[] {
+            var pairs = new[]
+            {
                 (_availableTier1DropList, Run.instance.availableTier1DropList),
                 (_availableTier2DropList, Run.instance.availableTier2DropList),
                 (_availableTier3DropList, Run.instance.availableTier3DropList),
                 (_availableLunarDropList, Run.instance.availableLunarItemDropList),
-                (_availableBossDropList , Run.instance.availableBossDropList),
-                (_availableVoidDropList , combinedAvailableVoidDropList)
+                (_availableBossDropList, Run.instance.availableBossDropList),
+                (_availableVoidDropList, combinedAvailableVoidDropList)
             };
             foreach (var (availMinusBlack, source) in pairs)
             {

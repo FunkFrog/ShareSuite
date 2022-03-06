@@ -22,7 +22,7 @@ namespace ShareSuite
             GenericPickupController self, CharacterBody body)
         {
             #region Sharedequipment
-            
+
             if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
             {
                 orig(self, body);
@@ -36,13 +36,13 @@ namespace ShareSuite
 
             // Send the pickup message
             ChatHandler.SendPickupMessage(body.master, self.pickupIndex);
-            
+
             // Give the equipment to the picker 
             body.inventory.SetEquipmentIndex(newEquip);
-            
+
             // Destroy the object
             Object.Destroy(self.gameObject);
-            
+
             // If the old equipment was not shared and the new one is, drop the blacklisted equipment and any other
             // shared equipment that the other players have
             if (!EquipmentShared(oldEquip) && EquipmentShared(newEquip))
@@ -52,19 +52,20 @@ namespace ShareSuite
             }
             // If the old equipment was shared and the new one isn't, but the picker is the only one alive with the
             // shared equipment, drop it on the ground and return
-            else if (EquipmentShared(oldEquip) && !EquipmentShared(newEquip) && GetLivingPlayersWithEquipment(oldEquip) < 1
-                      || !EquipmentShared(oldEquip) && !EquipmentShared(newEquip))
+            else if (EquipmentShared(oldEquip) && !EquipmentShared(newEquip) &&
+                     GetLivingPlayersWithEquipment(oldEquip) < 1
+                     || !EquipmentShared(oldEquip) && !EquipmentShared(newEquip))
             {
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
                 return;
             }
             // If the new equip is shared, create a droplet of the old one.
-            else if (EquipmentShared(newEquip)) 
+            else if (EquipmentShared(newEquip))
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
             // If the equipment they're picking up is not shared and someone else is alive with the shared equipment,
             // return
             else return;
-            
+
             // Loop over everyone who has an inventory and isn't the picker
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
                 .Where(p => p.inventory && p != body.master))
@@ -80,6 +81,7 @@ namespace ShareSuite
                     {
                         continue;
                     }
+
                     // Create a droplet of their current blacklisted equipment on the ground
                     var transform = player.GetBodyObject().transform;
                     var pickupIndex = PickupCatalog.FindPickupIndex(playerOrigEquipment);
@@ -94,11 +96,11 @@ namespace ShareSuite
                 // Sync the equipment if they're playing MUL-T
                 SyncToolbotEquip(player, ref newEquip);
             }
-            
+
             #endregion
         }
 
-        private static void DropAllOtherSharedEquipment(GenericPickupController self, CharacterBody body, 
+        private static void DropAllOtherSharedEquipment(GenericPickupController self, CharacterBody body,
             EquipmentIndex originalEquip)
         {
             var droppedEquipment = new List<EquipmentIndex>();
@@ -106,7 +108,7 @@ namespace ShareSuite
                 .Where(p => p.inventory && p != body.master))
             {
                 var playerEquipment = player.inventory.GetEquipmentIndex();
-                if (!EquipmentShared(playerEquipment) || droppedEquipment.Contains(playerEquipment) || 
+                if (!EquipmentShared(playerEquipment) || droppedEquipment.Contains(playerEquipment) ||
                     playerEquipment == originalEquip) continue;
                 CreateDropletIfExists(GetPickupIndex(playerEquipment), self.transform.position);
                 droppedEquipment.Add(playerEquipment);
@@ -115,8 +117,9 @@ namespace ShareSuite
 
         private static PickupIndex GetPickupIndex(EquipmentIndex originalEquip)
         {
-            return originalEquip != EquipmentIndex.None ? 
-                PickupCatalog.GetPickupDef(PickupCatalog.FindPickupIndex(originalEquip)).pickupIndex : PickupIndex.none;
+            return originalEquip != EquipmentIndex.None
+                ? PickupCatalog.GetPickupDef(PickupCatalog.FindPickupIndex(originalEquip)).pickupIndex
+                : PickupIndex.none;
         }
 
         public static void RemoveAllUnBlacklistedEquipment()
@@ -164,6 +167,7 @@ namespace ShareSuite
                 .Where(p => p.inventory && !p.IsDeadAndOutOfLivesServer())
                 .Count(master => master.inventory.currentEquipmentIndex == originalEquip);
         }
+
         /// <summary>
         /// This function is currently ineffective, but may be later extended to quickly set a validator
         /// on equipments to narrow them down to a set of ranges beyond just blacklisting.

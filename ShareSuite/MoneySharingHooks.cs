@@ -47,12 +47,15 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
 
-            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
+                IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
         }
 
-        private static void ShareTomeMoney(On.RoR2.MoneyPickup.orig_OnTriggerStay orig, MoneyPickup self, Collider other)
+        private static void ShareTomeMoney(On.RoR2.MoneyPickup.orig_OnTriggerStay orig, MoneyPickup self,
+            Collider other)
         {
             #region Sharedmoney
+
             if ((self.baseObject == null) || (!ShareSuite.MoneyIsShared.Value))
             {
                 orig(self, other);
@@ -79,6 +82,7 @@ namespace ShareSuite
             if (!ShareSuite.MoneyScalarEnabled.Value
                 || !NetworkServer.active) return;
             AddToSharedMoneyValue(amount);
+
             #endregion
         }
 
@@ -221,7 +225,7 @@ namespace ShareSuite
             orig(self);
         }
 
-        private static void GoldGatFireHook(On.EntityStates.GoldGat.GoldGatFire.orig_FireBullet orig, 
+        private static void GoldGatFireHook(On.EntityStates.GoldGat.GoldGatFire.orig_FireBullet orig,
             GoldGatFire self)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
@@ -229,10 +233,10 @@ namespace ShareSuite
                 orig(self);
                 return;
             }
-            
+
             var bodyMaster = self.GetFieldValue<CharacterMaster>("bodyMaster");
-            var cost = (int)(GoldGatFire.baseMoneyCostPerBullet * 
-                             (1f + (TeamManager.instance.GetTeamLevel(bodyMaster.teamIndex) - 1f) * 0.25f));
+            var cost = (int) (GoldGatFire.baseMoneyCostPerBullet *
+                              (1f + (TeamManager.instance.GetTeamLevel(bodyMaster.teamIndex) - 1f) * 0.25f));
             SharedMoneyValue = Math.Max(SharedMoneyValue - cost, 0);
             orig(self);
         }
@@ -240,7 +244,7 @@ namespace ShareSuite
         public static void RemoveGoldGatMoneyLine(ILContext il)
         {
             var cursor = new ILCursor(il);
-            
+
             cursor.GotoNext(
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(out _),
@@ -254,14 +258,16 @@ namespace ShareSuite
         }
 
 
-        private static void GoldGatDisconnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientDisconnect orig, RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
+        private static void GoldGatDisconnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientDisconnect orig,
+            RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
         {
             var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
             ToggleGoldGat(wasMultiplayer);
         }
 
-        private static void GoldGatConnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientConnect orig, RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
+        private static void GoldGatConnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientConnect orig,
+            RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
         {
             var wasMultiplayer = GeneralHooks.IsMultiplayer();
             orig(self, conn);
@@ -372,7 +378,10 @@ namespace ShareSuite
         private static void AddToSharedMoneyValue(float goldReward)
         {
             //Apply gold rewards to shared money pool
-            SharedMoneyValue = Math.Max(SharedMoneyValue + (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
+            SharedMoneyValue =
+                Math.Max(
+                    SharedMoneyValue +
+                    (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
         }
 
         public static void SetTeleporterActive(bool active)

@@ -10,6 +10,7 @@ using UnityEngine.Networking;
 // ReSharper disable UnusedMember.Local
 
 [assembly: HG.Reflection.SearchableAttribute.OptIn]
+
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
@@ -224,7 +225,7 @@ namespace ShareSuite
                 false,
                 "Toggles randomizing Void items in RandomizeSharedPickups mode."
             );
-            
+
             PrinterCauldronFixEnabled = Config.Bind(
                 "Balance",
                 "PrinterCauldronFix",
@@ -288,14 +289,14 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-            
+
             ViewedStartupMessage = Config.Bind(
                 "Debug",
                 "ViewedStartupMessage",
                 false,
                 "Keeps track of whether or not you've seen the boot message the first time. Prevents spam."
             );
-            
+
             VoidFieldLootCredit = Config.Bind(
                 "Balance",
                 "VoidFieldLootCredit",
@@ -344,7 +345,7 @@ namespace ShareSuite
 
         #region CommandParser
 
-        #pragma warning disable IDE0051 //Commands usually aren't called from code.
+#pragma warning disable IDE0051 //Commands usually aren't called from code.
 
         //TODO Add more information when you send the commands with no args
 
@@ -392,7 +393,8 @@ namespace ShareSuite
                     }
                     else
                     {
-                        if (GeneralHooks.IsMultiplayer()) IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
+                        if (GeneralHooks.IsMultiplayer())
+                            IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
                     }
                 }
 
@@ -568,7 +570,7 @@ namespace ShareSuite
                 Debug.Log($"Boss item sharing set to {BossItemsShared.Value}.");
             }
         }
-        
+
         // BossItemsShared
         [ConCommand(commandName = "ss_VoidItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether void items are shared or not.")]
@@ -605,7 +607,7 @@ namespace ShareSuite
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
             else
-            { 
+            {
                 RichMessagesEnabled.Value = valid.Value;
                 Debug.Log($"Rich Messages Enabled set to {RichMessagesEnabled.Value}.");
             }
@@ -917,8 +919,8 @@ namespace ShareSuite
 
         private static bool? TryGetBool(string arg)
         {
-            string[] posStr = { "yes", "true", "1" };
-            string[] negStr = { "no", "false", "0", "-1" };
+            string[] posStr = {"yes", "true", "1"};
+            string[] negStr = {"no", "false", "0", "-1"};
 
             if (posStr.Contains(arg.ToLower())) return true;
             if (negStr.Contains(arg.ToLower())) return false;
@@ -926,7 +928,7 @@ namespace ShareSuite
             return new bool?();
         }
 
-        #pragma warning restore IDE0051
+#pragma warning restore IDE0051
 
         #endregion CommandParser
     }

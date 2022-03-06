@@ -19,6 +19,7 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
+
         // ReSharper disable twice ArrangeTypeMemberModifiers
         private const string GrayColor = "7e91af";
         private const string RedColor = "ed4c40";
@@ -39,15 +40,16 @@ namespace ShareSuite
             else ShareSuite.ViewedStartupMessage.Value = true;
 
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
-                                         + $"<color=#{GrayColor}> display again!) </color>";
-            var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>" 
+                                     + $"<color=#{GrayColor}> display again!) </color>";
+            var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
                           + $"<color=#{RedColor}>ShareSuite 2.6</color><color=#{GrayColor}>! We're currently"
                           + " trying to get a better idea of how people use our mod. If you wouldn't mind taking 2 minutes to"
-                          + $" fill out this form, it would be </color><color=#{RedColor}>invaluable</color>" 
+                          + $" fill out this form, it would be </color><color=#{RedColor}>invaluable</color>"
                           + $"<color=#{GrayColor}> in helping us improve the mod!</color>";
-            var linkMessage = $"<color=#{LinkColor}>https://tinyurl.com/sharesuite</color>    <color=#{GrayColor}>(Type into browser)</color>";
+            var linkMessage =
+                $"<color=#{LinkColor}>https://tinyurl.com/sharesuite</color>    <color=#{GrayColor}>(Type into browser)</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
-            
+
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
             timer.Elapsed += delegate
             {
@@ -59,11 +61,13 @@ namespace ShareSuite
             timer.AutoReset = false;
             timer.Start();
         }
-        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig, 
+
+        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
             CharacterMaster master, PickupIndex pickupIndex)
         {
             if (!ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
+
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef)
         {
             var body = player.hasBody ? player.GetBody() : null;
@@ -142,21 +146,23 @@ namespace ShareSuite
 
             var remainingPlayers = pickupIndices.Count;
             var pickupMessage = "";
-            
+
 
             foreach (var index in pickupIndices)
             {
                 var pickupColor = index.Value.baseColor;
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
-                var itemCount = index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex);
+                var itemCount =
+                    index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
                     if (remainingPlayers > 1)
                     {
                         pickupMessage += $"<color=#{GrayColor}>,</color> ";
-                    } else if (remainingPlayers == 1)
+                    }
+                    else if (remainingPlayers == 1)
                     {
                         pickupMessage += $"<color=#{GrayColor}>, and</color> ";
                     }

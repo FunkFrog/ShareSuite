@@ -13,8 +13,12 @@ namespace ShareSuite
     {
         private static int _sacrificeOffset = 1;
         private static int _bossItems = 1;
-        private static List<string> NoInteractibleOverrideScenes = new List<string>{"MAP_BAZAAR_TITLE", 
-            "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"};
+
+        private static List<string> NoInteractibleOverrideScenes = new List<string>
+        {
+            "MAP_BAZAAR_TITLE",
+            "MAP_ARENA_TITLE", "MAP_LIMBO_TITLE", "MAP_MYSTERYSPACE_TITLE"
+        };
 
         internal static void Hook()
         {
@@ -57,7 +61,8 @@ namespace ShareSuite
         //     cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
         // }
 
-        private static void SetSacrificeOffset(On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
+        private static void SetSacrificeOffset(
+            On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
         {
             _sacrificeOffset = 2;
             orig(sceneDirector);
@@ -75,7 +80,9 @@ namespace ShareSuite
         private static void OverrideBossLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
             TeleporterInteraction self, Interactor activator)
         {
-            _bossItems = ShareSuite.OverrideBossLootScalingEnabled.Value ? ShareSuite.BossLootCredit.Value : Run.instance.participatingPlayerCount;
+            _bossItems = ShareSuite.OverrideBossLootScalingEnabled.Value
+                ? ShareSuite.BossLootCredit.Value
+                : Run.instance.participatingPlayerCount;
             orig(self, activator);
         }
 
@@ -85,7 +92,8 @@ namespace ShareSuite
             return ShareSuite.OverrideMultiplayerCheck.Value || PlayerCharacterMasterController.instances.Count > 1;
         }
 
-        private static void InteractibleCreditOverride(On.RoR2.SceneDirector.orig_PlaceTeleporter orig, SceneDirector self)
+        private static void InteractibleCreditOverride(On.RoR2.SceneDirector.orig_PlaceTeleporter orig,
+            SceneDirector self)
         {
             orig(self);
 
@@ -110,18 +118,18 @@ namespace ShareSuite
 
                 // The flat creditModifier slightly adjust interactables based on the amount of players.
                 // We do not want to reduce the amount of interactables too much for very high amounts of players (to support multiplayer mods).
-                var creditModifier = (float)(0.95 + clampPlayerCount * 0.05);
+                var creditModifier = (float) (0.95 + clampPlayerCount * 0.05);
 
                 // In addition to our flat modifier, we additionally introduce a stage modifier.
                 // This reduces player strength early game (as having more bodies gives a flat power increase early game).
-                creditModifier *= (float)Math.Max(
-                                        1.0 + 0.1 * Math.Min(
-                                            Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2
-                                            , 3)
-                                        , 1.0);
+                creditModifier *= (float) Math.Max(
+                    1.0 + 0.1 * Math.Min(
+                        Run.instance.participatingPlayerCount * 2 - Run.instance.stageClearCount - 2
+                        , 3)
+                    , 1.0);
 
                 // We must apply the transformation to interactableCredit otherwise bonusIntractableCreditObject will be overwritten.
-                interactableCredit = (int)(interactableCredit / creditModifier);
+                interactableCredit = (int) (interactableCredit / creditModifier);
 
                 // Fetch the amount of bonus interactables we may play with. We have to do this after our first math block,
                 // as we do not want to divide bonuscredits twice.
@@ -138,25 +146,31 @@ namespace ShareSuite
             }
 
             // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
-            if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance 
-                    || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
-                self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) + ShareSuite.InteractablesOffset.Value;
+            if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance
+                                                                  || !NoInteractibleOverrideScenes.Contains(
+                                                                      SceneInfo.instance.sceneDef.nameToken)))
+                self.interactableCredit =
+                    (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) +
+                    ShareSuite.InteractablesOffset.Value;
 
             if (ShareSuite.MoneyIsShared.Value && Run.instance.stageClearCount != 0)
             {
                 MoneySharingHooks.SharedMoneyValue = 15;
             }
+
             #endregion
 
             _sacrificeOffset = 1;
         }
 
-        private static float GetExpAdjustedDropChancePercent(On.RoR2.Util.orig_GetExpAdjustedDropChancePercent orig, float baseChancePercent, GameObject characterBodyObject)
+        private static float GetExpAdjustedDropChancePercent(On.RoR2.Util.orig_GetExpAdjustedDropChancePercent orig,
+            float baseChancePercent, GameObject characterBodyObject)
         {
             if (ShareSuite.SacrificeFixEnabled.Value)
             {
                 baseChancePercent /= PlayerCharacterMasterController.instances.Count;
             }
+
             return orig(baseChancePercent, characterBodyObject);
         }
     }
