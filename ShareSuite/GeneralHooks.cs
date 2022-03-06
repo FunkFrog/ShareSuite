@@ -142,6 +142,10 @@ namespace ShareSuite
                     || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
                 self.interactableCredit = (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) + ShareSuite.InteractablesOffset.Value;
 
+            if (ShareSuite.MoneyIsShared.Value && Run.instance.stageClearCount != 0)
+            {
+                MoneySharingHooks.SharedMoneyValue = 15;
+            }
             #endregion
 
             _sacrificeOffset = 1;
