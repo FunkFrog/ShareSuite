@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
-using On.RoR2.Audio;
 
 namespace ShareSuite
 {
@@ -348,6 +347,14 @@ namespace ShareSuite
                         return ShareSuite.LunarItemsShared.Value;
                     case ItemTier.Boss:
                         return ShareSuite.BossItemsShared.Value;
+                    case ItemTier.VoidTier1:
+                        return ShareSuite.VoidItemsShared.Value;
+                    case ItemTier.VoidTier2:
+                        return ShareSuite.VoidItemsShared.Value;
+                    case ItemTier.VoidTier3:
+                        return ShareSuite.VoidItemsShared.Value;
+                    case ItemTier.VoidBoss:
+                        return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.NoTier:
                         break;
                     default:

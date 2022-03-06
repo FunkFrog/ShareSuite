@@ -29,6 +29,7 @@ namespace ShareSuite
             EquipmentShared,
             LunarItemsShared,
             BossItemsShared,
+            VoidItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -41,6 +42,7 @@ namespace ShareSuite
             RandomizeSharedPickups,
             LunarItemsRandomized,
             BossItemsRandomized,
+            VoidItemsRandomized,
             OverrideMultiplayerCheck;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
@@ -170,6 +172,13 @@ namespace ShareSuite
                 "Toggles item sharing for boss (yellow color) items."
             );
 
+            VoidItemsShared = Config.Bind(
+                "Settings",
+                "VoidItemsShared",
+                false,
+                "Toggles item sharing for void (purple/corrupted) items."
+            );
+
             RichMessagesEnabled = Config.Bind(
                 "Settings",
                 "RichMessagesEnabled",
@@ -208,6 +217,13 @@ namespace ShareSuite
                 "Toggles randomizing Boss items in RandomizeSharedPickups mode."
             );
 
+            VoidItemsRandomized = Config.Bind(
+                "Balance",
+                "VoidItemsRandomized",
+                false,
+                "Toggles randomizing Void items in RandomizeSharedPickups mode."
+            );
+            
             PrinterCauldronFixEnabled = Config.Bind(
                 "Balance",
                 "PrinterCauldronFix",
@@ -542,6 +558,27 @@ namespace ShareSuite
             {
                 BossItemsShared.Value = valid.Value;
                 Debug.Log($"Boss item sharing set to {BossItemsShared.Value}.");
+            }
+        }
+        
+        // BossItemsShared
+        [ConCommand(commandName = "ss_VoidItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether void items are shared or not.")]
+        private static void CcVoidItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(VoidItemsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                VoidItemsShared.Value = valid.Value;
+                Debug.Log($"Void item sharing set to {VoidItemsShared.Value}.");
             }
         }
 
