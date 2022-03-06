@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
+using Console = System.Console;
 
 namespace ShareSuite
 {
@@ -221,7 +222,8 @@ namespace ShareSuite
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
                 || (!IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value) //if it's not a valid drop AND the dupe fix isn't enabled
                 || self.itemTier == ItemTier.Lunar
-                || costType == CostTypeIndex.Money)
+                || costType == CostTypeIndex.Money
+                || costType == CostTypeIndex.None)
             {
                 orig(self);
             }
@@ -238,8 +240,14 @@ namespace ShareSuite
                 return;
             }
 
+            if (self.costType == CostTypeIndex.None)
+            {
+                orig(self, activator);
+                return;
+            }
+                
             var shop = self.GetComponent<ShopTerminalBehavior>();
-
+            
             #region Cauldronfix
 
             if (ShareSuite.PrinterCauldronFixEnabled.Value)
@@ -253,9 +261,11 @@ namespace ShareSuite
                     || self.costType == CostTypeIndex.BossItem
                     || self.costType == CostTypeIndex.LunarItemOrEquipment)
                 {
-                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-                    inventory.GiveItem(item);
+                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
                     
+                    if (item == null) RoR2.Console.print("ShareSuite: PickupCatalog is null.");
+                    else inventory.GiveItem(item.Value);
+
                     orig(self, activator);
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
