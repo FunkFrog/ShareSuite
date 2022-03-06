@@ -400,6 +400,22 @@ namespace ShareSuite
                     if (ShareSuite.BossItemsRandomized.Value)
                         return PickRandomOf(Blacklist.AvailableBossDropList);
                     break;
+                case ItemTier.VoidBoss:
+                    if (ShareSuite.VoidItemsRandomized.Value)
+                        return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    break;
+                case ItemTier.VoidTier1:
+                    if (ShareSuite.VoidItemsRandomized.Value)
+                        return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    break;
+                case ItemTier.VoidTier2:
+                    if (ShareSuite.VoidItemsRandomized.Value)
+                        return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    break;
+                case ItemTier.VoidTier3:
+                    if (ShareSuite.VoidItemsRandomized.Value)
+                        return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    break;
             }
             var pickupDef = PickupCatalog.GetPickupDef(orDefault);
             if (Blacklist.HasItem(pickupDef.itemIndex))

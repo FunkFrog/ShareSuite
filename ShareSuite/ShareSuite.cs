@@ -43,7 +43,8 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck;
+            OverrideMultiplayerCheck,
+            Viewed;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
