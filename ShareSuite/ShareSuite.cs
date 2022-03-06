@@ -38,6 +38,7 @@ namespace ShareSuite
             OverridePlayerScalingEnabled,
             OverrideBossLootScalingEnabled,
             OverrideVoidFieldLootScalingEnabled,
+            OverrideSimulacrumLootScalingEnabled,
             SacrificeFixEnabled,
             MoneyScalarEnabled,
             RandomizeSharedPickups,
@@ -47,7 +48,7 @@ namespace ShareSuite
             OverrideMultiplayerCheck,
             ViewedStartupMessage;
 
-        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, InteractablesOffset;
+        public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
 
@@ -283,6 +284,13 @@ namespace ShareSuite
                 "Toggles override of the scalar of Void Field loot drops to your configured balance."
             );
 
+            OverrideSimulacrumLootScalingEnabled = Config.Bind(
+                "Balance",
+                "OverrideSimulacrumLootScaling",
+                true,
+                "Toggles override of the scalar of Simulacrum loot drops to your configured balance."
+            );
+
             OverrideMultiplayerCheck = Config.Bind(
                 "Debug",
                 "OverrideMultiplayerCheck",
@@ -301,8 +309,16 @@ namespace ShareSuite
                 "Balance",
                 "VoidFieldLootCredit",
                 1,
-                "Specifies the amount of Void Fields items dropped when the Void Field scaling override is true."
+                "Specifies the amount of items dropped from completed Void Fields when the Void Field scaling override is true."
             );
+
+            SimulacrumLootCredit = Config.Bind(
+                "Balance",
+                "SimulacrumLootCredit",
+                1,
+                "Specifies the amount of items dropped after each Simulacrum round when the Simulacrum scaling override is true."
+            );
+
 
             SacrificeFixEnabled = Config.Bind(
                 "Balance",
@@ -815,6 +831,39 @@ namespace ShareSuite
             }
         }
 
+        // DisableSimulacrumLootScaling
+        [ConCommand(commandName = "ss_OverrideSimulacrumLoot", flags = ConVarFlags.None,
+            helpText = "Modifies whether Simulacrum loot should scale based on player count.")]
+        private static void CcSimulacrumLoot(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(OverrideSimulacrumLootScalingEnabled.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                if (OverrideSimulacrumLootScalingEnabled.Value != valid.Value)
+                {
+                    if (OverrideSimulacrumLootScalingEnabled.Value && !valid.Value)
+                    {
+                        IL.RoR2.InfiniteTowerWaveController.DropRewards -= ItemSharingHooks.SimulacrumArenaDropEnable;
+                    }
+                    else
+                    {
+                        IL.RoR2.InfiniteTowerWaveController.DropRewards += ItemSharingHooks.SimulacrumArenaDropEnable;
+                    }
+                }
+
+                OverrideSimulacrumLootScalingEnabled.Value = valid.Value;
+                Debug.Log($"Void Field loot scaling disable set to {OverrideSimulacrumLootScalingEnabled.Value}.");
+            }
+        }
+
         // VoidFieldLootCredit
         [ConCommand(commandName = "ss_VoidFieldLootCredit", flags = ConVarFlags.None,
             helpText = "Modifies amount of Void Field item drops.")]
@@ -833,6 +882,27 @@ namespace ShareSuite
             {
                 VoidFieldLootCredit.Value = valid.Value;
                 Debug.Log($"Void Field loot credit set to {VoidFieldLootCredit.Value}.");
+            }
+        }
+
+        // VoidFieldLootCredit
+        [ConCommand(commandName = "ss_SimulacrumLootCredit", flags = ConVarFlags.None,
+            helpText = "Modifies amount of Simulacrum item drops.")]
+        private static void CcSimulacrumCredit(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(SimulacrumLootCredit.Value);
+                return;
+            }
+
+            var valid = args.TryGetArgInt(0);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to an integer number.");
+            else
+            {
+                SimulacrumLootCredit.Value = valid.Value;
+                Debug.Log($"Simulacrum loot credit set to {SimulacrumLootCredit.Value}.");
             }
         }
 

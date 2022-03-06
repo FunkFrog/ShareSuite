@@ -27,6 +27,8 @@ namespace ShareSuite
             On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
+            IL.RoR2.InfiniteTowerWaveController.DropRewards -= SimulacrumArenaDropEnable;
+
             //IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
         }
 
@@ -41,7 +43,11 @@ namespace ShareSuite
             On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value)
+            {
                 IL.RoR2.ArenaMissionController.EndRound += ArenaDropEnable;
+                IL.RoR2.InfiniteTowerWaveController.DropRewards += SimulacrumArenaDropEnable;
+            }
+
             //if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.AttemptGrant += RemoveDefaultPickupMessage;
         }
 
@@ -355,6 +361,22 @@ namespace ShareSuite
             cursor.Index++;
             cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.VoidFieldLootCredit.Value);
         }
+
+        //Simulacrum item fix
+        public static void SimulacrumArenaDropEnable(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+
+            cursor.GotoNext(
+                x => x.MatchLdloc(0),
+                x => x.MatchStloc(1),
+                x => x.MatchLdcR4(out _),
+                x => x.MatchLdloc(1)
+            );
+            cursor.Index++;
+            cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.SimulacrumLootCredit.Value);
+        }
+
 
         public static bool IsValidItemPickup(PickupIndex pickup)
         {
