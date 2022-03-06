@@ -144,7 +144,7 @@ namespace ShareSuite
                         var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                              shrineBloodBehavior.goldToPaidHpRatio);
 
-                        if (ShareSuite.MoneyScalarEnabled.Value) amount *= (uint) ShareSuite.MoneyScalar.Value;
+                        if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint)(amount * ShareSuite.MoneyScalar.Value);
 
                         SharedMoneyValue += (int) amount;
                         return;
