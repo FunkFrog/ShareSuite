@@ -3,20 +3,25 @@
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
+[![FunkFrog Donate](https://i.imgur.com/L9TfFGx.png)](https://ko-fi.com/funkfrog)[![Sipondo Donate](https://i.imgur.com/B7JuCNB.png)](https://ko-fi.com/sipondo)
+
 Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Aggravating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
 Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to resolve this issue is to remove the incentive to hoard loot in the first place!
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|    Most Recent Update - 2.5.1    |
+|    Most Recent Update - 2.6.0    |
 |:--------------------------------:|
-| **!!! PLEASE READ !!!** |
-| The R2Api version of this mod will NOT WORK without an updated MMHOOK! |
-| Please read through the changelog at the bottom for instructions on how to update this! |
-| Please also read through the instructions on how to transfer your config files! |
-| Added compatibility for the EnigmaticThunder api |
-| Fixed a bug where you'd need 2x the price to purchase things when equipment sharing and shared money were on |
+| Survivors of the Void Compatibility Update! |
+| Fixes drop rates in Simulacrum for balance |
+| Adds blacklist compatibility with Void items |
+| Fixes Shipping Manifest to work with mod |
+| Introduce "First Boot Message" system |
+| Fix default money value inconsistency between rounds |
+| Check the message below this patch TL;DR! |
+
+**We're trying to get data on how our players use the mod to improve it in the future. If you have 2 minutes to spare, please fill out the survey! https://tinyurl.com/sharesuite**
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
 
@@ -94,35 +99,41 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 3. Press enter and you're done!
 
 ### Default Config Settings
-| Setting                    | Default Value |                            Command |
-| :------------------------- | :-----------: | ---------------------------------: |
-| Mod Enabled                |          True |                         ss_Enabled |
-| Money is Shared            |         False |                   ss_MoneyIsShared |
-| White Items are Shared     |          True |                ss_WhiteItemsShared |
-| Green Items are Shared     |          True |                ss_GreenItemsShared |
-| Red Items are Shared       |          True |                  ss_RedItemsShared |
-| Equipment is Shared        |         False |                 ss_EquipmentShared |
-| Lunar Items are Shared     |         False |                ss_LunarItemsShared |
-| Boss Items are Shared      |          True |                 ss_BossItemsShared |
-| Rich Messages Enabled      |          True |             ss_RichMessagesEnabled |
-| Drop BL Equip Mode         |          True | ss_DropBlacklistedEquipmentOnShare |
-| Randomized Item Sharing    |         False |          ss_RandomizeSharedPickups |
-| Dupe Fix                   |          True |              ss_PrinterCauldronFix |
-| Sacrifice Fix              |          True |             ss_SacrificeFixEnabled |
-| Dead Players Get Items     |         False |             ss_DeadPlayersGetItems |
-| Override Player Scaling    |          True |           ss_OverridePlayerScaling |
-| Experimental Mode          |         False |                ss_ExperimentalMode |
-| Interactables Credit       |           1.0 |             ss_InteractablesCredit |
-| Interactables Offset       |           0.0 |             ss_InteractablesOffset |
-| Override Boss Loot Scaling |          True |         ss_OverrideBossLootScaling |
-| Boss Loot Credit           |             1 |                  ss_BossLootCredit |
-| Override Void Field Scaling|          True |           ss_OverrideVoidFieldLoot |
-| Void Field Loot Credit     |             1 |             ss_VoidFieldLootCredit |
-| Money Scalar Enabled       |         False |              ss_MoneyScalarEnabled |
-| Emulate Singleplayer Money |          True |        ss_EmulateSingleplayerMoney |
-| Money Scalar               |           1.0 |                     ss_MoneyScalar |
-| Item Blacklist             |   53,60,82,86 |                                N/A |
-| Equipment Blacklist        |         Empty |                                N/A |
+| Setting                          | Default Value |                            Command |
+| :--------------------------------| :-----------: | ---------------------------------: |
+| Mod Enabled                      |          True |                         ss_Enabled |
+| Money is Shared                  |          True |                   ss_MoneyIsShared |
+| White Items are Shared           |          True |                ss_WhiteItemsShared |
+| Green Items are Shared           |          True |                ss_GreenItemsShared |
+| Red Items are Shared             |          True |                  ss_RedItemsShared |
+| Equipment is Shared              |         False |                 ss_EquipmentShared |
+| Lunar Items are Shared           |         False |                ss_LunarItemsShared |
+| Boss Items are Shared            |          True |                 ss_BossItemsShared |
+| Void Items are Shared            |         False |                 ss_VoidItemsShared |
+| Rich Messages Enabled            |          True |             ss_RichMessagesEnabled |
+| Drop BL Equip Mode               |          True | ss_DropBlacklistedEquipmentOnShare |
+| Randomized Item Sharing          |         False |          ss_RandomizeSharedPickups |
+| Lunar Item Randomizing           |         False |                                N/A |
+| Boss Item Randomizing            |         False |                                N/A |
+| Void Item Randomizing            |         False |                                N/A |
+| Dupe Fix                         |          True |              ss_PrinterCauldronFix |
+| Sacrifice Fix                    |          True |             ss_SacrificeFixEnabled |
+| Dead Players Get Items           |         False |             ss_DeadPlayersGetItems |
+| Override Player Scaling          |          True |           ss_OverridePlayerScaling |
+| Experimental Mode                |         False |                ss_ExperimentalMode |
+| Interactables Credit             |           1.0 |             ss_InteractablesCredit |
+| Interactables Offset             |           0.0 |             ss_InteractablesOffset |
+| Override Boss Loot Scaling       |          True |         ss_OverrideBossLootScaling |
+| Override Simulacrum Loot Scaling |          True |          ss_OverrideSimulacrumLoot |
+| Boss Loot Credit                 |             1 |                  ss_BossLootCredit |
+| Override Void Field Scaling      |          True |           ss_OverrideVoidFieldLoot |
+| Void Field Loot Credit           |             1 |             ss_VoidFieldLootCredit |
+| Simulacrum Loot Credit           |             1 |            ss_SimulacrumLootCredit |
+| Money Scalar Enabled             |         False |              ss_MoneyScalarEnabled |
+| Emulate Singleplayer Money       |          True |        ss_EmulateSingleplayerMoney |
+| Money Scalar                     |           1.0 |                     ss_MoneyScalar |
+| Item Blacklist                   |   53,60,82,86 |                                N/A |
+| Equipment Blacklist              |         Empty |                                N/A |
 
 **Tip: Want to reset your config?**
 
@@ -173,8 +184,7 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 #### Features in Development
 
-- Item Pickup Banners for all players
-- Merge with AutoItemPickup to add new ways to distribute items (On Hiatus)
+- Everything in our 3.0.0 milestone! https://github.com/FunkFrog/RoR2SharedItems/milestone/2
 
 ### ![Bug Reports & Suggestions](https://i.imgur.com/ssmfn9f.png "ShareSuite Bug Reports + Suggestions")
 
@@ -203,52 +213,23 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 [![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
 
+### `2.6.0`
+- DLC 1 (Survivors of the Void) Compatibility Update
+- Fix drop rates in Simulacrum to maintain balance
+    - New config options: OverrideSimulacrumLootScalingEnabled and SimulacrumLootCredit
+- Add blacklist and sharing options for new Void items
+    - Not shared by default
+    - New config options: VoidItemsShared and VoidItemsRandomized
+- Fix Shipping Manifest terminals to work with the mod
+- Request survey on first lobby creation 5 seconds after first player joins
+    - https://tinyurl.com/sharesuite 
+    - In the future, this will provide a quick tl;dr of the latest patch notes!
+    - New config option: LastMessageSent: keeps track of the last version number a message was sent on, so we can tell if we need to send it again if the mod updates.
+- Fix default money value inconsistency between rounds
+
 ### `2.5.1`
 - Added support for EnigmaticThunder api
 - Fixed a bug where you'd need 2x the price to purchase things when equipment sharing and shared money were on
-- HOW TO UPDATE MMHOOK FOR R2API INSTALLATIONS
-    - Open your BepInEx/Plugins/R2Api folder
-        - If using a mod manager, you may have to uninstall R2Api & ShareSuite via the mod manager and then manually install the most recent version of r2api and ShareSuite
-    - Delete `MMHOOK_Assembly-CSharp.dll`
-    - Unzip the `New MMHOOK_Assembly-CSharp.dll for R2Api.zip` folder
-    - Place the new MMHOOK_Assembly-CSharp.dll in your BepInEx/Plugins/R2Api folder
-    - Delete the old `ShareSuite.dll` in your plugins folder
-    - Ensure you are **NOT** using EnigmaticThunder alongside R2Api with this installation type!!
-    - If you're updating from a previous install, follow the instructions to transfer your config below
-- HOW TO USE SHARESUITE WITH ENIGMATICTHUNDER
-    - Open your BepInEx/Plugins/ folder
-    - Delete `ShareSuite-R2.dll` or `ShareSuite.dll` if it was previously installed in your plugins folder
-        - If using a mod manager, you may have to uninstall ShareSuite and manually install it here
-    - Unzip the `ShareSuite - EnigmaticThunder Version.zip` folder
-    - Place `ShareSuite-ET.dll` in your plugins folder (or wherever `ShareSuite-R2.dll` or `ShareSuite.dll` previously was)
-    - Ensure you are **NOT** using R2Api alongside EnigmaticThunder with this installation type!!
-    - If you're updating from a previous install, follow the instructions to transfer your config below
-- HOW TO TRANSFER YOUR OLD CONFIG
-    - Run the game at least once with the new version installed to generate the new config
-    - Open `BepInEx/Config/com.funkfrog_sipondo.sharesuite.cfg` and `com.funkfrog_sipondo.sharesuite-r2.cfg` or `com.funkfrog_sipondo.sharesuite-et.cfg`
-    - Copy/Paste the entire config from `...sharesuite.cfg` into `...sharesuite-r2.cfg` or `...sharesuite-et.cfg` (whichever installation you're using)
-    - Follow the instructions on updating your blacklist to the new defaults as the old ones will NOT work
-- HOW TO UPDATE BLACKLISTS TO THE NEW DEFAULTS
-    - Open BepInEx/Config/com.funkfrog_sipondo.sharesuite.cfg
-    - Replace the numbers in `ItemBlacklist` (previously `53,60,82,86,101`) with `BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey`
-    - `EquipmentBlacklist` is empty by default
-    - To add items/equipment to these, use the "Code Names" on https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names.
-- STILL HAVING ISSUES?
-    - Where is my game installed?
-        - Open Steam
-        - Right click Risk of Rain 2
-        - Mouse over "Manage >"
-        - Click "Browse Local Files"
-    - R2API Version
-        - Are you sure you updated your MMHOOK dll?
-        - Are you sure you're not also using EnigmaticThunder?
-        - Have you tried without any mods besides R2Api and ShareSuite?
-    - EnigmaticThunder Version
-        - Are you sure you're not also using R2Api?
-        - Are you using any mods that rely on R2Api?
-    - **HELP!** I'm still having problems!
-        - Join our [Discord Server](https://discord.gg/c7QnQeb) and send your problem in #support, we'll help you as soon as we can!
-
 
 ### `2.5.0`
 - Resolved breaking issue regarding boss loot drops in future releases of r2api
@@ -270,11 +251,7 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 ### `2.1.0`
 - Fixed an issue regarding scrappers sharing to everyone 
 - Fixed item picking messages printing twice when rich messages are disabled 
-- Updated the game for the 1.0 RoR2 update! 
-
-### `2.0.1`
-- Fixed an issue regarding Scavengers dropping less items than intended.
-- Fixed an issue where other mods were unable to access shared money while inside the bazaar.
+- Updated the game for the 1.0 RoR2 update!
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 

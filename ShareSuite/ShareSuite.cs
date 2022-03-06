@@ -21,6 +21,9 @@ namespace ShareSuite
     {
         #region ConfigWrapper init
 
+        // Make sure both this and the BepInPlugin values get updated
+        public static string ModVersion = "2.6";
+        
         public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
@@ -45,12 +48,11 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck,
-            ViewedStartupMessage;
+            OverrideMultiplayerCheck;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
-        public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist;
+        public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
 
 
         private bool _previouslyEnabled;
@@ -86,7 +88,7 @@ namespace ShareSuite
 
             // Register all the hooks
             ReloadHooks();
-            MoneySharingHooks.SharedMoneyValue = 0;
+            MoneySharingHooks.SharedMoneyValue = 15;
 
             #endregion
         }
@@ -297,12 +299,12 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-
-            ViewedStartupMessage = Config.Bind(
+            
+            LastMessageSent = Config.Bind(
                 "Debug",
-                "ViewedStartupMessage",
-                false,
-                "Keeps track of whether or not you've seen the boot message the first time. Prevents spam."
+                "LastMessageSent",
+                "none",
+                "Keeps track of the last mod version that sent you a message. Prevents spam, don't touch."
             );
 
             VoidFieldLootCredit = Config.Bind(
@@ -318,8 +320,7 @@ namespace ShareSuite
                 1,
                 "Specifies the amount of items dropped after each Simulacrum round when the Simulacrum scaling override is true."
             );
-
-
+            
             SacrificeFixEnabled = Config.Bind(
                 "Balance",
                 "SacrificeFixEnabled",

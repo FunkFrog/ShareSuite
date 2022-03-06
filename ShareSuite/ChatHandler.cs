@@ -36,8 +36,8 @@ namespace ShareSuite
         {
             orig(user);
 
-            if (ShareSuite.ViewedStartupMessage.Value) return;
-            else ShareSuite.ViewedStartupMessage.Value = true;
+            if (ShareSuite.LastMessageSent.Value.Equals(ShareSuite.ModVersion)) return;
+            else ShareSuite.LastMessageSent.Value = ShareSuite.ModVersion;
 
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
