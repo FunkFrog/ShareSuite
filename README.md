@@ -3,7 +3,7 @@
 
 [![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-[![FunkFrog Donate](https://i.imgur.com/bUok5KW.png)](https://ko-fi.com/funkfrog)[![Sipondo Donate](https://i.imgur.com/dgpjTBg.png)](https://ko-fi.com/sipondo)
+[![FunkFrog Donate](https://i.imgur.com/L9TfFGx.png)](https://ko-fi.com/funkfrog)[![Sipondo Donate](https://i.imgur.com/dgpjTBg.png)](https://ko-fi.com/sipondo)
 
 Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Aggravating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
 
