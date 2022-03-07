@@ -84,6 +84,16 @@ namespace ShareSuite
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
             var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
 
+            if (pickupDef.coinValue > 0)
+            {
+                var coinMessage =
+                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                    $"{pickupName ?? "???"} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = coinMessage});
+                    return;
+            }
+            
             if (Blacklist.HasItem(pickupDef.itemIndex)
                 || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
             {
