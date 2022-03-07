@@ -146,13 +146,13 @@ namespace ShareSuite
             }
 
             // Set interactables budget to interactableCredit * config player count / sacrificeOffset.
-            if (ShareSuite.OverridePlayerScalingEnabled.Value && (!SceneInfo.instance
-                                                                  || !NoInteractibleOverrideScenes.Contains(
-                                                                      SceneInfo.instance.sceneDef.nameToken)))
+            if (ShareSuite.OverridePlayerScalingEnabled.Value &&
+                (!SceneInfo.instance || !NoInteractibleOverrideScenes.Contains(SceneInfo.instance.sceneDef.nameToken)))
+            {
                 self.interactableCredit =
                     (int) (interactableCredit * ShareSuite.InteractablesCredit.Value / _sacrificeOffset) +
                     ShareSuite.InteractablesOffset.Value;
-            
+            }
 
             #endregion
 
