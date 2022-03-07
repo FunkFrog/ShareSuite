@@ -111,7 +111,7 @@ namespace ShareSuite
         {
             #region Sharedmoney
 
-            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer() && self)
             {
                 switch (self.costType)
                 {
@@ -160,11 +160,11 @@ namespace ShareSuite
         private static void SplitExitMoney(On.RoR2.SceneExitController.orig_Begin orig, SceneExitController self)
         {
             MapTransitionActive = true;
-            if (!ShareSuite.MoneyIsShared.Value)
+            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer())
             {
                 orig(self);
                 return;
-            }
+            } 
 
             var players = PlayerCharacterMasterController.instances.Count;
             foreach (var player in PlayerCharacterMasterController.instances)
@@ -181,6 +181,8 @@ namespace ShareSuite
             BarrelInteraction self, Interactor activator)
         {
             orig(self, activator);
+            
+            if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
 
@@ -199,6 +201,8 @@ namespace ShareSuite
             DamageReport damageReport)
         {
             orig(self, damageReport);
+            
+            if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
 
@@ -220,7 +224,10 @@ namespace ShareSuite
 
             // This should run on every map, as it is required to fix shared money.
             // Reset shared money value to the default (0) at the start of each round
-            SharedMoneyValue = 0;
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
+            {
+                MoneySharingHooks.SharedMoneyValue = 15;
+            }
 
             orig(self);
         }
@@ -297,7 +304,7 @@ namespace ShareSuite
                 return;
             }
 
-            if (!ShareSuite.MoneyIsShared.Value
+            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
                 || !(bool) self.body
                 || !(bool) self.body.inventory
             )
@@ -344,7 +351,7 @@ namespace ShareSuite
         private static void BrittleCrownOnHitHook(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig,
             GlobalEventManager self, DamageInfo info, GameObject victim)
         {
-            if (!ShareSuite.MoneyIsShared.Value
+            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
                 || !(bool) info.attacker
                 || !(bool) info.attacker.GetComponent<CharacterBody>()
                 || !(bool) info.attacker.GetComponent<CharacterBody>().master
