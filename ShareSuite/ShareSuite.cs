@@ -21,8 +21,8 @@ namespace ShareSuite
     {
         #region ConfigWrapper init
 
-        // Make sure both this and the BepInPlugin values get updated
-        public static string ModVersion = "2.6";
+        // Update this when we want to send a new message
+        public static string MessageSendVer = "2.6";
         
         public static ConfigEntry<bool>
             ModIsEnabled,
