@@ -1,7 +1,5 @@
 using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using BepInEx.Configuration;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
 using R2API.Utils;

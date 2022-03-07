@@ -1,11 +1,7 @@
 using System;
-using R2API;
 using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using R2API.Utils;
 
 namespace ShareSuite
 {
