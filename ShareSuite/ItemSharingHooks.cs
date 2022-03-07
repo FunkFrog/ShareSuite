@@ -15,6 +15,12 @@ namespace ShareSuite
     public static class ItemSharingHooks
     {
         private static bool _itemLock = false;
+        
+        private static List<CostTypeIndex> printerCosts = new List<CostTypeIndex>
+        {
+            CostTypeIndex.WhiteItem, CostTypeIndex.GreenItem, CostTypeIndex.RedItem, CostTypeIndex.BossItem, 
+            CostTypeIndex.LunarItemOrEquipment
+        };
 
         public static void UnHook()
         {
@@ -235,12 +241,15 @@ namespace ShareSuite
             //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
 
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
-                || (!IsValidItemPickup(self.CurrentPickupIndex()) &&
-                    !ShareSuite.PrinterCauldronFixEnabled
-                        .Value) //if it's not a valid drop AND the dupe fix isn't enabled
+                || (!IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value)
+                //if it's not a valid drop AND the dupe fix isn't enabled
                 || self.itemTier == ItemTier.Lunar
                 || costType == CostTypeIndex.Money
                 || costType == CostTypeIndex.None)
+            {
+                orig(self);
+            }
+            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && printerCosts.Contains(costType))
             {
                 orig(self);
             }
@@ -267,17 +276,14 @@ namespace ShareSuite
 
             #region Cauldronfix
 
-            if (ShareSuite.PrinterCauldronFixEnabled.Value)
+            if (printerCosts.Contains(self.costType))
             {
-                var characterBody = activator.GetComponent<CharacterBody>();
-                var inventory = characterBody.inventory;
-
-                if (self.costType == CostTypeIndex.WhiteItem
-                    || self.costType == CostTypeIndex.GreenItem
-                    || self.costType == CostTypeIndex.RedItem
-                    || self.costType == CostTypeIndex.BossItem
-                    || self.costType == CostTypeIndex.LunarItemOrEquipment)
+                if (ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
+                    var characterBody = activator.GetComponent<CharacterBody>();
+                    var inventory = characterBody.inventory;
+
+
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
 
                     if (item == null) RoR2.Console.print("ShareSuite: PickupCatalog is null.");
@@ -288,7 +294,7 @@ namespace ShareSuite
                         shop.CurrentPickupIndex());
                     return;
                 }
-            }
+            } 
 
             #endregion Cauldronfix
 
