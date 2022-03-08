@@ -14,7 +14,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.6")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.7-dev")]
     [R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
