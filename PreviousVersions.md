@@ -1,5 +1,10 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`2.1.0`
+- Fixed an issue regarding scrappers sharing to everyone
+- Fixed item picking messages printing twice when rich messages are disabled
+- Updated the game for the 1.0 RoR2 update!
+
 `2.0.1`
 - Fixed an issue regarding Scavengers dropping less items than intended.
 - Fixed an issue where other mods were unable to access shared money while inside the bazaar.
