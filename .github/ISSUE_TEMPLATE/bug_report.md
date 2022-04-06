@@ -35,7 +35,7 @@ If you're using r2modman:
 %APPDATA%\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\config\com.funkfrog_sipondo.sharesuite.cfg
 
 Without r2modman:
-%APPDATA%\BepInEx\config\com.funkfrog_sipondo.sharesuite.cfg
+<your game install directory>/BepInEx/config/
 -->
 
 <details><summary>com.funkfrog_sipondo.sharesuite-r2.cfg</summary>
