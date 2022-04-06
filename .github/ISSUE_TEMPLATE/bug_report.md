@@ -26,5 +26,23 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Config File**
+<!--
+
+Replace YOUR_CONFIG_HERE with the contents of the following file:
+
+%APPDATA%\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\config\com.funkfrog_sipondo.sharesuite-r2.cfg
+-->
+
+<details><summary>com.funkfrog_sipondo.sharesuite-r2.cfg</summary>
+
+```
+YOUR_CONFIG_HERE
+```
+</details>
+
+
 **Additional context**
 Add any other context about the problem here.
+
+
