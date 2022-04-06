@@ -29,9 +29,13 @@ If applicable, add screenshots to help explain your problem.
 **Config File**
 <!--
 
-Replace YOUR_CONFIG_HERE with the contents of the following file:
+Replace YOUR_CONFIG_HERE with the contents of your config file. The config file will be in one of two locations:
 
-%APPDATA%\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\config\com.funkfrog_sipondo.sharesuite-r2.cfg
+If you're using r2modman:
+%APPDATA%\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\config\com.funkfrog_sipondo.sharesuite.cfg
+
+Without r2modman:
+%APPDATA%\BepInEx\config\com.funkfrog_sipondo.sharesuite.cfg
 -->
 
 <details><summary>com.funkfrog_sipondo.sharesuite-r2.cfg</summary>
