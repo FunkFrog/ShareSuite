@@ -38,7 +38,7 @@ Without r2modman:
 <your game install directory>/BepInEx/config/
 -->
 
-<details><summary>com.funkfrog_sipondo.sharesuite-r2.cfg</summary>
+<details><summary>com.funkfrog_sipondo.sharesuite.cfg</summary>
 
 ```
 YOUR_CONFIG_HERE
