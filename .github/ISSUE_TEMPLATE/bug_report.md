@@ -26,5 +26,27 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Config File**
+<!--
+
+Replace YOUR_CONFIG_HERE with the contents of your config file. The config file will be in one of two locations:
+
+If you're using r2modman:
+%APPDATA%\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\config\com.funkfrog_sipondo.sharesuite.cfg
+
+Without r2modman:
+<your game install directory>/BepInEx/config/
+-->
+
+<details><summary>com.funkfrog_sipondo.sharesuite.cfg</summary>
+
+```
+YOUR_CONFIG_HERE
+```
+</details>
+
+
 **Additional context**
 Add any other context about the problem here.
+
+
