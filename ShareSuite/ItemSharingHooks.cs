@@ -386,11 +386,11 @@ namespace ShareSuite
 
         public static bool IsValidItemPickup(PickupIndex pickup)
         {
-            var pickupdef = PickupCatalog.GetPickupDef(pickup);
-            if (pickupdef.itemIndex != ItemIndex.None)
+            var pickupDef = PickupCatalog.GetPickupDef(pickup);
+            if (pickupDef != null && pickupDef.itemIndex != ItemIndex.None)
             {
-                var itemdef = ItemCatalog.GetItemDef(pickupdef.itemIndex);
-                switch (itemdef.tier)
+                var itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
+                switch (itemDef.tier)
                 {
                     case ItemTier.Tier1:
                         return ShareSuite.WhiteItemsShared.Value;
@@ -412,12 +412,14 @@ namespace ShareSuite
                         return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.NoTier:
                         break;
+                    case ItemTier.AssignedAtRuntime:
+                        return true;
                     default:
                         return false;
                 }
             }
 
-            if (pickupdef.equipmentIndex != EquipmentIndex.None)
+            if (pickupDef != null && pickupDef.equipmentIndex != EquipmentIndex.None)
             {
                 // var equipdef = EquipmentCatalog.GetEquipmentDef(pickupdef.equipmentIndex);
                 // Optional further checks ...
