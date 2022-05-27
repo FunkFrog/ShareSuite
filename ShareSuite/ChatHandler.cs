@@ -289,6 +289,6 @@ namespace ShareSuite
         public static readonly SendPickupMessageDelegate SendPickupMessage =
             (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
                 typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.NonPublic | BindingFlags.Static) ?? throw new MissingMethodException());
+                    BindingFlags.Public | BindingFlags.Static) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
     }
 }
