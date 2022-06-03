@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
 using RoR2;
+using ShareSuite.Networking;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -23,7 +24,7 @@ namespace ShareSuite
 
         // Update this when we want to send a new message
         public static string MessageSendVer = "2.6";
-        
+
         public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
@@ -53,7 +54,7 @@ namespace ShareSuite
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
-
+        public static ConfigEntry<short> NetworkMessageType;
 
         private bool _previouslyEnabled;
 
@@ -91,6 +92,8 @@ namespace ShareSuite
             MoneySharingHooks.SharedMoneyValue = 15;
 
             #endregion
+
+            NetworkHandler.Setup();
         }
 
         private void ReloadHooks(object _ = null, EventArgs __ = null)
@@ -299,7 +302,7 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-            
+
             LastMessageSent = Config.Bind(
                 "Debug",
                 "LastMessageSent",
@@ -320,7 +323,7 @@ namespace ShareSuite
                 1,
                 "Specifies the amount of items dropped after each Simulacrum round when the Simulacrum scaling override is true."
             );
-            
+
             SacrificeFixEnabled = Config.Bind(
                 "Balance",
                 "SacrificeFixEnabled",
@@ -358,6 +361,13 @@ namespace ShareSuite
                 "Equipment (by internal name) that you do not want to share, comma separated. Please find the \"Code Names\"s at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             EquipmentBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
+
+            NetworkMessageType = Config.Bind(
+                "Settings",
+                "NetworkMessageType",
+                (short)1021,
+                "The identifier for network message for this mod. Must be unique across all mods."
+            );
         }
 
         #region CommandParser
