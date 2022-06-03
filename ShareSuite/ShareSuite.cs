@@ -23,7 +23,7 @@ namespace ShareSuite
 
         // Update this when we want to send a new message
         public static string MessageSendVer = "2.6";
-        
+
         public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
@@ -299,7 +299,7 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-            
+
             LastMessageSent = Config.Bind(
                 "Debug",
                 "LastMessageSent",
@@ -320,7 +320,7 @@ namespace ShareSuite
                 1,
                 "Specifies the amount of items dropped after each Simulacrum round when the Simulacrum scaling override is true."
             );
-            
+
             SacrificeFixEnabled = Config.Bind(
                 "Balance",
                 "SacrificeFixEnabled",

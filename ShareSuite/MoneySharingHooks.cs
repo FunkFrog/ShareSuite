@@ -27,6 +27,7 @@ namespace ShareSuite
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
+            On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -44,6 +45,7 @@ namespace ShareSuite
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
+            On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -54,7 +56,7 @@ namespace ShareSuite
         {
             #region Sharedmoney
 
-            if ((self.baseObject == null) || (!ShareSuite.MoneyIsShared.Value))
+            if (self.baseObject == null || !ShareSuite.MoneyIsShared.Value)
             {
                 orig(self, other);
                 return;
@@ -262,7 +264,6 @@ namespace ShareSuite
             cursor.RemoveRange(14);
         }
 
-
         private static void GoldGatDisconnect(On.RoR2.Networking.NetworkManagerSystem.orig_OnClientDisconnect orig,
             RoR2.Networking.NetworkManagerSystem self, NetworkConnection conn)
         {
@@ -338,6 +339,58 @@ namespace ShareSuite
             foreach (var player in PlayerCharacterMasterController.instances)
             {
                 if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
+                EffectManager.SimpleImpactEffect(Resources.Load<GameObject>(
+                        "Prefabs/Effects/ImpactEffects/CoinImpact"),
+                    player.master.GetBody().corePosition, Vector3.up, true);
+            }
+
+            #endregion
+        }
+
+        private static void RollOfPenniesDamageHook(
+            On.RoR2.HealthComponent.orig_TakeDamage orig,
+            HealthComponent self,
+            DamageInfo info)
+        {
+            if (!ShareSuite.MoneyIsShared.Value ||
+                !GeneralHooks.IsMultiplayer() ||
+                !(bool) self.body ||
+                !(bool) self.body.inventory
+               )
+            {
+                orig(self, info);
+                return;
+            }
+
+            orig(self, info);
+
+            if (!self.alive)
+            {
+                return;
+            }
+
+            #region Sharedmoney
+
+            var itemCount = self.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("GoldOnHurt"));
+
+            // Ignore all of this if we do not actually have the item
+            if (itemCount <= 0) return;
+
+            CharacterBody attacker = null;
+            if (info.attacker)
+            {
+                attacker = info.attacker.GetComponent<CharacterBody>();
+            }
+
+            if (attacker == null || attacker == self.body) return;
+
+            // Apply the calculation to the shared money pool
+            SharedMoneyValue += Mathf.FloorToInt(itemCount * 3 * Run.instance.difficultyCoefficient);
+
+            // Add impact effect
+            foreach (var player in PlayerCharacterMasterController.instances)
+            {
+                if (!(bool) player.master.GetBody() || player.master.GetBody() == self.body) continue;
                 EffectManager.SimpleImpactEffect(Resources.Load<GameObject>(
                         "Prefabs/Effects/ImpactEffects/CoinImpact"),
                     player.master.GetBody().corePosition, Vector3.up, true);

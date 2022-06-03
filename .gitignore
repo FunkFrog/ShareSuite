@@ -5,3 +5,5 @@ obj
 *.csproj
 buildreleases
 .idea
+Deps
+*DotSettings.user
