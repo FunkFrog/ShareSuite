@@ -1,20 +1,22 @@
-﻿using RoR2;
+﻿using System.Linq;
+using RoR2;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ShareSuite.Networking
 {
     public static class NetworkHandler
     {
-        private static void RegisterHandlers()
+        public static void RegisterHandlers()
         {
-            var client = NetworkManager.singleton.client;
+            var client = NetworkManager.singleton?.client;
+
+            if (client == null || client.handlers.ContainsKey(ShareSuite.NetworkMessageType.Value))
+            {
+                return;
+            }
 
             client.RegisterHandler(ShareSuite.NetworkMessageType.Value, ItemPickupHandler);
-        }
-
-        public static void Setup()
-        {
-            RegisterHandlers();
         }
 
         public static void SendItemPickupMessage(int connectionId, PickupIndex pickupIndex)
@@ -25,9 +27,9 @@ namespace ShareSuite.Networking
         private static void ItemPickupHandler(NetworkMessage networkMessage)
         {
             var itemPickupMessage = networkMessage.ReadMessage<ItemPickupMessage>();
-            var localPlayer = PlayerCharacterMasterController.instances[0];
+            var localPlayer = PlayerCharacterMasterController.instances.FirstOrDefault(x => x.networkUser.isLocalPlayer);
 
-            if (!itemPickupMessage.PickupIndex.isValid)
+            if (localPlayer == null || !itemPickupMessage.PickupIndex.isValid)
             {
                 return;
             }

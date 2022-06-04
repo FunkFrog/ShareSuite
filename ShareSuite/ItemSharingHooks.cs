@@ -17,7 +17,7 @@ namespace ShareSuite
     {
         private static bool _itemLock = false;
 
-        private static List<CostTypeIndex> printerCosts = new List<CostTypeIndex>
+        private static readonly List<CostTypeIndex> PrinterCosts = new List<CostTypeIndex>
         {
             CostTypeIndex.WhiteItem,
             CostTypeIndex.GreenItem,
@@ -157,13 +157,25 @@ namespace ShareSuite
                     randomizedPlayerDict.Add(master, item);
                 }
 
-                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                foreach (var player in PlayerCharacterMasterController.instances
+                             .Select(p => p.master))
                 {
-                    // Ensure character is not original player that picked up item
-                    if (body != null && player.inventory == body.inventory) continue;
-
                     // Do not reward dead players if not required
                     if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer()) continue;
+
+                    // Do not give an additional item to the player who picked it up.
+                    if (player.inventory == body.inventory)
+                    {
+                        // Do not send the message to unlock if it's the local player.
+                        if (player.isLocalPlayer)
+                        {
+                            continue;
+                        }
+
+                        NetworkHandler.SendItemPickupMessage(player.playerCharacterMasterController.networkUser.connectionToClient.connectionId, item.pickupIndex);
+
+                        continue;
+                    }
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
@@ -202,7 +214,9 @@ namespace ShareSuite
             }
 
             orig(self, body);
+
             ChatHandler.SendRichPickupMessage(master, item);
+
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
@@ -254,7 +268,7 @@ namespace ShareSuite
             {
                 orig(self);
             }
-            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && printerCosts.Contains(costType))
+            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
             {
                 orig(self);
             }
@@ -281,7 +295,7 @@ namespace ShareSuite
 
             #region Cauldronfix
 
-            if (printerCosts.Contains(self.costType))
+            if (PrinterCosts.Contains(self.costType))
             {
                 if (ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
@@ -500,22 +514,31 @@ namespace ShareSuite
 
         private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
         {
+            Debug.Log($"ShareSuite :: HandleGiveItem :: Give item {Language.GetString(pickupDef.nameToken)} to {characterMaster.playerCharacterMasterController.networkUser.GetNetworkPlayerName().GetResolvedName()}");
+
             characterMaster.inventory.GiveItem(pickupDef.itemIndex);
 
-            NetworkHandler.SendItemPickupMessage(characterMaster.networkIdentity.connectionToClient.connectionId, pickupDef.pickupIndex);
+            var connectionId = characterMaster.playerCharacterMasterController.networkUser.connectionToClient?.connectionId;
+
+            if (connectionId != null)
+            {
+                Debug.Log($"ShareSuite :: HandleGiveItem :: NetworkHandler.SendItemPickupMessage ");
+                NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
+            }
         }
 
         public static void HandleRichMessageUnlockAndNotification(CharacterMaster characterMaster, PickupIndex pickupIndex)
         {
             // No need if rich messages are disabled
-            if (!ShareSuite.RichMessagesEnabled.Value) return;
+            if (!ShareSuite.RichMessagesEnabled.Value)
+            {
+                return;
+            }
 
-            Debug.Log("ShareSuite :: Unlock pickup");
             characterMaster.playerCharacterMasterController?.networkUser?.localUser?.userProfile.DiscoverPickup(pickupIndex);
 
             if (characterMaster.inventory.GetItemCount(PickupCatalog.GetPickupDef(pickupIndex).itemIndex) <= 1)
             {
-                Debug.Log("ShareSuite :: Display pickup (new item)");
                 CharacterMasterNotificationQueue.PushPickupNotification(characterMaster, pickupIndex);
             }
         }

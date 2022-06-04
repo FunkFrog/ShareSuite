@@ -54,10 +54,10 @@ namespace ShareSuite
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
             timer.Elapsed += delegate
             {
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = notRepeatedMessage});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = message});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = linkMessage});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = clickChatBox});
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = notRepeatedMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = message });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = linkMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = clickChatBox });
             };
             timer.AutoReset = false;
             timer.Start();
@@ -73,10 +73,10 @@ namespace ShareSuite
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (!GeneralHooks.IsMultiplayer() || body == null
-                                              || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, pickupDef.pickupIndex);
+
                 return;
             }
 
@@ -91,19 +91,20 @@ namespace ShareSuite
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
                     $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
-                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = coinMessage});
-                    return;
+
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = coinMessage });
+
+                return;
             }
-            
-            if (Blacklist.HasItem(pickupDef.itemIndex)
-                || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
+
+            if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
             {
                 var singlePickupMessage =
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
                     $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
                     $"<color=#{NotSharingColor}>(Item Set to NOT be Shared)</color>";
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = singlePickupMessage});
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
                 return;
             }
 
@@ -112,17 +113,19 @@ namespace ShareSuite
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
                 $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves</color>" +
                 $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         public static void SendRichCauldronMessage(CharacterMaster player, PickupIndex index)
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (!GeneralHooks.IsMultiplayer() || body == null
-                                              || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer() ||
+                body == null ||
+                !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, index);
+
                 return;
             }
 
@@ -136,7 +139,7 @@ namespace ShareSuite
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
                 $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color><color=#{GrayColor}>.</color>";
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         public static void SendRichRandomizedPickupMessage(CharacterMaster origPlayer, PickupDef origPickup,
@@ -145,6 +148,7 @@ namespace ShareSuite
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(origPlayer, origPickup.pickupIndex);
+
                 return;
             }
 
@@ -157,7 +161,6 @@ namespace ShareSuite
 
             var remainingPlayers = pickupIndices.Count;
             var pickupMessage = "";
-
 
             foreach (var index in pickupIndices)
             {
@@ -188,7 +191,7 @@ namespace ShareSuite
                     $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color>";
             }
 
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         private static string ItemPickupFormatter(CharacterBody body)

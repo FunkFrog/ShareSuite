@@ -62,11 +62,14 @@ namespace ShareSuite
 
         public void Update()
         {
-            if (!NetworkServer.active
-                || !ModIsEnabled.Value
+            if (!ModIsEnabled.Value
                 || !MoneyIsShared.Value
                 || MoneySharingHooks.MapTransitionActive
                 || !GeneralHooks.IsMultiplayer()) return;
+
+            NetworkHandler.RegisterHandlers();
+
+            if (!NetworkServer.active) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
@@ -92,8 +95,6 @@ namespace ShareSuite
             MoneySharingHooks.SharedMoneyValue = 15;
 
             #endregion
-
-            NetworkHandler.Setup();
         }
 
         private void ReloadHooks(object _ = null, EventArgs __ = null)
