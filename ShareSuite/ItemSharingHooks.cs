@@ -514,15 +514,12 @@ namespace ShareSuite
 
         private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
         {
-            Debug.Log($"ShareSuite :: HandleGiveItem :: Give item {Language.GetString(pickupDef.nameToken)} to {characterMaster.playerCharacterMasterController.networkUser.GetNetworkPlayerName().GetResolvedName()}");
-
             characterMaster.inventory.GiveItem(pickupDef.itemIndex);
 
-            var connectionId = characterMaster.playerCharacterMasterController.networkUser.connectionToClient?.connectionId;
+            var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient?.connectionId;
 
             if (connectionId != null)
             {
-                Debug.Log($"ShareSuite :: HandleGiveItem :: NetworkHandler.SendItemPickupMessage ");
                 NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
             }
         }
