@@ -352,29 +352,27 @@ namespace ShareSuite
             HealthComponent self,
             DamageInfo info)
         {
-            if (!ShareSuite.MoneyIsShared.Value ||
-                !GeneralHooks.IsMultiplayer() ||
-                !(bool) self.body ||
-                !(bool) self.body.inventory
-               )
-            {
-                orig(self, info);
-                return;
-            }
-
             orig(self, info);
 
-            if (!self.alive)
+            if (!NetworkServer.active ||
+                !ShareSuite.MoneyIsShared.Value ||
+                !GeneralHooks.IsMultiplayer() ||
+                !self.alive ||
+                !(bool) self.body?.inventory
+               )
             {
                 return;
             }
 
             #region Sharedmoney
 
-            var itemCount = self.body.inventory.GetItemCount(ItemCatalog.FindItemIndex("GoldOnHurt"));
+            var itemCount = self.body!.inventory.GetItemCount(ItemCatalog.FindItemIndex("GoldOnHurt"));
 
             // Ignore all of this if we do not actually have the item
-            if (itemCount <= 0) return;
+            if (itemCount <= 0)
+            {
+                return;
+            }
 
             CharacterBody attacker = null;
             if (info.attacker)
@@ -382,7 +380,10 @@ namespace ShareSuite
                 attacker = info.attacker.GetComponent<CharacterBody>();
             }
 
-            if (attacker == null || attacker == self.body) return;
+            if (attacker == null || attacker == self.body)
+            {
+                return;
+            }
 
             // Apply the calculation to the shared money pool
             SharedMoneyValue += Mathf.FloorToInt(itemCount * 3 * Run.instance.difficultyCoefficient);
@@ -390,7 +391,11 @@ namespace ShareSuite
             // Add impact effect
             foreach (var player in PlayerCharacterMasterController.instances)
             {
-                if (!(bool) player.master.GetBody() || player.master.GetBody() == self.body) continue;
+                if (!(bool) player.master.GetBody() || player.master.GetBody() == self.body)
+                {
+                    continue;
+                }
+
                 EffectManager.SimpleImpactEffect(Resources.Load<GameObject>(
                         "Prefabs/Effects/ImpactEffects/CoinImpact"),
                     player.master.GetBody().corePosition, Vector3.up, true);
