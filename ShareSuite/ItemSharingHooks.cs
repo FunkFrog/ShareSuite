@@ -211,7 +211,7 @@ namespace ShareSuite
                         {
                             Debug.LogWarning($"ShareSuite :: No corresponding base item found for void item {voidItemName}.");
 
-                            // Can break loop. Item not found.
+                            // Can break loop. Void item has no known corresponding base.
                             break;
                         }
 
