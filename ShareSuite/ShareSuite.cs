@@ -23,7 +23,7 @@ namespace ShareSuite
 
         // Update this when we want to send a new message
         public static string MessageSendVer = "2.6";
-        
+
         public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
@@ -48,12 +48,12 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck;
+            OverrideMultiplayerCheck,
+            ShareVoidItemsAsBase;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
-
 
         private bool _previouslyEnabled;
 
@@ -65,12 +65,23 @@ namespace ShareSuite
                 || !ModIsEnabled.Value
                 || !MoneyIsShared.Value
                 || MoneySharingHooks.MapTransitionActive
-                || !GeneralHooks.IsMultiplayer()) return;
+                || !GeneralHooks.IsMultiplayer())
+            {
+                return;
+            }
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
-                if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
+                if (playerCharacterMasterController.master.IsDeadAndOutOfLivesServer())
+                {
+                    continue;
+                }
+
+                if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue)
+                {
+                    continue;
+                }
+
                 playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
             }
         }
@@ -183,6 +194,12 @@ namespace ShareSuite
                 false,
                 "Toggles item sharing for void (purple/corrupted) items."
             );
+
+            ShareVoidItemsAsBase = Config.Bind(
+                "Settings",
+                "ShareVoidItemsAsBase",
+                false,
+                "If enabled, other players will receive the a base item corresponding to the void item instead of the void item itself.");
 
             RichMessagesEnabled = Config.Bind(
                 "Settings",
@@ -299,7 +316,7 @@ namespace ShareSuite
                 false,
                 "Forces ShareSuite to think that the game is running in a multiplayer instance."
             );
-            
+
             LastMessageSent = Config.Bind(
                 "Debug",
                 "LastMessageSent",
@@ -320,7 +337,7 @@ namespace ShareSuite
                 1,
                 "Specifies the amount of items dropped after each Simulacrum round when the Simulacrum scaling override is true."
             );
-            
+
             SacrificeFixEnabled = Config.Bind(
                 "Balance",
                 "SacrificeFixEnabled",
@@ -332,8 +349,7 @@ namespace ShareSuite
                 "Settings",
                 "MoneyScalarEnabled",
                 false,
-                "Toggles the money scalar, set MoneyScalar to an amount to fine-tune the amount of gold " +
-                "you recieve."
+                "Toggles the money scalar, set MoneyScalar to an amount to fine-tune the amount of gold you receive."
             );
 
             MoneyScalar = Config.Bind(
@@ -378,7 +394,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 ModIsEnabled.Value = valid.Value;
@@ -399,7 +417,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 if (MoneyIsShared.Value != valid.Value)
@@ -411,7 +431,9 @@ namespace ShareSuite
                     else
                     {
                         if (GeneralHooks.IsMultiplayer())
+                        {
                             IL.EntityStates.GoldGat.GoldGatFire.FireBullet += MoneySharingHooks.RemoveGoldGatMoneyLine;
+                        }
                     }
                 }
 
@@ -433,7 +455,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 MoneyScalarEnabled.Value = valid.Value;
@@ -454,7 +478,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgDouble(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to a number.");
+            }
             else
             {
                 MoneyScalar.Value = valid.Value;
@@ -475,7 +501,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 WhiteItemsShared.Value = valid.Value;
@@ -496,7 +524,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 GreenItemsShared.Value = valid.Value;
@@ -517,7 +547,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 RedItemsShared.Value = valid.Value;
@@ -538,7 +570,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 EquipmentShared.Value = valid.Value;
@@ -559,7 +593,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 LunarItemsShared.Value = valid.Value;
@@ -580,7 +616,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 BossItemsShared.Value = valid.Value;
@@ -601,7 +639,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 VoidItemsShared.Value = valid.Value;
@@ -622,7 +662,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 RichMessagesEnabled.Value = valid.Value;
@@ -643,7 +685,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 DropBlacklistedEquipmentOnShare.Value = valid.Value;
@@ -665,7 +709,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 RandomizeSharedPickups.Value = valid.Value;
@@ -686,7 +732,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 PrinterCauldronFixEnabled.Value = valid.Value;
@@ -707,7 +755,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 OverridePlayerScalingEnabled.Value = valid.Value;
@@ -728,7 +778,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgDouble(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to a number.");
+            }
             else
             {
                 InteractablesCredit.Value = valid.Value;
@@ -749,7 +801,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to a number.");
+            }
             else
             {
                 InteractablesOffset.Value = valid.Value;
@@ -770,7 +824,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 OverrideBossLootScalingEnabled.Value = valid.Value;
@@ -791,7 +847,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to an integer number.");
+            }
             else
             {
                 BossLootCredit.Value = valid.Value;
@@ -812,7 +870,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 if (OverrideVoidFieldLootScalingEnabled.Value != valid.Value)
@@ -845,7 +905,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 if (OverrideSimulacrumLootScalingEnabled.Value != valid.Value)
@@ -878,7 +940,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to an integer number.");
+            }
             else
             {
                 VoidFieldLootCredit.Value = valid.Value;
@@ -899,7 +963,9 @@ namespace ShareSuite
 
             var valid = args.TryGetArgInt(0);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to an integer number.");
+            }
             else
             {
                 SimulacrumLootCredit.Value = valid.Value;
@@ -920,7 +986,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 SacrificeFixEnabled.Value = valid.Value;
@@ -941,7 +1009,9 @@ namespace ShareSuite
 
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
+            {
                 Debug.Log("Couldn't parse to boolean.");
+            }
             else
             {
                 DeadPlayersGetItems.Value = valid.Value;
@@ -993,8 +1063,15 @@ namespace ShareSuite
             string[] posStr = {"yes", "true", "1"};
             string[] negStr = {"no", "false", "0", "-1"};
 
-            if (posStr.Contains(arg.ToLower())) return true;
-            if (negStr.Contains(arg.ToLower())) return false;
+            if (posStr.Contains(arg.ToLower()))
+            {
+                return true;
+            }
+
+            if (negStr.Contains(arg.ToLower()))
+            {
+                return false;
+            }
 
             return new bool?();
         }

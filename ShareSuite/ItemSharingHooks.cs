@@ -9,16 +9,21 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
+using ShareSuite.Extensions;
+using ShareSuite.Helpers;
 
 namespace ShareSuite
 {
     public static class ItemSharingHooks
     {
-        private static bool _itemLock = false;
-        
-        private static List<CostTypeIndex> printerCosts = new List<CostTypeIndex>
+        private static bool _itemLock;
+
+        private static readonly List<CostTypeIndex> PrinterCosts = new List<CostTypeIndex>
         {
-            CostTypeIndex.WhiteItem, CostTypeIndex.GreenItem, CostTypeIndex.RedItem, CostTypeIndex.BossItem, 
+            CostTypeIndex.WhiteItem,
+            CostTypeIndex.GreenItem,
+            CostTypeIndex.RedItem,
+            CostTypeIndex.BossItem,
             CostTypeIndex.LunarItemOrEquipment
         };
 
@@ -87,15 +92,15 @@ namespace ShareSuite
             _itemLock = true;
             orig(self);
 
-            ScrapperController scrapperController =
+            var scrapperController =
                 GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
 
             Debug.Log(scrapperController);
             Debug.Log(_itemLock);
             if (scrapperController)
             {
-                PickupIndex pickupIndex = PickupIndex.none;
-                ItemDef itemDef = ItemCatalog.GetItemDef(scrapperController.lastScrappedItemIndex);
+                var pickupIndex = PickupIndex.none;
+                var itemDef = ItemCatalog.GetItemDef(scrapperController.lastScrappedItemIndex);
                 if (itemDef != null)
                 {
                     switch (itemDef.tier)
@@ -115,18 +120,24 @@ namespace ShareSuite
                     }
                 }
 
-                if (pickupIndex == PickupIndex.none) return;
+                if (pickupIndex == PickupIndex.none)
+                {
+                    return;
+                }
 
                 var interactor =
                     GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
                 Debug.Log("Interactor Established");
 
-                PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+                var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
 
-                if (!interactor) return;
+                if (!interactor)
+                {
+                    return;
+                }
 
                 SetInstanceField(typeof(ScrappingToIdle), self, "foundValidScrap", true);
-                CharacterBody component = interactor.GetComponent<CharacterBody>();
+                var component = interactor.GetComponent<CharacterBody>();
                 component.inventory.GiveItem(pickupDef.itemIndex);
                 ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
                 scrapperController.itemsEaten -= 1;
@@ -143,8 +154,10 @@ namespace ShareSuite
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
-            if (( //ShareSuite.RandomizeSharedPickups.Value ||
-                    !Blacklist.HasItem(item.itemIndex))
+            // For ShareVoidItemsAsBase
+            ItemDef voidBaseItem = null;
+
+            if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && GeneralHooks.IsMultiplayer())
@@ -157,10 +170,16 @@ namespace ShareSuite
                 foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
                 {
                     // Ensure character is not original player that picked up item
-                    if (body != null && player.inventory == body.inventory) continue;
+                    if (player.inventory == body.inventory)
+                    {
+                        continue;
+                    }
 
                     // Do not reward dead players if not required
-                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer()) continue;
+                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer())
+                    {
+                        continue;
+                    }
 
                     if (ShareSuite.RandomizeSharedPickups.Value)
                     {
@@ -183,6 +202,40 @@ namespace ShareSuite
 
                         randomizedPlayerDict.Add(player, giveItem);
                     }
+                    // Other players get the base of the void item
+                    else if (item.IsVoid() && ShareSuite.ShareVoidItemsAsBase.Value)
+                    {
+                        var voidItemName = Language.GetString(itemDef.nameToken);
+
+                        if (!VoidItemsHelper.BaseItemsCorrespondences.ContainsKey(itemDef))
+                        {
+                            Debug.LogWarning($"ShareSuite :: No corresponding base item found for void item {voidItemName}.");
+
+                            // Can break loop. Item not found.
+                            break;
+                        }
+
+                        // Ensures all other players get the same item in case of multiple possible bases
+                        if (voidBaseItem == null)
+                        {
+                            // Ensures that the rolled item can be shared
+                            var possibleBaseItems = VoidItemsHelper.BaseItemsCorrespondences[itemDef]
+                                .Where(x => IsValidItemPickup(x.GetPickupDef().pickupIndex) && !Blacklist.HasItem(x.itemIndex))
+                                .ToList();
+
+                            if (!possibleBaseItems.Any())
+                            {
+                                Debug.Log($"ShareSuite :: No corresponding base item can be shared for void item {voidItemName}.");
+
+                                // Can break loop. No base item can be shared.
+                                break;
+                            }
+
+                            voidBaseItem = possibleBaseItems[Random.Range(0, possibleBaseItems.Count)];
+                        }
+
+                        player.inventory.GiveItem(voidBaseItem.itemIndex);
+                    }
                     // Otherwise give everyone the same item
                     else
                     {
@@ -199,10 +252,18 @@ namespace ShareSuite
             }
 
             orig(self, body);
-            ChatHandler.SendRichPickupMessage(master, item);
+
+            if (voidBaseItem != null)
+            {
+                ChatHandler.SendShareVoidItemsAsBaseMessage(master, item, voidBaseItem);
+            }
+            else
+            {
+                ChatHandler.SendRichPickupMessage(master, item);
+            }
         }
 
-        // Depricated
+        // Deprecated
         // public static void RemoveDefaultPickupMessage(ILContext il)
         // {
         //     var cursor = new ILCursor(il);
@@ -235,10 +296,10 @@ namespace ShareSuite
 
             var costType = self.GetComponent<PurchaseInteraction>().costType;
 
-            //If is valid drop and dupe fix not enabled, true -> we want the item to pop
-            //if is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
-            //if is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop 
-            //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
+            // If is valid drop and dupe fix not enabled, true -> we want the item to pop
+            // If is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
+            // If is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop
+            // If is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
 
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
                 || (!IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value)
@@ -249,7 +310,7 @@ namespace ShareSuite
             {
                 orig(self);
             }
-            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && printerCosts.Contains(costType))
+            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
             {
                 orig(self);
             }
@@ -258,7 +319,10 @@ namespace ShareSuite
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
         {
-            if (!self.CanBeAffordedByInteractor(activator)) return;
+            if (!self.CanBeAffordedByInteractor(activator))
+            {
+                return;
+            }
 
             if (!GeneralHooks.IsMultiplayer())
             {
@@ -276,7 +340,7 @@ namespace ShareSuite
 
             #region Cauldronfix
 
-            if (printerCosts.Contains(self.costType))
+            if (PrinterCosts.Contains(self.costType))
             {
                 if (ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
@@ -286,15 +350,21 @@ namespace ShareSuite
 
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
 
-                    if (item == null) RoR2.Console.print("ShareSuite: PickupCatalog is null.");
-                    else inventory.GiveItem(item.Value);
+                    if (item == null)
+                    {
+                        MonoBehaviour.print("ShareSuite: PickupCatalog is null.");
+                    }
+                    else
+                    {
+                        inventory.GiveItem(item.Value);
+                    }
 
                     orig(self, activator);
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
                     return;
                 }
-            } 
+            }
 
             #endregion Cauldronfix
 
@@ -335,15 +405,15 @@ namespace ShareSuite
             EntityStates.ScavBackpack.Opening self)
         {
             orig(self);
-            ShareSuite.DefaultMaxScavItemDropCount = Math.Max(EntityStates.ScavBackpack.Opening.maxItemDropCount,
-                ShareSuite.DefaultMaxScavItemDropCount);
+            ShareSuite.DefaultMaxScavItemDropCount =
+                Math.Max(EntityStates.ScavBackpack.Opening.maxItemDropCount, ShareSuite.DefaultMaxScavItemDropCount);
             var chest = self.GetFieldValue<ChestBehavior>("chestBehavior");
             if (chest.tier1Chance > 0.0f)
             {
                 var adjustedDrops =
                     Math.Max(
-                        (int) Math.Ceiling((double) ShareSuite.DefaultMaxScavItemDropCount /
-                                           Run.instance.participatingPlayerCount), 2);
+                        (int) Math.Ceiling((double) ShareSuite.DefaultMaxScavItemDropCount / Run.instance.participatingPlayerCount),
+                        2);
                 EntityStates.ScavBackpack.Opening.maxItemDropCount =
                     Math.Min(adjustedDrops, ShareSuite.DefaultMaxScavItemDropCount);
             }
@@ -403,13 +473,10 @@ namespace ShareSuite
                     case ItemTier.Boss:
                         return ShareSuite.BossItemsShared.Value;
                     case ItemTier.VoidTier1:
-                        return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidTier2:
-                        return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidTier3:
-                        return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidBoss:
-                        return ShareSuite.VoidItemsShared.Value;
+                        return ShareSuite.VoidItemsShared.Value || ShareSuite.VoidItemsShared.Value;
                     case ItemTier.NoTier:
                         break;
                     case ItemTier.AssignedAtRuntime:
@@ -441,49 +508,70 @@ namespace ShareSuite
                     return PickRandomOf(Blacklist.AvailableTier3DropList);
                 case ItemTier.Lunar:
                     if (ShareSuite.LunarItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableLunarDropList);
+                    }
+
                     break;
                 case ItemTier.Boss:
                     if (ShareSuite.BossItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableBossDropList);
+                    }
+
                     break;
                 case ItemTier.VoidBoss:
                     if (ShareSuite.VoidItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    }
+
                     break;
                 case ItemTier.VoidTier1:
                     if (ShareSuite.VoidItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    }
+
                     break;
                 case ItemTier.VoidTier2:
                     if (ShareSuite.VoidItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    }
+
                     break;
                 case ItemTier.VoidTier3:
                     if (ShareSuite.VoidItemsRandomized.Value)
+                    {
                         return PickRandomOf(Blacklist.AvailableVoidDropList);
+                    }
+
                     break;
             }
 
             var pickupDef = PickupCatalog.GetPickupDef(orDefault);
             if (Blacklist.HasItem(pickupDef.itemIndex))
+            {
                 return null;
+            }
+
             return orDefault;
         }
 
         internal static object GetInstanceField(Type type, object instance, string fieldName)
         {
-            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-                                     | BindingFlags.Static | BindingFlags.GetField;
-            FieldInfo field = type.GetField(fieldName, bindFlags);
+            var bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                            | BindingFlags.Static | BindingFlags.GetField;
+            var field = type.GetField(fieldName, bindFlags);
             return field.GetValue(instance);
         }
 
         internal static void SetInstanceField(Type type, object instance, string fieldName, object value)
         {
-            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-                                     | BindingFlags.Static;
-            FieldInfo field = type.GetField(fieldName, bindFlags);
+            var bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                            | BindingFlags.Static;
+            var field = type.GetField(fieldName, bindFlags);
             field.SetValue(instance, value);
         }
 
