@@ -527,7 +527,7 @@ namespace ShareSuite
         public static void HandleRichMessageUnlockAndNotification(CharacterMaster characterMaster, PickupIndex pickupIndex)
         {
             // No need if rich messages are disabled
-            if (!ShareSuite.RichMessagesEnabled.Value)
+            if (!ShareSuite.RichMessagesEnabled.Value || !characterMaster.isLocalPlayer)
             {
                 return;
             }
