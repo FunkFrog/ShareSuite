@@ -476,7 +476,7 @@ namespace ShareSuite
                     case ItemTier.VoidTier2:
                     case ItemTier.VoidTier3:
                     case ItemTier.VoidBoss:
-                        return ShareSuite.VoidItemsShared.Value || ShareSuite.VoidItemsShared.Value;
+                        return ShareSuite.VoidItemsShared.Value || ShareSuite.ShareVoidItemsAsBase.Value;
                     case ItemTier.NoTier:
                         break;
                     case ItemTier.AssignedAtRuntime:
