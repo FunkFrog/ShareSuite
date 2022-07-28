@@ -132,7 +132,7 @@ namespace ShareSuite
                 scrapperController.itemsEaten -= 1;
             }
         }
-        
+
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
             GenericPickupController self, CharacterBody body)
         {
@@ -431,8 +431,11 @@ namespace ShareSuite
         }
 
         public static event Func<GenericPickupController, CharacterBody, bool> AdditionalPickupValidityChecks;
-        public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker) {
-            if(AdditionalPickupValidityChecks == null) return true;
+
+        public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker)
+        {
+            if(AdditionalPickupValidityChecks == null)
+                return true;
             var retv = true;
             foreach(Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks.GetInvocationList())
                 retv &= f(pickup, picker);
