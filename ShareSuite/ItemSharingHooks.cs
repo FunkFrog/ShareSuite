@@ -430,20 +430,13 @@ namespace ShareSuite
             return false;
         }
 
-        public class PickupValidityCheckEventData {
-            public bool pickupIsValid = true;
-            public readonly GenericPickupController pickup;
-
-            public PickupValidityCheckEventData(GenericPickupController pickup) {
-                this.pickup = pickup;
-            }
-        }
-        public static event EventHandler<PickupValidityCheckEventData> AdditionalPickupValidityChecks;
+        public static event Func<GenericPickupController, CharacterBody, bool> AdditionalPickupValidityChecks;
         public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker) {
             if(AdditionalPickupValidityChecks == null) return true;
-            var args = new PickupValidityCheckEventData(pickup);
-            AdditionalPickupValidityChecks.Invoke(picker, args);
-            return args.pickupIsValid;
+            var retv = true;
+            foreach(Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks.GetInvocationList())
+                retv &= f(pickup, picker);
+            return retv;
         }
         
         private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
