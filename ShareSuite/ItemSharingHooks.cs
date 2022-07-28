@@ -132,7 +132,7 @@ namespace ShareSuite
                 scrapperController.itemsEaten -= 1;
             }
         }
-
+        
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
             GenericPickupController self, CharacterBody body)
         {
@@ -147,6 +147,7 @@ namespace ShareSuite
                     !Blacklist.HasItem(item.itemIndex))
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
+                && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer())
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
@@ -429,6 +430,22 @@ namespace ShareSuite
             return false;
         }
 
+        public class PickupValidityCheckEventData {
+            public bool pickupIsValid = true;
+            public readonly GenericPickupController pickup;
+
+            public PickupValidityCheckEventData(GenericPickupController pickup) {
+                this.pickup = pickup;
+            }
+        }
+        public static event EventHandler<PickupValidityCheckEventData> AdditionalPickupValidityChecks;
+        public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker) {
+            if(AdditionalPickupValidityChecks == null) return true;
+            var args = new PickupValidityCheckEventData(pickup);
+            AdditionalPickupValidityChecks.Invoke(picker, args);
+            return args.pickupIsValid;
+        }
+        
         private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
