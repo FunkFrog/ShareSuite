@@ -150,6 +150,7 @@ namespace ShareSuite
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
+                && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer())
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
@@ -449,6 +450,18 @@ namespace ShareSuite
             return false;
         }
 
+        public static event Func<GenericPickupController, CharacterBody, bool> AdditionalPickupValidityChecks;
+
+        public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker)
+        {
+            if(AdditionalPickupValidityChecks == null)
+                return true;
+            var retv = true;
+            foreach(Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks.GetInvocationList())
+                retv &= f(pickup, picker);
+            return retv;
+        }
+        
         private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
