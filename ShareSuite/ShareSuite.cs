@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
 using RoR2;
+using ShareSuite.Networking;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -53,7 +54,7 @@ namespace ShareSuite
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
-
+        public static ConfigEntry<short> NetworkMessageType;
 
         private bool _previouslyEnabled;
 
@@ -61,11 +62,14 @@ namespace ShareSuite
 
         public void Update()
         {
-            if (!NetworkServer.active
-                || !ModIsEnabled.Value
+            if (!ModIsEnabled.Value
                 || !MoneyIsShared.Value
                 || MoneySharingHooks.MapTransitionActive
                 || !GeneralHooks.IsMultiplayer()) return;
+
+            NetworkHandler.RegisterHandlers();
+
+            if (!NetworkServer.active) return;
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
@@ -358,6 +362,13 @@ namespace ShareSuite
                 "Equipment (by internal name) that you do not want to share, comma separated. Please find the \"Code Names\"s at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             EquipmentBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
+
+            NetworkMessageType = Config.Bind(
+                "Settings",
+                "NetworkMessageType",
+                (short)1021,
+                "The identifier for network message for this mod. Must be unique across all mods."
+            );
         }
 
         #region CommandParser

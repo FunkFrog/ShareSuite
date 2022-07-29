@@ -37,12 +37,13 @@ namespace ShareSuite
             orig(user);
 
             if (ShareSuite.LastMessageSent.Value.Equals(ShareSuite.MessageSendVer)) return;
-            else ShareSuite.LastMessageSent.Value = ShareSuite.MessageSendVer;
+
+            ShareSuite.LastMessageSent.Value = ShareSuite.MessageSendVer;
 
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.6</color><color=#{GrayColor}>! We're currently"
+                          + $"<color=#{RedColor}>ShareSuite 2.7</color><color=#{GrayColor}>! We're currently"
                           + " trying to get a better idea of how people use our mod. If you wouldn't mind taking 2 minutes to"
                           + $" fill out this form, it would be </color><color=#{RedColor}>invaluable</color>"
                           + $"<color=#{GrayColor}> in helping us improve the mod!</color>";
@@ -53,10 +54,10 @@ namespace ShareSuite
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
             timer.Elapsed += delegate
             {
-                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = notRepeatedMessage});
-                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = message});
-                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = linkMessage});
-                RoR2.Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = clickChatBox});
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = notRepeatedMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = message });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = linkMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = clickChatBox });
             };
             timer.AutoReset = false;
             timer.Start();
@@ -72,10 +73,10 @@ namespace ShareSuite
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (!GeneralHooks.IsMultiplayer() || body == null
-                                              || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, pickupDef.pickupIndex);
+
                 return;
             }
 
@@ -89,39 +90,42 @@ namespace ShareSuite
                 var coinMessage =
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{pickupName ?? "???"} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
-                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = coinMessage});
-                    return;
+                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
+
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = coinMessage });
+
+                return;
             }
-            
-            if (Blacklist.HasItem(pickupDef.itemIndex)
-                || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
+
+            if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
             {
                 var singlePickupMessage =
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{pickupName ?? "???"} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
+                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
                     $"<color=#{NotSharingColor}>(Item Set to NOT be Shared)</color>";
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = singlePickupMessage});
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
                 return;
             }
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                $"{pickupName ?? "???"} ({itemCount})</color> <color=#{GrayColor}>for themselves</color>" +
+                $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves</color>" +
                 $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         public static void SendRichCauldronMessage(CharacterMaster player, PickupIndex index)
         {
             var body = player.hasBody ? player.GetBody() : null;
 
-            if (!GeneralHooks.IsMultiplayer() || body == null
-                                              || !ShareSuite.RichMessagesEnabled.Value)
+            if (!GeneralHooks.IsMultiplayer() ||
+                body == null ||
+                !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, index);
+
                 return;
             }
 
@@ -134,8 +138,8 @@ namespace ShareSuite
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
                 $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                $"{pickupName ?? "???"} ({itemCount})</color><color=#{GrayColor}>.</color>";
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+                $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color><color=#{GrayColor}>.</color>";
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         public static void SendRichRandomizedPickupMessage(CharacterMaster origPlayer, PickupDef origPickup,
@@ -144,6 +148,7 @@ namespace ShareSuite
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(origPlayer, origPickup.pickupIndex);
+
                 return;
             }
 
@@ -156,7 +161,6 @@ namespace ShareSuite
 
             var remainingPlayers = pickupIndices.Count;
             var pickupMessage = "";
-
 
             foreach (var index in pickupIndices)
             {
@@ -184,15 +188,15 @@ namespace ShareSuite
                     $"<color=#{playerColor}>{index.Key.playerCharacterMasterController.GetDisplayName()}</color> " +
                     $"<color=#{GrayColor}>got</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{pickupName ?? "???"} ({itemCount})</color>";
+                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color>";
             }
 
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         private static string ItemPickupFormatter(CharacterBody body)
         {
-            // Initialize an int for the amount of players eligible to recieve the item
+            // Initialize an int for the amount of players eligible to receive the item
             var eligiblePlayers = GetEligiblePlayers(body);
 
             // If there's nobody else, return " and No-one Else"
