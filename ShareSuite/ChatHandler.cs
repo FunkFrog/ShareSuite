@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using R2API.MiscHelpers;
 using RoR2;
 using ShareSuite.Extensions;
 using UnityEngine;
@@ -67,10 +68,10 @@ namespace ShareSuite
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
             timer.Elapsed += delegate
             {
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = notRepeatedMessage});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = message});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = linkMessage});
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = clickChatBox});
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = notRepeatedMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = message });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = linkMessage });
+                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = clickChatBox });
             };
             timer.AutoReset = false;
             timer.Start();
@@ -211,6 +212,11 @@ namespace ShareSuite
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
+                if (ShareSuite.RichMessagesEnabled.Value)
+                {
+                    SendPickupMessage(origPlayer, origPickup.pickupIndex);
+                }
+
                 return;
             }
 
@@ -224,11 +230,10 @@ namespace ShareSuite
             var remainingPlayers = pickupIndices.Count;
             var pickupMessage = "";
 
-
-            foreach (var index in pickupIndices)
+            foreach (var (key, value) in pickupIndices)
             {
-                var characterName = CharacterNameWithColorFormatter(index.Key.playerCharacterMasterController);
-                var itemName = ItemNameWithInventoryCountFormatter(index.Key.playerCharacterMasterController.master, index.Value);
+                var characterName = CharacterNameWithColorFormatter(key.playerCharacterMasterController);
+                var itemName = ItemNameWithInventoryCountFormatter(key.playerCharacterMasterController.master, value);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
@@ -247,7 +252,7 @@ namespace ShareSuite
                 pickupMessage += $"{characterName} <color=#{GrayColor}>got</color> {itemName}";
             }
 
-            Chat.SendBroadcastChat(new Chat.SimpleChatMessage {baseToken = pickupMessage});
+            Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
         private static string ItemPickupFormatter(CharacterBody body)

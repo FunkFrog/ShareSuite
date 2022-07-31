@@ -11,6 +11,7 @@ using Random = UnityEngine.Random;
 using EntityStates.Scrapper;
 using ShareSuite.Extensions;
 using ShareSuite.Helpers;
+using ShareSuite.Networking;
 
 namespace ShareSuite
 {
@@ -138,7 +139,7 @@ namespace ShareSuite
 
                 SetInstanceField(typeof(ScrappingToIdle), self, "foundValidScrap", true);
                 var component = interactor.GetComponent<CharacterBody>();
-                component.inventory.GiveItem(pickupDef.itemIndex);
+                HandleGiveItem(component.master, pickupDef);
                 ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
                 scrapperController.itemsEaten -= 1;
             }
@@ -160,6 +161,7 @@ namespace ShareSuite
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
+                && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer())
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
@@ -167,17 +169,26 @@ namespace ShareSuite
                     randomizedPlayerDict.Add(master, item);
                 }
 
-                foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master))
+                foreach (var player in PlayerCharacterMasterController.instances
+                             .Select(p => p.master))
                 {
-                    // Ensure character is not original player that picked up item
-                    if (player.inventory == body.inventory)
+                    // Do not reward dead players if not required
+                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer())
                     {
                         continue;
                     }
 
-                    // Do not reward dead players if not required
-                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer())
+                    // Do not give an additional item to the player who picked it up.
+                    if (player.inventory == body.inventory)
                     {
+                        // Do not send the message to unlock if it's the local player.
+                        if (player.isLocalPlayer)
+                        {
+                            continue;
+                        }
+
+                        NetworkHandler.SendItemPickupMessage(player.playerCharacterMasterController.networkUser.connectionToClient.connectionId, item.pickupIndex);
+
                         continue;
                     }
 
@@ -192,7 +203,7 @@ namespace ShareSuite
 
                         var giveItem = PickupCatalog.GetPickupDef(pickupIndex.Value);
 
-                        player.inventory.GiveItem(giveItem.itemIndex);
+                        HandleGiveItem(player, giveItem);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
@@ -239,14 +250,16 @@ namespace ShareSuite
                     // Otherwise give everyone the same item
                     else
                     {
-                        player.inventory.GiveItem(item.itemIndex);
+                        HandleGiveItem(player, item);
                     }
                 }
 
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
                     orig(self, body);
+
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
+
                     return;
                 }
             }
@@ -260,6 +273,7 @@ namespace ShareSuite
             else
             {
                 ChatHandler.SendRichPickupMessage(master, item);
+                HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
             }
         }
 
@@ -302,7 +316,7 @@ namespace ShareSuite
             // If is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
 
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
-                || (!IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value)
+                || !IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value
                 //if it's not a valid drop AND the dupe fix isn't enabled
                 || self.itemTier == ItemTier.Lunar
                 || costType == CostTypeIndex.Money
@@ -356,7 +370,7 @@ namespace ShareSuite
                     }
                     else
                     {
-                        inventory.GiveItem(item.Value);
+                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
                     }
 
                     orig(self, activator);
@@ -399,7 +413,6 @@ namespace ShareSuite
 
             orig(self, activator);
         }
-
 
         private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
@@ -453,7 +466,6 @@ namespace ShareSuite
             cursor.EmitDelegate<Func<int, int>>(i => ShareSuite.SimulacrumLootCredit.Value);
         }
 
-
         public static bool IsValidItemPickup(PickupIndex pickup)
         {
             var pickupDef = PickupCatalog.GetPickupDef(pickup);
@@ -496,6 +508,18 @@ namespace ShareSuite
             return false;
         }
 
+        public static event Func<GenericPickupController, CharacterBody, bool> AdditionalPickupValidityChecks;
+
+        public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker)
+        {
+            if(AdditionalPickupValidityChecks == null)
+                return true;
+            var retv = true;
+            foreach(Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks.GetInvocationList())
+                retv &= f(pickup, picker);
+            return retv;
+        }
+        
         private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
@@ -579,5 +603,33 @@ namespace ShareSuite
             collection.Count > 0
                 ? collection[Random.Range(0, collection.Count)]
                 : (T?) null;
+
+        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
+        {
+            characterMaster.inventory.GiveItem(pickupDef.itemIndex);
+
+            var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient?.connectionId;
+
+            if (connectionId != null)
+            {
+                NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
+            }
+        }
+
+        public static void HandleRichMessageUnlockAndNotification(CharacterMaster characterMaster, PickupIndex pickupIndex)
+        {
+            // No need if rich messages are disabled
+            if (!ShareSuite.RichMessagesEnabled.Value || !characterMaster.isLocalPlayer)
+            {
+                return;
+            }
+
+            characterMaster.playerCharacterMasterController?.networkUser?.localUser?.userProfile.DiscoverPickup(pickupIndex);
+
+            if (characterMaster.inventory.GetItemCount(PickupCatalog.GetPickupDef(pickupIndex).itemIndex) <= 1)
+            {
+                CharacterMasterNotificationQueue.PushPickupNotification(characterMaster, pickupIndex);
+            }
+        }
     }
 }
