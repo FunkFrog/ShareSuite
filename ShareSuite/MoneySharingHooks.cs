@@ -79,8 +79,11 @@ namespace ShareSuite
             // Collect reward from tome and put it into shared pool
             SharedMoneyValue += amount;
 
-            if (!ShareSuite.MoneyScalarEnabled.Value
-                || !NetworkServer.active) return;
+            if (!ShareSuite.MoneyScalarEnabled.Value || !NetworkServer.active)
+            {
+                return;
+            }
+
             AddToSharedMoneyValue(amount);
 
             #endregion
@@ -144,7 +147,10 @@ namespace ShareSuite
                         var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                              shrineBloodBehavior.goldToPaidHpRatio);
 
-                        if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint)(amount * ShareSuite.MoneyScalar.Value);
+                        if (ShareSuite.MoneyScalarEnabled.Value)
+                        {
+                            amount = (uint)(amount * ShareSuite.MoneyScalar.Value);
+                        }
 
                         SharedMoneyValue += (int) amount;
                         return;
@@ -164,7 +170,7 @@ namespace ShareSuite
             {
                 orig(self);
                 return;
-            } 
+            }
 
             var players = PlayerCharacterMasterController.instances.Count;
             foreach (var player in PlayerCharacterMasterController.instances)
@@ -181,7 +187,7 @@ namespace ShareSuite
             BarrelInteraction self, Interactor activator)
         {
             orig(self, activator);
-            
+
             if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
@@ -189,8 +195,10 @@ namespace ShareSuite
             // Collect reward from barrel and put it into shared pool
             SharedMoneyValue += self.goldReward;
 
-            if (!ShareSuite.MoneyScalarEnabled.Value
-                || !NetworkServer.active) return;
+            if (!ShareSuite.MoneyScalarEnabled.Value || !NetworkServer.active)
+            {
+                return;
+            }
 
             AddToSharedMoneyValue(self.goldReward);
 
@@ -201,7 +209,7 @@ namespace ShareSuite
             DamageReport damageReport)
         {
             orig(self, damageReport);
-            
+
             if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
@@ -209,8 +217,10 @@ namespace ShareSuite
             // Collect reward from kill and put it into shared pool
             SharedMoneyValue += (int) self.goldReward;
 
-            if (!ShareSuite.MoneyScalarEnabled.Value
-                || !NetworkServer.active) return;
+            if (!ShareSuite.MoneyScalarEnabled.Value || !NetworkServer.active)
+            {
+                return;
+            }
 
             AddToSharedMoneyValue(self.goldReward);
 
@@ -226,7 +236,7 @@ namespace ShareSuite
             // Reset shared money value to the default (0) at the start of each round
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
             {
-                MoneySharingHooks.SharedMoneyValue = 15;
+                SharedMoneyValue = 15;
             }
 
             orig(self);
@@ -283,7 +293,9 @@ namespace ShareSuite
         private static void ToggleGoldGat(bool wasMultiplayer)
         {
             var isMultiplayer = GeneralHooks.IsMultiplayer();
+
             if (wasMultiplayer == isMultiplayer) return;
+
             if (ShareSuite.MoneyIsShared.Value && isMultiplayer)
             {
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -303,9 +315,10 @@ namespace ShareSuite
                 return;
             }
 
-            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
-                || !(bool) self.body
-                || !(bool) self.body.inventory
+            if (!ShareSuite.MoneyIsShared.Value ||
+                !GeneralHooks.IsMultiplayer() ||
+                !(bool) self.body ||
+                !(bool) self.body.inventory
             )
             {
                 orig(self, info);
@@ -338,7 +351,11 @@ namespace ShareSuite
             // Add impact effect
             foreach (var player in PlayerCharacterMasterController.instances)
             {
-                if (!(bool) player.master.GetBody() || player.master.GetBody() == body) continue;
+                if (!(bool) player.master.GetBody() || player.master.GetBody() == body)
+                {
+                    continue;
+                }
+
                 EffectManager.SimpleImpactEffect(Resources.Load<GameObject>(
                         "Prefabs/Effects/ImpactEffects/CoinImpact"),
                     player.master.GetBody().corePosition, Vector3.up, true);
@@ -407,10 +424,11 @@ namespace ShareSuite
         private static void BrittleCrownOnHitHook(On.RoR2.GlobalEventManager.orig_OnHitEnemy orig,
             GlobalEventManager self, DamageInfo info, GameObject victim)
         {
-            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
-                || !(bool) info.attacker
-                || !(bool) info.attacker.GetComponent<CharacterBody>()
-                || !(bool) info.attacker.GetComponent<CharacterBody>().master
+            if (!ShareSuite.MoneyIsShared.Value ||
+                !GeneralHooks.IsMultiplayer() ||
+                !(bool) info.attacker ||
+                !(bool) info.attacker.GetComponent<CharacterBody>() ||
+                !(bool) info.attacker.GetComponent<CharacterBody>().master
             )
             {
                 orig(self, info, victim);
@@ -443,8 +461,8 @@ namespace ShareSuite
             //Apply gold rewards to shared money pool
             SharedMoneyValue =
                 Math.Max(
-                    SharedMoneyValue +
-                    (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward), 0);
+                    SharedMoneyValue + (int) Mathf.Floor(goldReward * (float) ShareSuite.MoneyScalar.Value - goldReward),
+                    0);
         }
 
         public static void SetTeleporterActive(bool active)

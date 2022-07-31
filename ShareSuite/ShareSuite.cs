@@ -63,10 +63,10 @@ namespace ShareSuite
 
         public void Update()
         {
-            if (!ModIsEnabled.Value
-                || !MoneyIsShared.Value
-                || MoneySharingHooks.MapTransitionActive
-                || !GeneralHooks.IsMultiplayer())
+            if (!ModIsEnabled.Value ||
+                !MoneyIsShared.Value ||
+                MoneySharingHooks.MapTransitionActive ||
+                !GeneralHooks.IsMultiplayer())
             {
                 return;
             }
@@ -1034,7 +1034,7 @@ namespace ShareSuite
             }
         }
 
-//TODO re-introduce these as add/remove commands
+// TODO re-introduce these as add/remove commands
 //        // ItemBlacklist
 //        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
 //            helpText = "Items (by index) that you do not want to share, comma separated.")]

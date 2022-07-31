@@ -245,7 +245,7 @@ namespace ShareSuite
                             voidBaseItem = possibleBaseItems[Random.Range(0, possibleBaseItems.Count)];
                         }
 
-                        player.inventory.GiveItem(voidBaseItem.itemIndex);
+                        HandleGiveItem(player, voidBaseItem.GetPickupDef());
                     }
                     // Otherwise give everyone the same item
                     else
@@ -273,8 +273,9 @@ namespace ShareSuite
             else
             {
                 ChatHandler.SendRichPickupMessage(master, item);
-                HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
             }
+
+            HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
 
         // Deprecated
@@ -575,7 +576,7 @@ namespace ShareSuite
             }
 
             var pickupDef = PickupCatalog.GetPickupDef(orDefault);
-            if (Blacklist.HasItem(pickupDef.itemIndex))
+            if (Blacklist.HasItem(pickupDef!.itemIndex))
             {
                 return null;
             }
