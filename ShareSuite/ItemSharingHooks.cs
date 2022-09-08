@@ -17,7 +17,7 @@ namespace ShareSuite
 {
     public static class ItemSharingHooks
     {
-        private static bool _itemLock;
+        private static bool _itemLock = false;
 
         private static readonly List<CostTypeIndex> PrinterCosts = new List<CostTypeIndex>
         {
