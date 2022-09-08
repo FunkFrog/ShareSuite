@@ -43,12 +43,10 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.7</color><color=#{GrayColor}>! We're currently"
-                          + " trying to get a better idea of how people use our mod. If you wouldn't mind taking 2 minutes to"
-                          + $" fill out this form, it would be </color><color=#{RedColor}>invaluable</color>"
-                          + $"<color=#{GrayColor}> in helping us improve the mod!</color>";
-            var linkMessage =
-                $"<color=#{LinkColor}>https://tinyurl.com/sharesuite</color>    <color=#{GrayColor}>(Type into browser)</color>";
+                          + $"<color=#{RedColor}>ShareSuite 2.8</color><color=#{GrayColor}>!"
+                          + " You should now receive logbook updates, and item description popups upon picking up items."
+                          + " (You can turn Rich Messages back on now!) This mod is now compatible with Yeet, and"
+                          + " some general maintenance has been done to the default blacklists! Have fun!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
@@ -56,7 +54,6 @@ namespace ShareSuite
             {
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = notRepeatedMessage });
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = message });
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = linkMessage });
                 Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = clickChatBox });
             };
             timer.AutoReset = false;
