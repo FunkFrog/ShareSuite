@@ -1,5 +1,9 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`2.2.0`
+- Updated the mod to work with the latest patch
+- Adjusted the Sacrifice Fix to not drop extremely low amounts of items with more then 4 players in a lobby
+
 `2.1.0`
 - Fixed an issue regarding scrappers sharing to everyone
 - Fixed item picking messages printing twice when rich messages are disabled
