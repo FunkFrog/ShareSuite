@@ -11,17 +11,17 @@ namespace ShareSuite.Networking
         {
             var client = NetworkManager.singleton?.client;
 
-            if (client == null || client.handlers.ContainsKey(ShareSuite.NetworkMessageType.Value))
+            if (client == null || client.handlers.ContainsKey((short) ShareSuite.NetworkMessageType.Value))
             {
                 return;
             }
 
-            client.RegisterHandler(ShareSuite.NetworkMessageType.Value, ItemPickupHandler);
+            client.RegisterHandler((short) ShareSuite.NetworkMessageType.Value, ItemPickupHandler);
         }
 
         public static void SendItemPickupMessage(int connectionId, PickupIndex pickupIndex)
         {
-            NetworkServer.SendToClient(connectionId, ShareSuite.NetworkMessageType.Value, new ItemPickupMessage(pickupIndex));
+            NetworkServer.SendToClient(connectionId, (short) ShareSuite.NetworkMessageType.Value, new ItemPickupMessage(pickupIndex));
         }
 
         private static void ItemPickupHandler(NetworkMessage networkMessage)
