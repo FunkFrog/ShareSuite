@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
@@ -15,8 +15,8 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
+    [BepInDependency("com.KingEnderBrine.InLobbyConfig", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.8.0")]
-    [R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -52,9 +52,9 @@ namespace ShareSuite
             OverrideMultiplayerCheck;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
-        public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
+        public static ConfigEntry<float> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
-        public static ConfigEntry<short> NetworkMessageType;
+        public static ConfigEntry<int> NetworkMessageType;
 
         private bool _previouslyEnabled;
 
@@ -81,10 +81,9 @@ namespace ShareSuite
 
         public static int DefaultMaxScavItemDropCount = 0;
 
-        public ShareSuite()
+        public void Awake()
         {
             InitConfig();
-            CommandHelper.AddToConsoleWhenReady();
 
             //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
@@ -124,7 +123,7 @@ namespace ShareSuite
         {
             ModIsEnabled = Config.Bind(
                 "Settings",
-                "ModEnabled",
+                "Enabled",
                 true,
                 "Toggles whether or not the mod is enabled. If turned off while in-game, it will unhook " +
                 "everything and reset the game to it's default behaviors."
@@ -258,7 +257,7 @@ namespace ShareSuite
             InteractablesCredit = Config.Bind(
                 "Balance",
                 "InteractablesCredit",
-                1d,
+                1f,
                 "If player scaling via this mod is enabled, the amount of players the game should think are playing in terms of chest spawns."
             );
 
@@ -343,7 +342,7 @@ namespace ShareSuite
             MoneyScalar = Config.Bind(
                 "Settings",
                 "MoneyScalar",
-                1D,
+                1f,
                 "Modifies player count used in calculations of gold earned when money sharing is on."
             );
 
@@ -366,9 +365,14 @@ namespace ShareSuite
             NetworkMessageType = Config.Bind(
                 "Settings",
                 "NetworkMessageType",
-                (short)1021,
+                1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
             );
+
+            if (ModCompatibilityInLobbyConfig.enabled)
+            {
+                ModCompatibilityInLobbyConfig.CreateFromBepInExConfigFile(Config, "ShareSuite");
+            }
         }
 
         #region CommandParser
@@ -463,7 +467,7 @@ namespace ShareSuite
                 return;
             }
 
-            var valid = args.TryGetArgDouble(0);
+            var valid = args.TryGetArgFloat(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to a number.");
             else
@@ -737,7 +741,7 @@ namespace ShareSuite
                 return;
             }
 
-            var valid = args.TryGetArgDouble(0);
+            var valid = args.TryGetArgFloat(0);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to a number.");
             else
