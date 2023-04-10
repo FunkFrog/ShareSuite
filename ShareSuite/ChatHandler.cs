@@ -66,8 +66,9 @@ namespace ShareSuite
             if (!ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
 
-        public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef)
+        public static void SendRichPickupMessage(CharacterMaster player, GenericPickupController pickupController)
         {
+            PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupController.pickupIndex);
             var body = player.hasBody ? player.GetBody() : null;
 
             if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
@@ -94,7 +95,7 @@ namespace ShareSuite
                 return;
             }
 
-            if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
+            if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex) || !ItemSharingHooks.IsValidPickupObject(pickupController, body))
             {
                 var singlePickupMessage =
                     $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
@@ -139,9 +140,10 @@ namespace ShareSuite
             Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = pickupMessage });
         }
 
-        public static void SendRichRandomizedPickupMessage(CharacterMaster origPlayer, PickupDef origPickup,
+        public static void SendRichRandomizedPickupMessage(CharacterMaster origPlayer, GenericPickupController origPickupController,
             Dictionary<CharacterMaster, PickupDef> pickupIndices)
         {
+            PickupDef origPickup = PickupCatalog.GetPickupDef(origPickupController.pickupIndex);
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(origPlayer, origPickup.pickupIndex);
@@ -152,7 +154,7 @@ namespace ShareSuite
             // If nobody got a randomized item
             if (pickupIndices.Count == 1)
             {
-                SendRichPickupMessage(origPlayer, origPickup);
+                SendRichPickupMessage(origPlayer, origPickupController);
                 return;
             }
 

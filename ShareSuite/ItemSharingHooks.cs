@@ -209,14 +209,14 @@ namespace ShareSuite
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
                     orig(self, body);
-                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
+                    ChatHandler.SendRichRandomizedPickupMessage(master, self, randomizedPlayerDict);
                     return;
                 }
             }
 
             orig(self, body);
 
-            ChatHandler.SendRichPickupMessage(master, item);
+            ChatHandler.SendRichPickupMessage(master, self);
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
