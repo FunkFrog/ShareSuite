@@ -43,10 +43,8 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.8</color><color=#{GrayColor}>!"
-                          + " You should now receive logbook updates, and item description popups upon picking up items."
-                          + " (You can turn Rich Messages back on now!) This mod is now compatible with Yeet, and"
-                          + " some general maintenance has been done to the default blacklists! Have fun!</color>";
+                          + $"<color=#{RedColor}>ShareSuite 2.8.1</color><color=#{GrayColor}>!"
+                          + " This release contains a small fix to item pickups. Have fun!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds

@@ -21,7 +21,7 @@ namespace ShareSuite.Networking
 
         public static void SendItemPickupMessage(int connectionId, PickupIndex pickupIndex)
         {
-            NetworkServer.SendToClient(connectionId, ShareSuite.NetworkMessageType.Value, new ItemPickupMessage(pickupIndex));
+            //NetworkServer.SendToClient(connectionId, ShareSuite.NetworkMessageType.Value, new ItemPickupMessage(pickupIndex)); temporary to prevent communication error
         }
 
         private static void ItemPickupHandler(NetworkMessage networkMessage)
