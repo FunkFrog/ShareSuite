@@ -15,8 +15,8 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.8.1")]
-    [R2APISubmoduleDependency("CommandHelper")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.9.0")]
+    //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
     {
@@ -84,7 +84,7 @@ namespace ShareSuite
         public ShareSuite()
         {
             InitConfig();
-            CommandHelper.AddToConsoleWhenReady();
+            //CommandHelper.AddToConsoleWhenReady();
 
             //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
