@@ -1,5 +1,8 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
+`2.3.0`
+- Fixed a bug where scrapper wouldn't output the correct amount of scrap
+
 `2.2.0`
 - Updated the mod to work with the latest patch
 - Adjusted the Sacrifice Fix to not drop extremely low amounts of items with more then 4 players in a lobby
