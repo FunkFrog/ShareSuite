@@ -23,7 +23,7 @@ namespace ShareSuite
         #region ConfigWrapper init
 
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.8";
+        public static string MessageSendVer = "2.9";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
@@ -84,7 +84,7 @@ namespace ShareSuite
         public ShareSuite()
         {
             InitConfig();
-            //CommandHelper.AddToConsoleWhenReady();
+            CommandHelper.AddToConsoleWhenReady();
 
             //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
