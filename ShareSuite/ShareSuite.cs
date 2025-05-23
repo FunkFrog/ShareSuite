@@ -14,8 +14,8 @@ using UnityEngine.Networking;
 
 namespace ShareSuite
 {
-    [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.9.0")]
+    [BepInDependency(R2API.R2API.PluginGUID)]
+    [BepInPlugin("com.drewcav96.sharesuite", "ShareSuite", "2.9.1")]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -49,7 +49,8 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck;
+            OverrideMultiplayerCheck,
+            CapHalcyoniteDrops;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -84,7 +85,7 @@ namespace ShareSuite
         public ShareSuite()
         {
             InitConfig();
-            CommandHelper.AddToConsoleWhenReady();
+            //CommandHelper.AddToConsoleWhenReady();
 
             //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
 
@@ -368,6 +369,13 @@ namespace ShareSuite
                 "NetworkMessageType",
                 (short)1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
+            );
+
+            CapHalcyoniteDrops = Config.Bind(
+                "Settings",
+                "CapHalcyoniteDrops",
+                true,
+                "Toggles whether or not the Halcyonite Shrine should be capped to 1 total drop."
             );
         }
 

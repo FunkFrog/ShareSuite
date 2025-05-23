@@ -1,78 +1,86 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>8</LangVersion>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>8</LangVersion>
+	</PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath></OutputPath>
-    </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+		<OutputPath></OutputPath>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <Reference Include="0Harmony, Version=2.7.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\0Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="0Harmony20, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\0Harmony20.dll</HintPath>
-      </Reference>
-      <Reference Include="Assembly-CSharp.R2API.mm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\Assembly-CSharp.R2API.mm.dll</HintPath>
-      </Reference>
-      <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.dll</HintPath>
-      </Reference>
-      <Reference Include="BepInEx.Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.Harmony.dll</HintPath>
-      </Reference>
-      <Reference Include="BepInEx.Preloader, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.Preloader.dll</HintPath>
-      </Reference>
-      <Reference Include="com.unity.multiplayer-hlapi.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
-      </Reference>
-      <Reference Include="HarmonyXInterop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\HarmonyXInterop.dll</HintPath>
-      </Reference>
-      <Reference Include="HGCSharpUtils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\HGCSharpUtils.dll</HintPath>
-      </Reference>
-      <Reference Include="MMHOOK_RoR2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MMHOOK_RoR2.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil.Mdb, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Mdb.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil.Pdb, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Pdb.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil.Rocks, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Rocks.dll</HintPath>
-      </Reference>
-      <Reference Include="MonoMod.RuntimeDetour, Version=22.1.4.3, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MonoMod.RuntimeDetour.dll</HintPath>
-      </Reference>
-      <Reference Include="MonoMod.Utils, Version=22.1.4.3, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MonoMod.Utils.dll</HintPath>
-      </Reference>
-      <Reference Include="R2API, Version=4.4.1.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\R2API.dll</HintPath>
-      </Reference>
-      <Reference Include="RoR2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\RoR2.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.CoreModule.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.PhysicsModule.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="MMHOOK.RoR2" Version="2025.5.5" />
+	  <PackageReference Include="R2API.CommandHelper" Version="1.0.2" />
+	  <PackageReference Include="R2API.Core" Version="5.1.5" />
+	</ItemGroup>
+
+	<!--
+	<ItemGroup>
+		<Reference Include="0Harmony">
+			<HintPath>Deps\0Harmony.dll</HintPath>
+		</Reference>
+		<Reference Include="0Harmony20">
+			<HintPath>..\Deps\0Harmony20.dll</HintPath>
+		</Reference>
+		<Reference Include="Assembly-CSharp.R2API">
+			<HintPath>..\Deps\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx">
+			<HintPath>..\Deps\BepInEx.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Harmony">
+			<HintPath>..\Deps\BepInEx.Harmony.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Preloader">
+			<HintPath>..\Deps\BepInEx.Preloader.dll</HintPath>
+		</Reference>
+		<Reference Include="com.unity.multiplayer-hlapi.Runtime">
+			<HintPath>..\Deps\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="HarmonyXInterop">
+			<HintPath>..\Deps\HarmonyXInterop.dll</HintPath>
+		</Reference>
+		<Reference Include="HGCSharpUtils">
+			<HintPath>..\Deps\HGCSharpUtils.dll</HintPath>
+		</Reference>
+		<Reference Include="MMHOOK_RoR2">
+			<HintPath>..\Deps\MMHOOK_RoR2.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>..\Deps\Mono.Cecil.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Mdb">
+			<HintPath>..\Deps\Mono.Cecil.Mdb.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Pdb">
+			<HintPath>..\Deps\Mono.Cecil.Pdb.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Rocks">
+			<HintPath>..\Deps\Mono.Cecil.Rocks.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.RuntimeDetour">
+			<HintPath>..\Deps\MonoMod.RuntimeDetour.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.Utils">
+			<HintPath>..\Deps\MonoMod.Utils.dll</HintPath>
+		</Reference>
+		<Reference Include="R2API">
+			<HintPath>..\Deps\R2API.dll</HintPath>
+		</Reference>
+		<Reference Include="RoR2">
+			<HintPath>..\Deps\RoR2.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>..\Deps\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>..\Deps\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+			<HintPath>..\Deps\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	-->
 
 </Project>

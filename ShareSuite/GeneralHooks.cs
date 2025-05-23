@@ -2,6 +2,8 @@ using System;
 using RoR2;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using R2API.Utils;
 
 namespace ShareSuite
 {
@@ -19,6 +21,7 @@ namespace ShareSuite
         internal static void Hook()
         {
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards += HalcyoniteShrineInteractable_DropRewards;
             //IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
@@ -29,6 +32,7 @@ namespace ShareSuite
         internal static void UnHook()
         {
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards -= HalcyoniteShrineInteractable_DropRewards;
             //IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
@@ -56,6 +60,75 @@ namespace ShareSuite
         //     cursor.Index++;
         //     cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
         // }
+
+        private static void HalcyoniteShrineInteractable_DropRewards(On.RoR2.HalcyoniteShrineInteractable.orig_DropRewards orig, HalcyoniteShrineInteractable self)
+        {
+            if (!ShareSuite.CapHalcyoniteDrops.Value)
+            {
+                // Do not override
+                orig(self);
+                return;
+            }
+
+            if (!NetworkServer.active)
+            {
+                Debug.LogWarning("[Server] function 'System.Void RoR2.HalcyoniteShrineInteractable::DropRewards()' called on client");
+                return;
+            }
+
+            self.stateMachine.SetNextState(EntityStateCatalog.InstantiateState(ref self.finishedState));
+
+            int participatingPlayerCount = Run.instance.participatingPlayerCount;
+            var rewardDropTable = self.GetFieldValue<BasicPickupDropTable>(nameof(self.rewardDropTable));
+            var rewardOptionCount = self.GetFieldValue<int>(nameof(self.rewardOptionCount));
+            var rewardOffset = self.GetFieldValue<Vector3>(nameof(self.rewardOffset));
+
+            if (participatingPlayerCount <= 0 || !self.gameObject || !rewardDropTable)
+            {
+                return;
+            }
+
+            Vector3 vector = Quaternion.AngleAxis(UnityEngine.Random.Range(0, 360), Vector3.up) * (Vector3.up * 40f + Vector3.forward * 5f);
+            Vector3 position = self.gameObject.transform.position + rewardOffset;
+            GenericPickupController.CreatePickupInfo createPickupInfo = default;
+            var rng = self.GetFieldValue<Xoroshiro128Plus>(nameof(self.rng));
+
+            createPickupInfo.rotation = Quaternion.identity;
+
+            if (RunArtifactManager.instance.IsArtifactEnabled(RoR2Content.Artifacts.Command))
+            {
+                int num3 = rewardOptionCount - 2;
+
+                for (int i = 0; i < num3; i++)
+                {
+                    PickupIndex pickupIndex = rewardDropTable.GenerateDrop(rng);
+
+                    createPickupInfo.pickupIndex = pickupIndex;
+                    createPickupInfo.position = position;
+
+                    GenericPickupController.CreatePickupInfo pickupInfo = createPickupInfo;
+
+                    PickupDropletController.CreatePickupDroplet(pickupInfo, pickupInfo.position, vector);
+                }
+            }
+            else
+            {
+                var rewardDisplayTier = self.GetFieldValue<ItemTier>(nameof(self.rewardDisplayTier));
+                var halcyoniteDropTableTier3 = self.GetFieldValue<BasicPickupDropTable>(nameof(self.halcyoniteDropTableTier3));
+                var halcyoniteDropTableTier2 = self.GetFieldValue<BasicPickupDropTable>(nameof(self.halcyoniteDropTableTier2));
+                var rewardPickupPrefab = self.GetFieldValue<GameObject>(nameof(self.rewardPickupPrefab));
+
+                createPickupInfo.pickupIndex = PickupCatalog.FindPickupIndex(rewardDisplayTier);
+                createPickupInfo.pickerOptions = PickupPickerController.GenerateOptionsFromDropTablePlusForcedStorm(rewardOptionCount, halcyoniteDropTableTier3, halcyoniteDropTableTier2, rng);
+                createPickupInfo.prefabOverride = rewardPickupPrefab;
+
+                GenericPickupController.CreatePickupInfo pickupInfo2 = createPickupInfo;
+
+                pickupInfo2.position = position;
+
+                PickupDropletController.CreatePickupDroplet(pickupInfo2, position, vector);
+            }
+        }
 
         private static void SetSacrificeOffset(
             On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
