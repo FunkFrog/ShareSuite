@@ -350,7 +350,7 @@ namespace ShareSuite
             ItemBlacklist = Config.Bind(
                 "Settings",
                 "ItemBlacklist",
-                "BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey,FreeChest,RoboBallBuddy,MinorConstructOnKill",
+                "BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey,FreeChest,RoboBallBuddy,MinorConstructOnKill,LowerPricedChests,BarrageOnBoss,ItemDropChanceOnKill",
                 "Items (by internal name) that you do not want to share, comma separated. Please find the item \"Code Names\" at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
