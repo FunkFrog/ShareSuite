@@ -242,7 +242,7 @@ namespace ShareSuite
                 if (!master.hasBody || master.GetBody() == body) continue;
 
                 // If the player is dead/deadplayersgetitems is off, continue and add nothing
-                if (master.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                if (ItemSharingHooks.IsDeadAndNotADrone(master) && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                 // Get the player color
                 var playerColor = GetPlayerColor(playerCharacterMasterController);
@@ -285,7 +285,7 @@ namespace ShareSuite
                 if (!master.inventory || master.GetBody() == body) continue;
 
                 // If the player is alive, add one to eligablePlayers
-                if (!master.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value)
+                if (!ItemSharingHooks.IsDeadAndNotADrone(master) || ShareSuite.DeadPlayersGetItems.Value)
                 {
                     eligiblePlayers++;
                 }

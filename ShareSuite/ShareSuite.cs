@@ -91,7 +91,7 @@ namespace ShareSuite
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
+                if (ItemSharingHooks.IsDeadAndNotADrone(playerCharacterMasterController.master)) continue;
                 if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
                 playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
             }

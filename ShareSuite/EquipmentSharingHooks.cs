@@ -66,7 +66,7 @@ namespace ShareSuite
             {
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
                 return;
-            }
+            }    
             // If the new equip is shared, create a droplet of the old one.
             else if (EquipmentShared(newEquip))
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
@@ -171,7 +171,7 @@ namespace ShareSuite
         private static int GetLivingPlayersWithEquipment(EquipmentIndex originalEquip)
         {
             return PlayerCharacterMasterController.instances.Select(p => p.master)
-                .Where(p => p.inventory && !p.IsDeadAndOutOfLivesServer())
+                .Where(p => p.inventory && !ItemSharingHooks.IsDeadAndNotADrone(p))
                 .Count(master => master.inventory.currentEquipmentIndex == originalEquip);
         }
 

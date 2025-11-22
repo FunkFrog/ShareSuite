@@ -1,15 +1,16 @@
-using System;
+using EntityStates.Scrapper;
+using MonoMod.Cil;
+using R2API.Utils;
+using RewiredConsts;
 using RoR2;
+using ShareSuite.Networking;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MonoMod.Cil;
-using R2API.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 using Random = UnityEngine.Random;
-using EntityStates.Scrapper;
-using ShareSuite.Networking;
 
 namespace ShareSuite
 {
@@ -166,7 +167,7 @@ namespace ShareSuite
                              .Select(p => p.master))
                 {
                     // Do not reward dead players if not required
-                    if (!ShareSuite.DeadPlayersGetItems.Value && player.IsDeadAndOutOfLivesServer()) continue;
+                    if (!ShareSuite.DeadPlayersGetItems.Value && IsDeadAndNotADrone(player)) continue;
 
                     // Do not give an additional item to the player who picked it up.
                     if (player.inventory == body.inventory)
@@ -227,6 +228,12 @@ namespace ShareSuite
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
+        }
+
+        public static bool IsDeadAndNotADrone(CharacterMaster master)
+        {
+            if (master == null || master.GetBody() == null) return true;
+            return master.IsDeadAndOutOfLivesServer() && !master.GetBody().IsDrone;
         }
 
         private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig,
