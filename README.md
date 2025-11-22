@@ -11,11 +11,11 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|    Most Recent Update - 2.8    |
-|:--------------------------------:|
-| Add compatiblity with Yeet |
-| Add defense nucleus to default item blacklist |
-| Restore functionality of the logbook and the item description windows |
+|                       Most Recent Update - 2.10.0                        |
+|:------------------------------------------------------------------------:|
+|                          Update to support DLC3                          |
+|                 Add specific DLC3 items to the blacklist                 |
+| There are **KNOWN ISSUES** with this release! Check below for more info. |
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
 
@@ -126,8 +126,6 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 | Money Scalar Enabled             |         False |              ss_MoneyScalarEnabled |
 | Emulate Singleplayer Money       |          True |        ss_EmulateSingleplayerMoney |
 | Money Scalar                     |           1.0 |                     ss_MoneyScalar |
-| Item Blacklist                   |   53,60,82,86 |                                N/A |
-| Equipment Blacklist              |         Empty |                                N/A |
 
 **Tip: Want to reset your config?**
 
@@ -205,9 +203,29 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 ### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
 
-[![Build](https://img.shields.io/travis/com/FunkFrog/RoR2SharedItems?label=Build&style=flat-square)](https://travis-ci.com/FunkFrog/RoR2SharedItems)[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)[![Latest commit to Dev](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/dev?label=Latest%20Commit%20%28dev%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/tree/dev)
+[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-### `2.8.0 (Current Release)`
+### `2.10.0 (Current Release)`
+- Update to support DLC3
+- Add the following DLC3 items to the default blacklist
+  - Box of Dynamite
+  - Orphaned Core
+  - Sentry Key
+  - Prison Matrix
+  - Encrypted Cerebellum
+  - Exposed Cerebellum
+  - Quick Fix
+  - Seared Steak
+  - Hearty Stew
+  - Ultimate Meal
+  - Sauteed Worms
+- **KNOWN ISSUES**
+  - Singleplayer chat pickup messages are missing
+  - Drones encounter errors when being played as post-death with items and money sharing
+  - Scrappers currently encounter issues where if a client uses them, they will consume an item and not drop anything. 
+    - It is recommended that you only use scrappers as the host for the time being
+
+### `2.8.0`
 - Add compatiblity with Yeet (and any other mod wishing to mark items as unsharable)
 - Add defense nucleus to default item blacklist
 - Restore functionality of the logbook and the item description windows (you may want to turn rich messages back on if you turned them off to fix this problem!)
@@ -243,13 +261,6 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 - Resolved a minor issue with 3d printers
 - Resolved a minor issue with Ghor's Tome
 - Added a field "InteractablesOffset" to the scaling config allowing for more control over the game's balance
-
-### `2.4.0`
-- Introduces a new Sacrifice fix to fix poor drop rates with larger groups of people
-  - Thanks to raeon for the PR!
-
-### `2.3.0`
-- Fixed a bug where scrapper wouldn't output the correct amount of scrap
 
 **Looking for the changelogs for versions older then 5 prior? [Click here!](https://github.com/FunkFrog/RoR2SharedItems/blob/master/PreviousVersions.md)**
 
