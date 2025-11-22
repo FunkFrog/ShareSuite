@@ -43,7 +43,7 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.10.0 DLC3 Beta</color><color=#{GrayColor}>!"
+                          + $"<color=#{RedColor}>ShareSuite 2.11.0 DLC3</color><color=#{GrayColor}>!"
                           + " This release contains KNOWN ISSUES. Check our Discord for up-to-date info!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
@@ -61,14 +61,18 @@ namespace ShareSuite
         public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
-            if (!ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
 
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary)
         {
-            var body = player.hasBody ? player.GetBody() : null;
+            if (!GeneralHooks.IsMultiplayer())
+            {
+                return;
+            }
 
-            if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
+            var body = player.hasBody ? player.GetBody() : null;
+            if (body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, new UniquePickup(pickupDef.pickupIndex));
 
@@ -242,7 +246,7 @@ namespace ShareSuite
                 if (!master.hasBody || master.GetBody() == body) continue;
 
                 // If the player is dead/deadplayersgetitems is off, continue and add nothing
-                if (master.IsDeadAndOutOfLivesServer() && !ShareSuite.DeadPlayersGetItems.Value) continue;
+                if (ItemSharingHooks.IsDeadAndNotADrone(master) && !ShareSuite.DeadPlayersGetItems.Value) continue;
 
                 // Get the player color
                 var playerColor = GetPlayerColor(playerCharacterMasterController);
@@ -285,7 +289,7 @@ namespace ShareSuite
                 if (!master.inventory || master.GetBody() == body) continue;
 
                 // If the player is alive, add one to eligablePlayers
-                if (!master.IsDeadAndOutOfLivesServer() || ShareSuite.DeadPlayersGetItems.Value)
+                if (!ItemSharingHooks.IsDeadAndNotADrone(master) || ShareSuite.DeadPlayersGetItems.Value)
                 {
                     eligiblePlayers++;
                 }

@@ -11,10 +11,12 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|                       Most Recent Update - 2.10.0                        |
+|                       Most Recent Update - 2.11.0                        |
 |:------------------------------------------------------------------------:|
 |                          Update to support DLC3                          |
-|                 Add specific DLC3 items to the blacklist                 |
+|                        Fixed drone item sharing                          |
+|                   Fixed chat messages in single player                   |
+|                 Fixed scrapper not working in multiplayer                |
 | There are **KNOWN ISSUES** with this release! Check below for more info. |
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
@@ -205,25 +207,9 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-### `2.10.0 (Current Release)`
-- Update to support DLC3
-- Add the following DLC3 items to the default blacklist
-  - Box of Dynamite
-  - Orphaned Core
-  - Sentry Key
-  - Prison Matrix
-  - Encrypted Cerebellum
-  - Exposed Cerebellum
-  - Quick Fix
-  - Seared Steak
-  - Hearty Stew
-  - Ultimate Meal
-  - Sauteed Worms
-- **KNOWN ISSUES**
-  - Singleplayer chat pickup messages are missing
-  - Drones encounter errors when being played as post-death with items and money sharing
-  - Scrappers currently encounter issues where if a client uses them, they will consume an item and not drop anything. 
-    - It is recommended that you only use scrappers as the host for the time being
+### `2.11.0 (Current Release)`
+- Fixed various problems due to DLC3. Please report on our discord if any other issues persist!
+- Expanded the blacklist with: LowerPricedChests,ItemDropChanceOnKill,BarrageOnBoss
 
 **Looking for the changelogs for versions older then the current? Check the 'Changelog' tab on our Thunderstore page!**
 

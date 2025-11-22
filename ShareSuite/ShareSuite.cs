@@ -15,7 +15,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.10.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.11.0")]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -25,7 +25,7 @@ namespace ShareSuite
         public void Awake()
         {
             Log.Init(Logger);
-            
+
             InitConfig();
             CommandHelper.AddToConsoleWhenReady();
 
@@ -41,7 +41,7 @@ namespace ShareSuite
         }
 
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.10.0";
+        public static string MessageSendVer = "2.11.0";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
@@ -91,7 +91,7 @@ namespace ShareSuite
 
             foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
             {
-                if (playerCharacterMasterController.master.IsDeadAndOutOfLivesServer()) continue;
+                if (ItemSharingHooks.IsDeadAndNotADrone(playerCharacterMasterController.master)) continue;
                 if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
                 playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
             }
@@ -355,7 +355,7 @@ namespace ShareSuite
                 "BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey,FreeChest,RoboBallBuddy," +
                 "MinorConstructOnKill,ScrapRed,ScrapWhite,ScrapYellow,ScrapGreen,DronesDropDynamite,PhysicsProjectile," +
                 "PowerPyramid,PowerCube,MasterBattery,MasterCore,BonusHealthBoost,CookedSteak,Stew,UltimateMeal," +
-                "WyrmOnHit",
+                "WyrmOnHit,LowerPricedChests,ItemDropChanceOnKill,BarrageOnBoss",
                 "Items (by internal name) that you do not want to share, comma separated. Please find the item \"Code Names\" at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();
@@ -371,7 +371,7 @@ namespace ShareSuite
             NetworkMessageType = Config.Bind(
                 "Settings",
                 "NetworkMessageType",
-                (short)1021,
+                (short) 1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
             );
         }
@@ -965,49 +965,49 @@ namespace ShareSuite
             }
         }
 
-//TODO re-introduce these as add/remove commands
-//        // ItemBlacklist
-//        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
-//            helpText = "Items (by index) that you do not want to share, comma separated.")]
-//        private static void CcItemBlacklist(ConCommandArgs args)
-//        {
-//            if (args.Count == 0)
-//            {
-//                Debug.Log(ItemBlacklist.Value);
-//                return;
-//            }
-//
-//            var list = string.Join(",",
-//                from i in Enumerable.Range(0, args.Count)
-//                select args.TryGetArgInt(i) into num
-//                where num != null
-//                select num.Value);
-//            ItemBlacklist.Value = list;
-//        }
-//
-//        // ItemBlacklist
-//        [ConCommand(commandName = "ss_EquipmentBlacklist", flags = ConVarFlags.None,
-//            helpText = "Equipment (by index) that you do not want to share, comma separated.")]
-//        private static void CcEquipmentBlacklist(ConCommandArgs args)
-//        {
-//            if (args.Count == 0)
-//            {
-//                Debug.Log(EquipmentBlacklist.Value);
-//                return;
-//            }
-//
-//            var list = string.Join(",",
-//                from i in Enumerable.Range(0, args.Count)
-//                select args.TryGetArgInt(i) into num
-//                where num != null
-//                select num.Value);
-//            ItemBlacklist.Value = list;
-//        }
+        //TODO re-introduce these as add/remove commands
+        //        // ItemBlacklist
+        //        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
+        //            helpText = "Items (by index) that you do not want to share, comma separated.")]
+        //        private static void CcItemBlacklist(ConCommandArgs args)
+        //        {
+        //            if (args.Count == 0)
+        //            {
+        //                Debug.Log(ItemBlacklist.Value);
+        //                return;
+        //            }
+        //
+        //            var list = string.Join(",",
+        //                from i in Enumerable.Range(0, args.Count)
+        //                select args.TryGetArgInt(i) into num
+        //                where num != null
+        //                select num.Value);
+        //            ItemBlacklist.Value = list;
+        //        }
+        //
+        //        // ItemBlacklist
+        //        [ConCommand(commandName = "ss_EquipmentBlacklist", flags = ConVarFlags.None,
+        //            helpText = "Equipment (by index) that you do not want to share, comma separated.")]
+        //        private static void CcEquipmentBlacklist(ConCommandArgs args)
+        //        {
+        //            if (args.Count == 0)
+        //            {
+        //                Debug.Log(EquipmentBlacklist.Value);
+        //                return;
+        //            }
+        //
+        //            var list = string.Join(",",
+        //                from i in Enumerable.Range(0, args.Count)
+        //                select args.TryGetArgInt(i) into num
+        //                where num != null
+        //                select num.Value);
+        //            ItemBlacklist.Value = list;
+        //        }
 
         private static bool? TryGetBool(string arg)
         {
-            string[] posStr = {"yes", "true", "1"};
-            string[] negStr = {"no", "false", "0", "-1"};
+            string[] posStr = { "yes", "true", "1" };
+            string[] negStr = { "no", "false", "0", "-1" };
 
             if (posStr.Contains(arg.ToLower())) return true;
             if (negStr.Contains(arg.ToLower())) return false;
