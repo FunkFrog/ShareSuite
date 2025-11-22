@@ -43,6 +43,7 @@ namespace ShareSuite
 
         public static void Hook()
         {
+            Log.Debug("Sharesuite: Hooking itemsharing");
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
             On.RoR2.GenericPickupController.AttemptGrant += OnGrantItem;
@@ -93,8 +94,8 @@ namespace ShareSuite
             var scrapperController =
                 GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
 
-            MonoBehaviour.print(scrapperController);
-            MonoBehaviour.print(_itemLock);
+            Log.Debug(scrapperController);
+            Log.Debug(_itemLock);
             if (scrapperController)
             {
                 var pickupIndex = PickupIndex.none;
@@ -123,7 +124,7 @@ namespace ShareSuite
 
                 var interactor =
                     GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
-                MonoBehaviour.print("Interactor Established");
+                Log.Debug("Interactor Established");
 
                 var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
 
@@ -237,23 +238,23 @@ namespace ShareSuite
 
         private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
         {
-            MonoBehaviour.print("Sharesuite: OnPurchaseDrop triggered");
+            Log.Debug("Sharesuite: OnPurchaseDrop triggered");
             if (!NetworkServer.active)
             {
-                MonoBehaviour.print("Sharesuite: Not server, returning");
+                Log.Debug("Sharesuite: Not server, returning");
                 orig(self);
                 return;
             }
 
             var costType = self.GetComponent<PurchaseInteraction>().costType;
-            MonoBehaviour.print("Sharesuite: CostType: " + costType);
+            Log.Debug("Sharesuite: CostType: " + costType);
 
             //If is valid drop and dupe fix not enabled, true -> we want the item to pop
             //if is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
             //if is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop
             //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
 
-            MonoBehaviour.print("Sharesuite: Multiplayer: " + GeneralHooks.IsMultiplayer() + " | ValidItemPickup: " +
+            Log.Debug("Sharesuite: Multiplayer: " + GeneralHooks.IsMultiplayer() + " | ValidItemPickup: " +
                       IsValidItemPickup(self.CurrentPickupIndex()) + " | PrinterCauldronFixEnabled: " +
                       ShareSuite.PrinterCauldronFixEnabled.Value);
             
@@ -264,12 +265,12 @@ namespace ShareSuite
                 || costType == CostTypeIndex.Money
                 || costType == CostTypeIndex.None)
             {
-                MonoBehaviour.print("Sharesuite: Origin branch 1");
+                Log.Debug("Sharesuite: Origin branch 1");
                 orig(self);
             }
             else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
             {
-                MonoBehaviour.print("Sharesuite: Origin branch 2");
+                Log.Debug("Sharesuite: Origin branch 2");
                 orig(self);
             }
         }
@@ -277,7 +278,7 @@ namespace ShareSuite
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
         {
-            MonoBehaviour.print("Sharesuite: OnShopPurchase triggered");
+            Log.Debug("Sharesuite: OnShopPurchase triggered");
             if (!self.CanBeAffordedByInteractor(activator)) return;
 
             if (!GeneralHooks.IsMultiplayer() || self.costType == CostTypeIndex.None)
@@ -292,7 +293,7 @@ namespace ShareSuite
 
             if (PrinterCosts.Contains(self.costType))
             {
-                MonoBehaviour.print("Sharesuite: PrinterCauldronfix branch");
+                Log.Debug("Sharesuite: PrinterCauldronfix branch");
                 if (ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
                     var characterBody = activator.GetComponent<CharacterBody>();
@@ -301,16 +302,16 @@ namespace ShareSuite
 
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
 
-                    if (item == null) MonoBehaviour.print("ShareSuite: PickupCatalog is null.");
+                    if (item == null) Log.Debug("ShareSuite: PickupCatalog is null.");
                     else
                     {
-                        MonoBehaviour.print("Sharesuite: handling give item");
+                        Log.Debug("Sharesuite: handling give item");
                         HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
                     }
 
-                    MonoBehaviour.print("Sharesuite: orig");
+                    Log.Debug("Sharesuite: orig");
                     orig(self, activator);
-                    MonoBehaviour.print("Sharesuite: rich cauldron message");
+                    Log.Debug("Sharesuite: rich cauldron message");
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
                     return;
@@ -325,7 +326,7 @@ namespace ShareSuite
             {
                 if (self.costType == CostTypeIndex.Equipment)
                 {
-                    MonoBehaviour.print("Sharesuite: equipment drone fix thing");
+                    Log.Debug("Sharesuite: equipment drone fix thing");
                     //todo check the amount removed is greater than or equal to 1 before doing this
 
                     orig(self, activator);
@@ -335,7 +336,7 @@ namespace ShareSuite
 
             #endregion
 
-            MonoBehaviour.print("Sharesuite: ending orig call");
+            Log.Debug("Sharesuite: ending orig call");
             orig(self, activator);
         }
 

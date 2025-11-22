@@ -15,15 +15,20 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.9.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.9.1")]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
     {
         #region ConfigWrapper init
 
+        public void Awake()
+        {
+            Log.Init(Logger);
+        }
+
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.9";
+        public static string MessageSendVer = "2.9.1";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
