@@ -23,6 +23,8 @@ namespace ShareSuite
         {
             #region Sharedequipment
 
+
+            // If equipment sharing is disabled, or we're not in multiplayer, or we're not in an server, run the original method
             if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
             {
                 orig(self, body);
@@ -33,6 +35,12 @@ namespace ShareSuite
             var oldEquip = body.inventory.currentEquipmentIndex;
             var oldEquipPickupIndex = GetPickupIndex(oldEquip);
             var newEquip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
+
+            // If the new item is not equipment, return
+            if (IsEquipment(newEquip) == false)
+            {
+                return;
+            }
 
             // Send the pickup message
             ChatHandler.SendPickupMessage(body.master, new UniquePickup(self.pickupIndex));
@@ -58,7 +66,7 @@ namespace ShareSuite
             {
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
                 return;
-            }
+            }    
             // If the new equip is shared, create a droplet of the old one.
             else if (EquipmentShared(newEquip))
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
@@ -163,7 +171,7 @@ namespace ShareSuite
         private static int GetLivingPlayersWithEquipment(EquipmentIndex originalEquip)
         {
             return PlayerCharacterMasterController.instances.Select(p => p.master)
-                .Where(p => p.inventory && !p.IsDeadAndOutOfLivesServer())
+                .Where(p => p.inventory && !ItemSharingHooks.IsDeadAndNotADrone(p))
                 .Count(master => master.inventory.currentEquipmentIndex == originalEquip);
         }
 
@@ -176,7 +184,7 @@ namespace ShareSuite
         private static bool EquipmentShared(EquipmentIndex pickup)
         {
             if (pickup == EquipmentIndex.None) return true;
-            return IsEquipment(pickup) && !Blacklist.HasEquipment(pickup);
+            return !Blacklist.HasEquipment(pickup);
         }
 
         private static bool IsEquipment(EquipmentIndex index)
