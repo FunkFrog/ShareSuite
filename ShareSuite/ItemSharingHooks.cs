@@ -33,8 +33,8 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.AttemptGrant -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
-            On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
-            On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
+            // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
+            // On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.InfiniteTowerWaveController.DropRewards -= SimulacrumArenaDropEnable;
@@ -49,8 +49,8 @@ namespace ShareSuite
             On.RoR2.GenericPickupController.AttemptGrant += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
-            On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
-            On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
+            // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
+            // On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value)
             {
@@ -61,84 +61,84 @@ namespace ShareSuite
             //if (ShareSuite.RichMessagesEnabled.Value) IL.RoR2.GenericPickupController.AttemptGrant += RemoveDefaultPickupMessage;
         }
 
-        private static PickupIndex ItemLock(On.RoR2.PickupCatalog.orig_FindPickupIndex_string orig, string pickupName)
-        {
-            // This is a bit of a dubious hook, but it enables really nice interaction with the scrapper, where we add
-            // an item every time the scrapper finishes its animation.
+        // private static PickupIndex ItemLock(On.RoR2.PickupCatalog.orig_FindPickupIndex_string orig, string pickupName)
+        // {
+        //     // This is a bit of a dubious hook, but it enables really nice interaction with the scrapper, where we add
+        //     // an item every time the scrapper finishes its animation.
 
-            #region Cauldronfix
+        //     #region Cauldronfix
 
-            if (_itemLock)
-            {
-                _itemLock = false;
-                return orig("This is not an item!");
-            }
+        //     if (_itemLock)
+        //     {
+        //         _itemLock = false;
+        //         return orig("This is not an item!");
+        //     }
 
-            return orig(pickupName);
+        //     return orig(pickupName);
 
-            #endregion
-        }
+        //     #endregion
+        // }
 
-        private static void ScrappingToIdle_OnEnter(On.EntityStates.Scrapper.ScrappingToIdle.orig_OnEnter orig,
-            ScrappingToIdle self)
-        {
-            if (!(ShareSuite.PrinterCauldronFixEnabled.Value && NetworkServer.active && GeneralHooks.IsMultiplayer()))
-            {
-                orig(self);
-                return;
-            }
+        // private static void ScrappingToIdle_OnEnter(On.EntityStates.Scrapper.ScrappingToIdle.orig_OnEnter orig,
+        //     ScrappingToIdle self)
+        // {
+        //     if (!(ShareSuite.PrinterCauldronFixEnabled.Value && NetworkServer.active && GeneralHooks.IsMultiplayer()))
+        //     {
+        //         orig(self);
+        //         return;
+        //     }
 
-            _itemLock = true;
-            orig(self);
+        //     _itemLock = true;
+        //     orig(self);
 
-            var scrapperController =
-                GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
+        //     var scrapperController =
+        //         GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
 
-            Log.Debug(scrapperController);
-            Log.Debug(_itemLock);
-            if (scrapperController)
-            {
-                var pickupIndex = PickupIndex.none;
-                var itemDef = ItemCatalog.GetItemDef((ItemIndex) GetInstanceField(typeof(ScrapperController),
-                    scrapperController, "_lastScrappedItemIndex"));
-                if (itemDef != null)
-                {
-                    switch (itemDef.tier)
-                    {
-                        case ItemTier.Tier1:
-                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapWhite");
-                            break;
-                        case ItemTier.Tier2:
-                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapGreen");
-                            break;
-                        case ItemTier.Tier3:
-                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapRed");
-                            break;
-                        case ItemTier.Boss:
-                            pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapYellow");
-                            break;
-                    }
-                }
+        //     Log.Debug(scrapperController);
+        //     Log.Debug(_itemLock);
+        //     if (scrapperController)
+        //     {
+        //         var pickupIndex = PickupIndex.none;
+        //         var itemDef = ItemCatalog.GetItemDef((ItemIndex) GetInstanceField(typeof(ScrapperController),
+        //             scrapperController, "_lastScrappedItemIndex"));
+        //         if (itemDef != null)
+        //         {
+        //             switch (itemDef.tier)
+        //             {
+        //                 case ItemTier.Tier1:
+        //                     pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapWhite");
+        //                     break;
+        //                 case ItemTier.Tier2:
+        //                     pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapGreen");
+        //                     break;
+        //                 case ItemTier.Tier3:
+        //                     pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapRed");
+        //                     break;
+        //                 case ItemTier.Boss:
+        //                     pickupIndex = PickupCatalog.FindPickupIndex("ItemIndex.ScrapYellow");
+        //                     break;
+        //             }
+        //         }
 
-                if (pickupIndex == PickupIndex.none) return;
+        //         if (pickupIndex == PickupIndex.none) return;
 
-                var interactor =
-                    GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
-                Log.Debug("Interactor Established");
+        //         var interactor =
+        //             GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
+        //         Log.Debug("Interactor Established");
 
-                var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+        //         var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
 
-                if (!interactor) return;
+        //         if (!interactor) return;
 
-                SetInstanceField(typeof(ScrappingToIdle), self, "foundValidScrap", true);
-                var component = interactor.GetComponent<CharacterBody>();
-                HandleGiveItem(component.master, pickupDef);
-                ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
+        //         SetInstanceField(typeof(ScrappingToIdle), self, "foundValidScrap", true);
+        //         var component = interactor.GetComponent<CharacterBody>();
+        //         HandleGiveItem(component.master, pickupDef);
+        //         ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
 
-                var itemsEaten = (int) GetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten");
-                SetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten", itemsEaten - 1);
-            }
-        }
+        //         var itemsEaten = (int) GetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten");
+        //         SetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten", itemsEaten - 1);
+        //     }
+        // }
 
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
             GenericPickupController self, CharacterBody body)
