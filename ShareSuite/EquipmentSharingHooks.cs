@@ -23,6 +23,8 @@ namespace ShareSuite
         {
             #region Sharedequipment
 
+
+            // If equipment sharing is disabled, or we're not in multiplayer, or we're not in an server, run the original method
             if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
             {
                 orig(self, body);
@@ -33,6 +35,12 @@ namespace ShareSuite
             var oldEquip = body.inventory.currentEquipmentIndex;
             var oldEquipPickupIndex = GetPickupIndex(oldEquip);
             var newEquip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
+
+            // If the new item is not equipment, return
+            if (IsEquipment(newEquip) == false)
+            {
+                return;
+            }
 
             // Send the pickup message
             ChatHandler.SendPickupMessage(body.master, new UniquePickup(self.pickupIndex));
@@ -176,7 +184,7 @@ namespace ShareSuite
         private static bool EquipmentShared(EquipmentIndex pickup)
         {
             if (pickup == EquipmentIndex.None) return true;
-            return IsEquipment(pickup) && !Blacklist.HasEquipment(pickup);
+            return !Blacklist.HasEquipment(pickup);
         }
 
         private static bool IsEquipment(EquipmentIndex index)
