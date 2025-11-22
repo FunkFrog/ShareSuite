@@ -61,14 +61,18 @@ namespace ShareSuite
         public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
-            if (!ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
 
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary)
         {
-            var body = player.hasBody ? player.GetBody() : null;
+            if (!GeneralHooks.IsMultiplayer())
+            {
+                return;
+            }
 
-            if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
+            var body = player.hasBody ? player.GetBody() : null;
+            if (body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, new UniquePickup(pickupDef.pickupIndex));
 

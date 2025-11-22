@@ -236,7 +236,7 @@ namespace ShareSuite
             return orig(self);
         }
 
-        private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup_bool orig, ShopTerminalBehavior self, 
+        private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup_bool orig, ShopTerminalBehavior self,
             bool isDuplicated)
         {
             Log.Debug("Sharesuite: OnPurchaseDrop triggered");
@@ -258,7 +258,7 @@ namespace ShareSuite
             Log.Debug("Sharesuite: Multiplayer: " + GeneralHooks.IsMultiplayer() + " | ValidItemPickup: " +
                       IsValidItemPickup(self.CurrentPickupIndex()) + " | PrinterCauldronFixEnabled: " +
                       ShareSuite.PrinterCauldronFixEnabled.Value);
-            
+
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
                 || !IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value
                 //if it's not a valid drop AND the dupe fix isn't enabled
