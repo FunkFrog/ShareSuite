@@ -67,18 +67,39 @@ namespace ShareSuite
         public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary)
         {
             var body = player.hasBody ? player.GetBody() : null;
-
-            if (!GeneralHooks.IsMultiplayer() || body == null || !ShareSuite.RichMessagesEnabled.Value)
+            if (body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
                 if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, new UniquePickup(pickupDef.pickupIndex));
 
                 return;
             }
-
+            
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
             var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
+
+            if (!GeneralHooks.IsMultiplayer())
+            {
+                if (temporary)
+                {
+                    var singlePickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves temporarily.</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
+                    return;
+                }
+                else
+                {
+                    var singlePickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)}";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
+                    return;
+                }
+            }
 
             if (pickupDef.coinValue > 0)
             {
