@@ -25,6 +25,19 @@ namespace ShareSuite
         public void Awake()
         {
             Log.Init(Logger);
+            
+            InitConfig();
+            CommandHelper.AddToConsoleWhenReady();
+
+            //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
+
+            #region Hook registration
+
+            // Register all the hooks
+            ReloadHooks();
+            MoneySharingHooks.SharedMoneyValue = 15;
+
+            #endregion
         }
 
         // Update this when we want to send a new message
@@ -85,22 +98,6 @@ namespace ShareSuite
         }
 
         public static int DefaultMaxScavItemDropCount = 0;
-
-        public ShareSuite()
-        {
-            InitConfig();
-            CommandHelper.AddToConsoleWhenReady();
-
-            //On.RoR2.Networking.GameNetworkManager.OnClientConnect += (self, user, t) => { };
-
-            #region Hook registration
-
-            // Register all the hooks
-            ReloadHooks();
-            MoneySharingHooks.SharedMoneyValue = 15;
-
-            #endregion
-        }
 
         private void ReloadHooks(object _ = null, EventArgs __ = null)
         {
