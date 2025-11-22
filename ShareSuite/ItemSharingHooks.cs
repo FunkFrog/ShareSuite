@@ -1,4 +1,5 @@
 using EntityStates.Scrapper;
+using IL.RoR2.Achievements.FalseSon;
 using MonoMod.Cil;
 using R2API.Utils;
 using RewiredConsts;
@@ -156,7 +157,7 @@ namespace ShareSuite
                 && IsValidItemPickup(self.pickupIndex)
                 && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer()
-                && !self.pickup.isTempItem) // Don't share the item with anyone else if the item is temporary
+                && (!self.pickup.isTempItem || ShareSuite.TemporaryItemsShared.Value)) // Don't share the item with anyone else if the item is temporary unless TemporaryItemsShared is enabled
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -196,7 +197,7 @@ namespace ShareSuite
 
                         var giveItem = PickupCatalog.GetPickupDef(pickupIndex.Value);
 
-                        HandleGiveItem(player, giveItem);
+                        HandleGiveItem(player, giveItem, self.pickup.isTempItem);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
@@ -209,7 +210,7 @@ namespace ShareSuite
                     // Otherwise give everyone the same item
                     else
                     {
-                        HandleGiveItem(player, item);
+                        HandleGiveItem(player, item, self.pickup.isTempItem);
                     }
                 }
 
@@ -314,7 +315,7 @@ namespace ShareSuite
                     else
                     {
                         Log.Debug("Sharesuite: handling give item");
-                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
+                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()), false);
                     }
 
                     Log.Debug("Sharesuite: orig");
@@ -521,9 +522,12 @@ namespace ShareSuite
                 ? collection[Random.Range(0, collection.Count)]
                 : (T?) null;
 
-        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
+        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef, bool tempItem)
         {
-            characterMaster.inventory.GiveItem(pickupDef.itemIndex);
+            if (!tempItem)
+                characterMaster.inventory.GiveItemPermanent(pickupDef.itemIndex);
+            else
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
 
             var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
                 ?.connectionId;
