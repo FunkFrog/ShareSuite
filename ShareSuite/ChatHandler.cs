@@ -43,7 +43,7 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.10.0 DLC3 Beta</color><color=#{GrayColor}>!"
+                          + $"<color=#{RedColor}>ShareSuite 2.11.0 DLC3</color><color=#{GrayColor}>!"
                           + " This release contains KNOWN ISSUES. Check our Discord for up-to-date info!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 

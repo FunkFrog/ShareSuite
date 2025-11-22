@@ -2,6 +2,26 @@
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
+### `2.10.0 (Current Release)`
+- Update to support DLC3
+- Add the following DLC3 items to the default blacklist
+  - Box of Dynamite
+  - Orphaned Core
+  - Sentry Key
+  - Prison Matrix
+  - Encrypted Cerebellum
+  - Exposed Cerebellum
+  - Quick Fix
+  - Seared Steak
+  - Hearty Stew
+  - Ultimate Meal
+  - Sauteed Worms
+- **KNOWN ISSUES**
+  - Singleplayer chat pickup messages are missing
+  - Drones encounter errors when being played as post-death with items and money sharing
+  - Scrappers currently encounter issues where if a client uses them, they will consume an item and not drop anything. 
+    - It is recommended that you only use scrappers as the host for the time being
+
 ### `2.8.0`
 - Add compatiblity with Yeet (and any other mod wishing to mark items as unsharable)
 - Add defense nucleus to default item blacklist

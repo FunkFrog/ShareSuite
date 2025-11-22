@@ -1,6 +1,6 @@
 {
     "name": "ShareSuite",
-    "version_number": "2.10.0",
+    "version_number": "2.11.0",
     "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
     "description": "Share gear between members of your party - Highly Balanced - Completely Customisable",
     "dependencies": [
