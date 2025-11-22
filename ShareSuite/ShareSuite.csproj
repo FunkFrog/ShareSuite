@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
@@ -137,5 +137,9 @@
         <HintPath>$(RoR2InstallPath)\Risk of Rain 2_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Debug&quot; (&#xA;  if exist &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; (&#xA;   xcopy &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShareSuite.dll&quot; &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; /Y /I&#xA; )&#xA;)&#xA;" />
+    </Target>
 
 </Project>
