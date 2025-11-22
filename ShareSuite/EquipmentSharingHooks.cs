@@ -35,7 +35,7 @@ namespace ShareSuite
             var newEquip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
             // Send the pickup message
-            ChatHandler.SendPickupMessage(body.master, self.pickupIndex);
+            ChatHandler.SendPickupMessage(body.master, new UniquePickup(self.pickupIndex));
 
             // Give the equipment to the picker 
             body.inventory.SetEquipmentIndex(newEquip);
@@ -90,8 +90,7 @@ namespace ShareSuite
                 }
 
                 // Give the player the new equipment
-                playerInventory.SetEquipmentIndex(newEquip);
-                self.NetworkpickupIndex = PickupCatalog.FindPickupIndex(newEquip);
+                playerInventory.SetEquipmentIndex(newEquip, true);
 
                 // Sync the equipment if they're playing MUL-T
                 SyncToolbotEquip(player, ref newEquip);

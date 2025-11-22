@@ -38,7 +38,6 @@ namespace ShareSuite
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.InfiniteTowerWaveController.DropRewards -= SimulacrumArenaDropEnable;
-
             //IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
         }
 
@@ -94,12 +93,13 @@ namespace ShareSuite
             var scrapperController =
                 GetInstanceField(typeof(ScrapperBaseState), self, "scrapperController") as ScrapperController;
 
-            Debug.Log(scrapperController);
-            Debug.Log(_itemLock);
+            MonoBehaviour.print(scrapperController);
+            MonoBehaviour.print(_itemLock);
             if (scrapperController)
             {
                 var pickupIndex = PickupIndex.none;
-                var itemDef = ItemCatalog.GetItemDef(scrapperController.lastScrappedItemIndex);
+                var itemDef = ItemCatalog.GetItemDef((ItemIndex) GetInstanceField(typeof(ScrapperController),
+                    scrapperController, "_lastScrappedItemIndex"));
                 if (itemDef != null)
                 {
                     switch (itemDef.tier)
@@ -123,7 +123,7 @@ namespace ShareSuite
 
                 var interactor =
                     GetInstanceField(typeof(ScrapperController), scrapperController, "interactor") as Interactor;
-                Debug.Log("Interactor Established");
+                MonoBehaviour.print("Interactor Established");
 
                 var pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
 
@@ -133,7 +133,9 @@ namespace ShareSuite
                 var component = interactor.GetComponent<CharacterBody>();
                 HandleGiveItem(component.master, pickupDef);
                 ChatHandler.SendRichCauldronMessage(component.inventory.GetComponent<CharacterMaster>(), pickupIndex);
-                scrapperController.itemsEaten -= 1;
+
+                var itemsEaten = (int) GetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten");
+                SetInstanceField(typeof(ScrapperController), scrapperController, "_itemsEaten", itemsEaten - 1);
             }
         }
 
@@ -151,7 +153,8 @@ namespace ShareSuite
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && IsValidPickupObject(self, body)
-                && GeneralHooks.IsMultiplayer())
+                && GeneralHooks.IsMultiplayer()
+                && !self.pickup.isTempItem) // Don't share the item with anyone else if the item is temporary
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -173,7 +176,9 @@ namespace ShareSuite
                             continue;
                         }
 
-                        NetworkHandler.SendItemPickupMessage(player.playerCharacterMasterController.networkUser.connectionToClient.connectionId, item.pickupIndex);
+                        NetworkHandler.SendItemPickupMessage(
+                            player.playerCharacterMasterController.networkUser.connectionToClient.connectionId,
+                            item.pickupIndex);
 
                         continue;
                     }
@@ -209,34 +214,19 @@ namespace ShareSuite
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
                     orig(self, body);
-                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict);
+                    ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict,
+                        self.pickup.isTempItem);
                     return;
                 }
             }
 
             orig(self, body);
 
-            ChatHandler.SendRichPickupMessage(master, item);
+            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem);
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
-
-        // Deprecated
-        // public static void RemoveDefaultPickupMessage(ILContext il)
-        // {
-        //     var cursor = new ILCursor(il);
-        //
-        //     cursor.GotoNext(
-        //         x => x.MatchLdarg(2),
-        //         x => x.MatchCallvirt(out _),
-        //         x => x.MatchLdarg(0),
-        //         x => x.MatchLdfld(out _),
-        //         x => x.MatchCall(out _)
-        //     );
-        //
-        //     cursor.RemoveRange(5);
-        // }
 
         private static string FixZeroItemCount(On.RoR2.Chat.PlayerPickupChatMessage.orig_ConstructChatString orig,
             Chat.PlayerPickupChatMessage self)
@@ -247,19 +237,26 @@ namespace ShareSuite
 
         private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
         {
+            MonoBehaviour.print("Sharesuite: OnPurchaseDrop triggered");
             if (!NetworkServer.active)
             {
+                MonoBehaviour.print("Sharesuite: Not server, returning");
                 orig(self);
                 return;
             }
 
             var costType = self.GetComponent<PurchaseInteraction>().costType;
+            MonoBehaviour.print("Sharesuite: CostType: " + costType);
 
             //If is valid drop and dupe fix not enabled, true -> we want the item to pop
             //if is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
             //if is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop
             //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
 
+            MonoBehaviour.print("Sharesuite: Multiplayer: " + GeneralHooks.IsMultiplayer() + " | ValidItemPickup: " +
+                      IsValidItemPickup(self.CurrentPickupIndex()) + " | PrinterCauldronFixEnabled: " +
+                      ShareSuite.PrinterCauldronFixEnabled.Value);
+            
             if (!GeneralHooks.IsMultiplayer() // is not multiplayer
                 || !IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value
                 //if it's not a valid drop AND the dupe fix isn't enabled
@@ -267,10 +264,12 @@ namespace ShareSuite
                 || costType == CostTypeIndex.Money
                 || costType == CostTypeIndex.None)
             {
+                MonoBehaviour.print("Sharesuite: Origin branch 1");
                 orig(self);
             }
             else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
             {
+                MonoBehaviour.print("Sharesuite: Origin branch 2");
                 orig(self);
             }
         }
@@ -278,15 +277,10 @@ namespace ShareSuite
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
         {
+            MonoBehaviour.print("Sharesuite: OnShopPurchase triggered");
             if (!self.CanBeAffordedByInteractor(activator)) return;
 
-            if (!GeneralHooks.IsMultiplayer())
-            {
-                orig(self, activator);
-                return;
-            }
-
-            if (self.costType == CostTypeIndex.None)
+            if (!GeneralHooks.IsMultiplayer() || self.costType == CostTypeIndex.None)
             {
                 orig(self, activator);
                 return;
@@ -294,25 +288,29 @@ namespace ShareSuite
 
             var shop = self.GetComponent<ShopTerminalBehavior>();
 
-            #region Cauldronfix
+            #region PrinterCauldronfix
 
             if (PrinterCosts.Contains(self.costType))
             {
+                MonoBehaviour.print("Sharesuite: PrinterCauldronfix branch");
                 if (ShareSuite.PrinterCauldronFixEnabled.Value)
                 {
                     var characterBody = activator.GetComponent<CharacterBody>();
-                    var inventory = characterBody.inventory;
 
+                    var inventory = characterBody.inventory;
 
                     var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
 
                     if (item == null) MonoBehaviour.print("ShareSuite: PickupCatalog is null.");
                     else
                     {
+                        MonoBehaviour.print("Sharesuite: handling give item");
                         HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
                     }
 
+                    MonoBehaviour.print("Sharesuite: orig");
                     orig(self, activator);
+                    MonoBehaviour.print("Sharesuite: rich cauldron message");
                     ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
                         shop.CurrentPickupIndex());
                     return;
@@ -321,35 +319,23 @@ namespace ShareSuite
 
             #endregion Cauldronfix
 
-            #region EquipDronefix
+            #region EquipmentDronefix
 
             if (ShareSuite.EquipmentShared.Value)
             {
                 if (self.costType == CostTypeIndex.Equipment)
                 {
-                    var rng = self.GetComponent<Xoroshiro128Plus>();
-                    var itemIndex = ItemIndex.None;
+                    MonoBehaviour.print("Sharesuite: equipment drone fix thing");
+                    //todo check the amount removed is greater than or equal to 1 before doing this
 
-                    var costTypeDef = CostTypeCatalog.GetCostTypeDef(self.costType);
-                    if (shop)
-                    {
-                        itemIndex = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()).itemIndex;
-                    }
-
-                    var payCostResults = costTypeDef.PayCost(self.cost,
-                        activator, self.gameObject, rng, itemIndex);
-
-                    if (payCostResults.equipmentTaken.Count >= 1)
-                    {
-                        orig(self, activator);
-                        EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
-                        return;
-                    }
+                    orig(self, activator);
+                    EquipmentSharingHooks.RemoveAllUnBlacklistedEquipment();
                 }
             }
 
             #endregion
 
+            MonoBehaviour.print("Sharesuite: ending orig call");
             orig(self, activator);
         }
 
@@ -454,14 +440,15 @@ namespace ShareSuite
 
         public static bool IsValidPickupObject(GenericPickupController pickup, CharacterBody picker)
         {
-            if(AdditionalPickupValidityChecks == null)
+            if (AdditionalPickupValidityChecks == null)
                 return true;
             var retv = true;
-            foreach(Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks.GetInvocationList())
+            foreach (Func<GenericPickupController, CharacterBody, bool> f in AdditionalPickupValidityChecks
+                         .GetInvocationList())
                 retv &= f(pickup, picker);
             return retv;
         }
-        
+
         private static PickupIndex? GetRandomItemOfTier(ItemTier tier, PickupIndex orDefault)
         {
             switch (tier)
@@ -529,7 +516,8 @@ namespace ShareSuite
         {
             characterMaster.inventory.GiveItem(pickupDef.itemIndex);
 
-            var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient?.connectionId;
+            var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
+                ?.connectionId;
 
             if (connectionId != null)
             {
@@ -537,7 +525,8 @@ namespace ShareSuite
             }
         }
 
-        public static void HandleRichMessageUnlockAndNotification(CharacterMaster characterMaster, PickupIndex pickupIndex)
+        public static void HandleRichMessageUnlockAndNotification(CharacterMaster characterMaster,
+            PickupIndex pickupIndex)
         {
             // No need if rich messages are disabled
             if (!ShareSuite.RichMessagesEnabled.Value || !characterMaster.isLocalPlayer)
@@ -545,7 +534,8 @@ namespace ShareSuite
                 return;
             }
 
-            characterMaster.playerCharacterMasterController?.networkUser?.localUser?.userProfile.DiscoverPickup(pickupIndex);
+            characterMaster.playerCharacterMasterController?.networkUser?.localUser?.userProfile.DiscoverPickup(
+                pickupIndex);
 
             if (characterMaster.inventory.GetItemCount(PickupCatalog.GetPickupDef(pickupIndex).itemIndex) <= 1)
             {

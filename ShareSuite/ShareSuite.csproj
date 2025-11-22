@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>8</LangVersion>
     </PropertyGroup>
 
@@ -10,68 +10,128 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="0Harmony, Version=2.7.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\0Harmony.dll</HintPath>
+      <Reference Include="0Harmony">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\0Harmony.dll</HintPath>
       </Reference>
-      <Reference Include="0Harmony20, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\0Harmony20.dll</HintPath>
+      <Reference Include="0Harmony20">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\0Harmony20.dll</HintPath>
       </Reference>
-      <Reference Include="Assembly-CSharp.R2API.mm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\Assembly-CSharp.R2API.mm.dll</HintPath>
+      <Reference Include="BepInEx">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\BepInEx.dll</HintPath>
       </Reference>
-      <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.dll</HintPath>
+      <Reference Include="BepInEx.Bootstrap">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\BepInEx.Bootstrap.dll</HintPath>
       </Reference>
-      <Reference Include="BepInEx.Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.Harmony.dll</HintPath>
+      <Reference Include="BepInEx.Harmony">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\BepInEx.Harmony.dll</HintPath>
       </Reference>
-      <Reference Include="BepInEx.Preloader, Version=5.4.21.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\BepInEx.Preloader.dll</HintPath>
+      <Reference Include="BepInEx.MonoMod.HookGenPatcher">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\BepInEx.MonoMod.HookGenPatcher.dll</HintPath>
       </Reference>
-      <Reference Include="com.unity.multiplayer-hlapi.Runtime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+      <Reference Include="BepInEx.Preloader">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\BepInEx.Preloader.dll</HintPath>
       </Reference>
-      <Reference Include="HarmonyXInterop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\HarmonyXInterop.dll</HintPath>
+      <Reference Include="com.unity.multiplayer-hlapi.Runtime">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
       </Reference>
-      <Reference Include="HGCSharpUtils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\HGCSharpUtils.dll</HintPath>
+      <Reference Include="HarmonyXInterop">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\HarmonyXInterop.dll</HintPath>
       </Reference>
-      <Reference Include="MMHOOK_RoR2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MMHOOK_RoR2.dll</HintPath>
+      <Reference Include="HGCSharpUtils">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\HGCSharpUtils.dll</HintPath>
       </Reference>
-      <Reference Include="Mono.Cecil, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.dll</HintPath>
+      <Reference Include="MMHOOK_RoR2">
+        <HintPath>..\..\..\AppData\Roaming\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
       </Reference>
-      <Reference Include="Mono.Cecil.Mdb, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Mdb.dll</HintPath>
+      <Reference Include="Mono.Cecil">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\Mono.Cecil.dll</HintPath>
       </Reference>
-      <Reference Include="Mono.Cecil.Pdb, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Pdb.dll</HintPath>
+      <Reference Include="Mono.Cecil.Mdb">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\Mono.Cecil.Mdb.dll</HintPath>
       </Reference>
-      <Reference Include="Mono.Cecil.Rocks, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e">
-        <HintPath>..\Deps\Mono.Cecil.Rocks.dll</HintPath>
+      <Reference Include="Mono.Cecil.Pdb">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\Mono.Cecil.Pdb.dll</HintPath>
       </Reference>
-      <Reference Include="MonoMod.RuntimeDetour, Version=22.1.4.3, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MonoMod.RuntimeDetour.dll</HintPath>
+      <Reference Include="Mono.Cecil.Rocks">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\Mono.Cecil.Rocks.dll</HintPath>
       </Reference>
-      <Reference Include="MonoMod.Utils, Version=22.1.4.3, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\MonoMod.Utils.dll</HintPath>
+      <Reference Include="MonoMod">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\MonoMod.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoMod.RuntimeDetour">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\MonoMod.RuntimeDetour.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoMod.RuntimeDetour.HookGen">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\MonoMod.RuntimeDetour.HookGen.dll</HintPath>
+      </Reference>
+      <Reference Include="MonoMod.Utils">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\MonoMod.Utils.dll</HintPath>
+      </Reference>
+      <Reference Include="mscorlib">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\mscorlib.dll</HintPath>
       </Reference>
       <Reference Include="R2API, Version=4.4.1.0, Culture=neutral, PublicKeyToken=null">
         <HintPath>..\Deps\R2API.dll</HintPath>
       </Reference>
-      <Reference Include="RoR2, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\RoR2.dll</HintPath>
+      <Reference Include="R2API.CommandHelper">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\R2API.CommandHelper.dll</HintPath>
       </Reference>
-      <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.dll</HintPath>
+      <Reference Include="R2API.Core">
+        <HintPath>..\..\..\OneDrive\Desktop\Deps\R2API.Core.dll</HintPath>
       </Reference>
-      <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.CoreModule.dll</HintPath>
+      <Reference Include="RoR2">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\RoR2.dll</HintPath>
       </Reference>
-      <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\Deps\UnityEngine.PhysicsModule.dll</HintPath>
+      <Reference Include="System">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.dll</HintPath>
+      </Reference>
+      <Reference Include="System.ComponentModel.Composition">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.ComponentModel.Composition.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Core">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Core.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Data">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Data.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Drawing">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Drawing.dll</HintPath>
+      </Reference>
+      <Reference Include="System.IO.Compression">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.IO.Compression.dll</HintPath>
+      </Reference>
+      <Reference Include="System.IO.Compression.FileSystem">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.IO.Compression.FileSystem.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Net.Http">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Net.Http.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Numerics">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Numerics.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Runtime">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Runtime.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Runtime.Serialization">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Runtime.Serialization.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Transactions">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Transactions.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Xml">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Xml.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Xml.Linq">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Xml.Linq.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.PhysicsModule">
+        <HintPath>D:\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       </Reference>
     </ItemGroup>
 
