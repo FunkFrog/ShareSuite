@@ -1,7 +1,8 @@
 Versions older then 5 prior are no longer listed on the mod's README, and will be here after each update.
 
-### `2.3.0`
-- Fixed a bug where scrapper wouldn't output the correct amount of scrap
+`2.4.0`
+- Introduces a new Sacrifice fix to fix poor drop rates with larger groups of people
+  - Thanks to raeon for the PR!
 
 `2.3.0`
 - Fixed a bug where scrapper wouldn't output the correct amount of scrap
