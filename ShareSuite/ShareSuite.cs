@@ -15,7 +15,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.9.1")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.10.0")]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -41,7 +41,7 @@ namespace ShareSuite
         }
 
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.9.1";
+        public static string MessageSendVer = "2.10.0";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
@@ -351,8 +351,11 @@ namespace ShareSuite
 
             ItemBlacklist = Config.Bind(
                 "Settings",
-                "ItemBlacklist",
-                "BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey,FreeChest,RoboBallBuddy,MinorConstructOnKill,ScrapRed,ScrapWhite,ScrapYellow,ScrapGreen",
+                "ItemBlacklistDLC3+",
+                "BeetleGland,TreasureCache,TitanGoldDuringTP,TPHealingNova,ArtifactKey,FreeChest,RoboBallBuddy," +
+                "MinorConstructOnKill,ScrapRed,ScrapWhite,ScrapYellow,ScrapGreen,DronesDropDynamite,PhysicsProjectile," +
+                "PowerPyramid,PowerCube,MasterBattery,MasterCore,BonusHealthBoost,CookedSteak,Stew,UltimateMeal," +
+                "WyrmOnHit",
                 "Items (by internal name) that you do not want to share, comma separated. Please find the item \"Code Names\" at: https://github.com/risk-of-thunder/R2Wiki/wiki/Item-&-Equipment-IDs-and-Names"
             );
             ItemBlacklist.SettingChanged += (o, e) => Blacklist.Recalculate();

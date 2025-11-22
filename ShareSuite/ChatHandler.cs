@@ -43,8 +43,9 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.9.0 CommandHelper Beta</color><color=#{GrayColor}>!"
-                          + " This release may still contain problems. Have fun!</color>";
+                          + $"<color=#{RedColor}>ShareSuite 2.10.0 DLC3 Beta</color><color=#{GrayColor}>!"
+                          + " This release contains KNOWN ISSUES. Expect updates soon. Check our Discord server, linked" +
+                          "on the Thunderstore page, for the most up-to-date information! Have fun!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds

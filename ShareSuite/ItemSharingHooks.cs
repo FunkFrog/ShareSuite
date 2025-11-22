@@ -29,7 +29,7 @@ namespace ShareSuite
         public static void UnHook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
-            On.RoR2.ShopTerminalBehavior.DropPickup -= OnPurchaseDrop;
+            On.RoR2.ShopTerminalBehavior.DropPickup_bool -= OnPurchaseDrop;
             On.RoR2.GenericPickupController.AttemptGrant -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
@@ -45,7 +45,7 @@ namespace ShareSuite
         {
             Log.Debug("Sharesuite: Hooking itemsharing");
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
-            On.RoR2.ShopTerminalBehavior.DropPickup += OnPurchaseDrop;
+            On.RoR2.ShopTerminalBehavior.DropPickup_bool += OnPurchaseDrop;
             On.RoR2.GenericPickupController.AttemptGrant += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
@@ -236,13 +236,14 @@ namespace ShareSuite
             return orig(self);
         }
 
-        private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup orig, ShopTerminalBehavior self)
+        private static void OnPurchaseDrop(On.RoR2.ShopTerminalBehavior.orig_DropPickup_bool orig, ShopTerminalBehavior self, 
+            bool isDuplicated)
         {
             Log.Debug("Sharesuite: OnPurchaseDrop triggered");
             if (!NetworkServer.active)
             {
                 Log.Debug("Sharesuite: Not server, returning");
-                orig(self);
+                orig(self, isDuplicated);
                 return;
             }
 
@@ -266,12 +267,12 @@ namespace ShareSuite
                 || costType == CostTypeIndex.None)
             {
                 Log.Debug("Sharesuite: Origin branch 1");
-                orig(self);
+                orig(self, isDuplicated);
             }
             else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
             {
                 Log.Debug("Sharesuite: Origin branch 2");
-                orig(self);
+                orig(self, isDuplicated);
             }
         }
 
