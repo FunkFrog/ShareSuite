@@ -11,13 +11,13 @@ Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, play
 
 ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
 
-|                       Most Recent Update - 2.11.0                        |
-|:------------------------------------------------------------------------:|
-|                          Update to support DLC3                          |
-|                        Fixed drone item sharing                          |
-|                   Fixed chat messages in single player                   |
-|                 Fixed scrapper not working in multiplayer                |
-| There are **KNOWN ISSUES** with this release! Check below for more info. |
+|                 Most Recent Update - 2.10.1                 |
+|:-----------------------------------------------------------:|
+|                   Update to support DLC3                    |
+|                  Fixed drone item sharing                   |
+|            Fixed chat messages in single player             |
+|          Fixed scrapper not working in multiplayer          |
+| Fix simulacrum having the incorrect amount of interactables |
 
 *If you'd like more info about this update, check the changelog at the bottom of the page!*
 
@@ -207,8 +207,11 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-### `2.11.0 (Current Release)`
-- Fixed various problems due to DLC3. Please report on our discord if any other issues persist!
+### `2.10.1 (Current Release)`
+- Fixed drone item & money sharing
+- Fixed chat messages in single player
+- Fixed scrapper not working in multiplayer
+- Fix simulacrum having the incorrect amount of interactables
 - Expanded the blacklist with: LowerPricedChests,ItemDropChanceOnKill,BarrageOnBoss
 
 **Looking for the changelogs for versions older then the current? Check the 'Changelog' tab on our Thunderstore page!**
