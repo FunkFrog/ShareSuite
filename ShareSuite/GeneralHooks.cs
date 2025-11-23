@@ -19,7 +19,6 @@ namespace ShareSuite
         internal static void Hook()
         {
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
-            //IL.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
@@ -29,7 +28,6 @@ namespace ShareSuite
         internal static void UnHook()
         {
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
-            //IL.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
             On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
@@ -42,20 +40,6 @@ namespace ShareSuite
             group.bonusRewardCount += _bossItems - 1; // Rewards are 1 + bonusRewardCount, so we subtract one
             orig(group);
         }
-        // Depricated
-        // private static void BossGroup_DropRewards(ILContext il)
-        // {
-        //     var cursor = new ILCursor(il);
-        //
-        //     cursor.GotoNext(
-        //         x => x.MatchLdloc(0),
-        //         x => x.MatchMul(),
-        //         x => x.MatchStloc(3),
-        //         x => x.MatchLdcR4(out _)
-        //     );
-        //     cursor.Index++;
-        //     cursor.EmitDelegate<Func<int, int>>(i => _bossItems);
-        // }
 
         private static void SetSacrificeOffset(
             On.RoR2.Artifacts.SacrificeArtifactManager.orig_OnPrePopulateSceneServer orig, SceneDirector sceneDirector)
@@ -84,6 +68,8 @@ namespace ShareSuite
 
         public static bool IsMultiplayer()
         {
+            //TODO remove debug
+            return true;
             // Check whether the quantity of players in the lobby exceeds one.
             return ShareSuite.OverrideMultiplayerCheck.Value || PlayerCharacterMasterController.instances.Count > 1;
         }
@@ -105,9 +91,19 @@ namespace ShareSuite
 
             if (stageInfo)
             {
-                // Overwrite our base value with the actual amount of director credits.
-                interactableCredit = stageInfo.sceneDirectorInteractibleCredits;
-
+                Log.Debug("Current gamemode; " + GameModeCatalog.GetGameModeName(RoR2.Run.instance.gameModeIndex));
+                if (GameModeCatalog.GetGameModeName(Run.instance.gameModeIndex) == "InfiniteTowerRun")
+                {
+                    // For simulacrum, make sure the interactable credit is set correctly as it is changed
+                    // within the director differently than other stages, see issue #216
+                    interactableCredit = 600;
+                }
+                else
+                {
+                    // Overwrite our base value with the actual amount of director credits.
+                    interactableCredit = stageInfo.sceneDirectorInteractibleCredits;
+                }
+                
                 // We require playercount for several of the following computations. We don't want this to break with
                 // those crazy 'mega party mods', thus we clamp this value.
                 var clampPlayerCount = Math.Min(Run.instance.participatingPlayerCount, 8);
