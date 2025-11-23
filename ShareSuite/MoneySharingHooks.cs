@@ -1,9 +1,14 @@
-using System;
-using System.Linq;
+using EntityStates.AffixVoid;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
 using R2API.Utils;
 using RoR2;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,6 +33,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
+            On.RoR2.GoldSiphonNearbyBodyController.DrainGold -= SiphonGold;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -46,6 +52,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
+            On.RoR2.GoldSiphonNearbyBodyController.DrainGold += SiphonGold;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -104,6 +111,67 @@ namespace ShareSuite
         public static bool SharedMoneyEnabled()
         {
             return ShareSuite.MoneyIsShared.Value;
+        }
+
+        private static void SiphonGold(On.RoR2.GoldSiphonNearbyBodyController.orig_DrainGold orig,
+            GoldSiphonNearbyBodyController self)
+        {
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
+            {
+                orig(self);
+                return;
+            }
+            //var bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+            //                | BindingFlags.Static | BindingFlags.GetField;
+            //var amountOfPlayerField = typeof(GoldSiphonNearbyBodyController).GetField("tetheredPlayers", bindFlags);
+            //int amountOfPlayers = (int) amountOfPlayerField.GetValue(self);
+            Debug.Log("Siphoning gold");
+            Debug.Log($"Shrine: {self.shrineGameObject.name}");
+            Debug.Log($"Amount of Player: {self.GetFieldValue<int>("tetheredPlayers")}");
+            Debug.Log($"tierTracker: {self.GetFieldValue<int>("tierTracker")}");
+            Debug.Log($"goldDrainValue: {self.GetFieldValue<int>("goldDrainValue")}");
+            Debug.Log($"appliedDrain: {self.GetFieldValue<uint>("appliedDrain")}");
+
+            SphereSearch sphereSearch = self.GetFieldValue<SphereSearch>("sphereSearch");
+            List<GameObject> candidates = new List<GameObject>();
+            List<HurtBox> hurtBoxes = new List<HurtBox>();
+            TeamMask mask = default(TeamMask);
+            mask.AddTeam(TeamIndex.Player);
+            sphereSearch.mask = LayerIndex.entityPrecise.mask;
+            sphereSearch.origin = self.gameObject.transform.position;
+            sphereSearch.radius = self.GetFieldValue<HalcyoniteShrineInteractable>("parentShrineReference").radius;
+            sphereSearch.queryTriggerInteraction = QueryTriggerInteraction.UseGlobal;
+            sphereSearch.RefreshCandidates();
+            sphereSearch.FilterCandidatesByHurtBoxTeam(mask);
+            sphereSearch.OrderCandidatesByDistance();
+            sphereSearch.FilterCandidatesByDistinctHurtBoxEntities();
+            sphereSearch.GetHurtBoxes(hurtBoxes);
+            sphereSearch.GetCandidates(candidates);
+            sphereSearch.ClearCandidates();
+            Debug.Log($"candidates: {candidates.Count}");
+            Debug.Log($"hurtboxes {hurtBoxes.Count}");
+            int players = 0;
+            if ((candidates.Count > 0) || (hurtBoxes.Count > 0))
+            {
+                foreach (GameObject obj in candidates)
+                {
+                    Debug.Log($"candidates: {(obj.name ?? "null")}");
+                }
+                foreach (HurtBox obj in hurtBoxes)
+                {
+                    if (obj == null)
+                        Debug.Log("hurtBox: null hurtbox");
+                    else
+                    //Debug.Log($"hurtBox: {(obj.name ?? "null")}");
+                        if (obj.healthComponent.body.isPlayerControlled) players++;
+                        Debug.Log($"Players in range: {players}");
+                }
+            }
+
+            SharedMoneyValue -= (int) (players * self.GetFieldValue<uint>("appliedDrain"));
+            Debug.Log("-------");
+
+            orig(self);
         }
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
