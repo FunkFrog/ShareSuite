@@ -68,8 +68,6 @@ namespace ShareSuite
 
         public static bool IsMultiplayer()
         {
-            //TODO remove debug
-            return true;
             // Check whether the quantity of players in the lobby exceeds one.
             return ShareSuite.OverrideMultiplayerCheck.Value || PlayerCharacterMasterController.instances.Count > 1;
         }
