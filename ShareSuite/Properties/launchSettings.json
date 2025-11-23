@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ShareSuite": {
+      "commandName": "Project"
+    },
+    "RoR2 Mod Launch": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Risk of Rain 2\\Risk of Rain 2.exe",
+      "commandLineArgs": "--doorstop-enabled true --doorstop-target-assembly \"%appdata%\\r2modmanPlus-local\\RiskOfRain2\\profiles\\Default\\BepInEx\\core\\BepInEx.Preloader.dll\""
+    }
+  }
+}
