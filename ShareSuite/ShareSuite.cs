@@ -53,6 +53,7 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
+            TemporaryItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -188,6 +189,13 @@ namespace ShareSuite
                 "VoidItemsShared",
                 false,
                 "Toggles item sharing for void (purple/corrupted) items."
+            );
+
+            TemporaryItemsShared = Config.Bind(
+                "Settings",
+                "TemporaryItemsShared",
+                false,
+                "Toggles item sharing for temporary items."
             );
 
             RichMessagesEnabled = Config.Bind(
