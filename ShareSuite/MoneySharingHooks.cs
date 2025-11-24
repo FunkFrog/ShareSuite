@@ -121,16 +121,19 @@ namespace ShareSuite
                 orig(self);
                 return;
             }
+
+            uint currentDrain = self.GetFieldValue<uint>("appliedDrain");
+
             //var bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
             //                | BindingFlags.Static | BindingFlags.GetField;
             //var amountOfPlayerField = typeof(GoldSiphonNearbyBodyController).GetField("tetheredPlayers", bindFlags);
             //int amountOfPlayers = (int) amountOfPlayerField.GetValue(self);
+            Debug.Log("-------");
             Debug.Log("Siphoning gold");
-            Debug.Log($"Shrine: {self.shrineGameObject.name}");
             Debug.Log($"Amount of Player: {self.GetFieldValue<int>("tetheredPlayers")}");
             Debug.Log($"tierTracker: {self.GetFieldValue<int>("tierTracker")}");
             Debug.Log($"goldDrainValue: {self.GetFieldValue<int>("goldDrainValue")}");
-            Debug.Log($"appliedDrain: {self.GetFieldValue<uint>("appliedDrain")}");
+            Debug.Log($"appliedDrain: {currentDrain}");
 
             SphereSearch sphereSearch = self.GetFieldValue<SphereSearch>("sphereSearch");
             List<GameObject> candidates = new List<GameObject>();
@@ -148,30 +151,35 @@ namespace ShareSuite
             sphereSearch.GetHurtBoxes(hurtBoxes);
             sphereSearch.GetCandidates(candidates);
             sphereSearch.ClearCandidates();
-            Debug.Log($"candidates: {candidates.Count}");
-            Debug.Log($"hurtboxes {hurtBoxes.Count}");
             int players = 0;
-            if ((candidates.Count > 0) || (hurtBoxes.Count > 0))
+            if (hurtBoxes.Count > 0)
             {
-                foreach (GameObject obj in candidates)
-                {
-                    Debug.Log($"candidates: {(obj.name ?? "null")}");
-                }
                 foreach (HurtBox obj in hurtBoxes)
                 {
                     if (obj == null)
                         Debug.Log("hurtBox: null hurtbox");
                     else
-                    //Debug.Log($"hurtBox: {(obj.name ?? "null")}");
                         if (obj.healthComponent.body.isPlayerControlled) players++;
                         Debug.Log($"Players in range: {players}");
                 }
             }
 
-            SharedMoneyValue -= (int) (players * self.GetFieldValue<uint>("appliedDrain"));
-            Debug.Log("-------");
-
-            orig(self);
+            Debug.Log($"currentDrain {currentDrain}");
+            Debug.Log($"SharedMoneyValue {SharedMoneyValue}");
+            if (currentDrain == 4294967295) {
+                Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
+                orig(self);
+                return; 
+            }
+            if (SharedMoneyValue >= (int) currentDrain) {
+                SharedMoneyValue -= (int) (players * self.GetFieldValue<uint>("appliedDrain"));
+                orig(self);
+                return;
+            }
+            else {
+                Debug.Log("Not Draining due to too little money");
+                return;
+            }
         }
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
