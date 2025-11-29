@@ -22,7 +22,7 @@ namespace ShareSuite
         private static void DontTakeDamage(On.RoR2.HealthComponent.orig_TakeDamage orig,
             HealthComponent self, DamageInfo damageInfo)
         {
-            if (ShareSuite.GodModeEnabled.Value && self.body.isPlayerControlled)
+            if (ShareSuite.GodMode.Value && self.body.isPlayerControlled)
             {
                 return;
             }

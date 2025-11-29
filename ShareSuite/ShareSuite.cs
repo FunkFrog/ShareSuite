@@ -71,7 +71,7 @@ namespace ShareSuite
             VoidItemsRandomized,
             OverrideMultiplayerCheck;
 #if DEBUG
-        public static ConfigEntry<bool> GodModeEnabled;
+        public static ConfigEntry<bool> GodMode;
 #endif
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
@@ -391,9 +391,9 @@ namespace ShareSuite
             );
 
 #if DEBUG
-            GodModeEnabled = Config.Bind(
+            GodMode = Config.Bind(
                 "Settings",
-                "GodModeEnabled",
+                "GodMode",
                 false,
                 "Toggles god mode for debugging purposes."
                 ); 
@@ -988,9 +988,8 @@ namespace ShareSuite
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
             }
         }
-
-
 #endregion CommandParser
+
 #if DEBUG
         // Debug Command: Set MoneyValue for all players
         [ConCommand(commandName = "ss_SetMoneyValue", flags = ConVarFlags.None,
@@ -1094,7 +1093,7 @@ namespace ShareSuite
                 // Kill enemy
                 body.healthComponent.Suicide(body.gameObject, body.gameObject, DamageType.Generic);
             }
-            Debug.Log("Killed all enemies in the stage.");
+            Debug.Log("Killed all players in the stage.");
         }
 
         // Debug Command: Kill all enemies
@@ -1147,7 +1146,7 @@ namespace ShareSuite
         {
             if (args.Count == 0)
             {
-                Debug.Log(GodModeEnabled.Value);
+                Debug.Log(GodMode.Value);
                 return;
             }
 
@@ -1156,8 +1155,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
-                GodModeEnabled.Value = valid.Value;
-                Debug.Log($"Godmode set to {GodModeEnabled.Value}.");
+                GodMode.Value = valid.Value;
+                Debug.Log($"Godmode set to {GodMode.Value}.");
             }
         }
 #endif
