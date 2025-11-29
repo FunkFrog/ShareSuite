@@ -139,7 +139,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Debug&quot; (&#xA;  if exist &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; (&#xA;   xcopy &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShareSuite.dll&quot; &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; /Y /I&#xA; )&#xA;)&#xA;" />
+      <Exec Command="if &quot;$(ConfigurationName)&quot; == &quot;Debug&quot; (&#xA;  if exist &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; (&#xA;   xcopy &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShareSuite.dll&quot; &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; /Y /I&#xD;&#xA;   xcopy &quot;$(ProjectDir)bin\Debug\netstandard2.1\ShareSuite.pdb&quot; &quot;%25AppData%25\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\FunkFrog-and-Sipondo-ShareSuite\ShareSuite\&quot; /Y /I&#xA; )&#xA;)&#xA;" />
     </Target>
 
 </Project>

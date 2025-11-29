@@ -1,12 +1,14 @@
-﻿using System;
-using System.Linq;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
 using RoR2;
 using ShareSuite.Networking;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable UnusedMember.Local
 
@@ -68,6 +70,9 @@ namespace ShareSuite
             BossItemsRandomized,
             VoidItemsRandomized,
             OverrideMultiplayerCheck;
+#if DEBUG
+        public static ConfigEntry<bool> GodModeEnabled;
+#endif
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -98,6 +103,10 @@ namespace ShareSuite
         }
 
         public static int DefaultMaxScavItemDropCount = 0;
+#if DEBUG
+        public static int playerCount = PlayerCharacterMasterController.instances.Count;
+#endif
+
 
         private void ReloadHooks(object _ = null, EventArgs __ = null)
         {
@@ -109,6 +118,9 @@ namespace ShareSuite
                 EquipmentSharingHooks.UnHook();
                 ChatHandler.UnHook();
                 _previouslyEnabled = false;
+#if DEBUG
+                DebugTools.UnHook();
+#endif
             }
 
             if (!_previouslyEnabled && ModIsEnabled.Value)
@@ -119,6 +131,9 @@ namespace ShareSuite
                 ItemSharingHooks.Hook();
                 EquipmentSharingHooks.Hook();
                 ChatHandler.Hook();
+#if DEBUG
+                DebugTools.Hook();
+#endif
             }
         }
 
@@ -374,9 +389,18 @@ namespace ShareSuite
                 (short) 1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
             );
+
+#if DEBUG
+            GodModeEnabled = Config.Bind(
+                "Settings",
+                "GodModeEnabled",
+                false,
+                "Toggles god mode for debugging purposes."
+                ); 
+#endif
         }
 
-        #region CommandParser
+#region CommandParser
 
 #pragma warning disable IDE0051 //Commands usually aren't called from code.
 
@@ -965,6 +989,178 @@ namespace ShareSuite
             }
         }
 
+
+#endregion CommandParser
+#if DEBUG
+        // Debug Command: Set MoneyValue for all players
+        [ConCommand(commandName = "ss_SetMoneyValue", flags = ConVarFlags.None,
+            helpText = "Sets money value for all players.")]
+        private static void CcSetMoneyValue(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log("Need 1 argument.");
+                return;
+            }
+            else if (args.Count > 1) {
+                Debug.Log("Function only takes 1 argument. Ignoring rest.");
+            }
+            if (int.TryParse(args[0], out int moneyValue))
+            {
+                if (!MoneyIsShared.Value)
+                {
+                    foreach (var player in PlayerCharacterMasterController.instances)
+                    {
+                        if (player && player.master)
+                        {
+                            player.master.money = (uint) moneyValue;
+                        }
+                    }
+                    return;
+                }
+                else
+                {
+                    MoneySharingHooks.SharedMoneyValue = moneyValue;
+                }
+               Debug.Log($"Set money value to {moneyValue} for all players.");
+            }
+            else
+            {
+                Debug.Log("Couldn't parse to integer.");
+            }
+        }
+
+        // Debug Command: Set Next Active Stage
+        [ConCommand(commandName = "ss_SetNextActiveStage", flags = ConVarFlags.None,
+            helpText = "Sets the next active stage. Takes max 2 arguments stagename and a boolean to go now. Defaults to setting next.")]
+        private static void CcSetNextActiveStage(ConCommandArgs args)
+        {
+            List<string> scenes = SceneCatalog.allStageSceneDefs.Select(sceneDef => sceneDef.baseSceneName).ToList();
+            if (args.Count == 0)
+            {
+
+                Debug.Log($"Next stage is {Run.instance.nextStageScene.baseSceneName}");
+                return;
+            }
+            else if (args.Count > 2)
+            {
+                Debug.Log("Function only takes 2 argument. Ignoring rest.");
+            }
+            else
+            {
+                string stageName = (string) args[0];
+                if (!scenes.Contains(stageName))
+                {
+                    Debug.Log("Invalid stage name.");
+                    Debug.Log($"Valid stage names are: {string.Join(',', scenes)}");
+                    return;
+                }
+                SceneDef scene = SceneCatalog.GetSceneDefFromSceneName(stageName);
+                Run.instance.nextStageScene = scene;
+                Debug.Log($"Set next active stage to {Run.instance.nextStageScene.baseSceneName}.");
+                if (args.Count == 2)
+                {
+                    var valid = TryGetBool(args[1]);
+                    if (valid.HasValue && valid.Value)
+                    {
+                        Debug.Log("Advancing stage now.");
+                        Run.instance.AdvanceStage(Run.instance.nextStageScene);
+                    }
+                    if (valid.HasValue)
+                    {
+                        Debug.Log("Going to the next stage on normal stage change.");
+                    }
+                    else
+                    {
+                        Debug.Log("Couldn't parse to boolean.");
+                    }
+                }
+            }
+        }
+
+        // Debug Command: End Game by killing all players.
+        [ConCommand(commandName = "ss_EndGame", flags = ConVarFlags.None,
+            helpText = "Ends the current game.")]
+        private static void CcEndGame(ConCommandArgs args)
+        {
+            var characters = new List<CharacterBody>(CharacterBody.readOnlyInstancesList);
+            foreach (var body in characters)
+            {
+                if (!body || !body.healthComponent) continue;
+
+                // Skip players
+                if (!body.isPlayerControlled) continue;
+
+                // Kill enemy
+                body.healthComponent.Suicide(body.gameObject, body.gameObject, DamageType.Generic);
+            }
+            Debug.Log("Killed all enemies in the stage.");
+        }
+
+        // Debug Command: Kill all enemies
+        [ConCommand(commandName = "ss_KillAllEnemies", flags = ConVarFlags.None,
+            helpText = "Kills all enemies in the stage.")]
+        private static void CcKillAllEnemies(ConCommandArgs args)
+        {
+            var characters = new List<CharacterBody>(CharacterBody.readOnlyInstancesList);
+            foreach (var body in characters)
+            {
+                if (!body || !body.healthComponent) continue;
+
+                // Skip players
+                if (body.isPlayerControlled) continue;
+
+                // Kill enemy
+                body.healthComponent.Suicide(body.gameObject, body.gameObject, DamageType.Generic);
+            }
+            Debug.Log("Killed all enemies in the stage.");
+        }
+
+        // Debug Command: Set Amount of Players.
+        [ConCommand(commandName = "ss_SetPlayers", flags = ConVarFlags.None,
+            helpText = "Sets amount of players in the game.")]
+        private static void CcSetPlayers(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log($"CurrentPlayers: {playerCount}");
+                return;
+            }
+            else if (args.Count > 1)
+            {
+                Debug.Log("Function only takes 1 argument. Ignoring rest.");
+            }
+            if (int.TryParse(args[0], out int pcCount))
+            {
+                playerCount = pcCount;
+                Debug.Log($"Set CurrentPlayers to {pcCount}.");
+            }
+            else
+            {
+                Debug.Log("Couldn't parse to integer.");
+            }
+        }
+        // WhiteItemsShared
+        [ConCommand(commandName = "ss_GodMode", flags = ConVarFlags.None,
+            helpText = "Toggles godmode. Takes boolean.")]
+        private static void CcGodMode(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(GodModeEnabled.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                GodModeEnabled.Value = valid.Value;
+                Debug.Log($"Godmode set to {GodModeEnabled.Value}.");
+            }
+        }
+#endif
         //TODO re-introduce these as add/remove commands
         //        // ItemBlacklist
         //        [ConCommand(commandName = "ss_ItemBlacklist", flags = ConVarFlags.None,
@@ -1015,8 +1211,15 @@ namespace ShareSuite
             return new bool?();
         }
 
-#pragma warning restore IDE0051
+        private static int? TryGetInt(string arg)
+        {
+            if (int.TryParse(arg, out int result))
+            {
+                return result;
+            }
+            return new int?();
+        }
 
-        #endregion CommandParser
+#pragma warning restore IDE0051
     }
 }
