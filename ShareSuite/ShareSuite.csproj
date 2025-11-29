@@ -11,19 +11,19 @@
 
     <ItemGroup>
       <Reference Include="0Harmony">
-        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2121\BepInExPack\BepInEx\core\0Harmony.dll</HintPath>
+        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\0Harmony.dll</HintPath>
       </Reference>
       <Reference Include="0Harmony20">
-        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2121\BepInExPack\BepInEx\core\0Harmony20.dll</HintPath>
+        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\0Harmony20.dll</HintPath>
       </Reference>
       <Reference Include="BepInEx">
-        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2121\BepInExPack\BepInEx\core\BepInEx.dll</HintPath>
+        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
       </Reference>
       <Reference Include="BepInEx.Bootstrap">
-        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2121\BepInExPack\BepInEx\core\BepInEx.Bootstrap.dll</HintPath>
+        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\BepInEx.Bootstrap.dll</HintPath>
       </Reference>
       <Reference Include="BepInEx.Harmony">
-        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2121\BepInExPack\BepInEx\core\BepInEx.Harmony.dll</HintPath>
+        <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\BepInExPack\BepInEx\core\BepInEx.Harmony.dll</HintPath>
       </Reference>
       <Reference Include="BepInEx.MonoMod.HookGenPatcher">
         <HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\BepInEx.MonoMod.HookGenPatcher.dll</HintPath>
