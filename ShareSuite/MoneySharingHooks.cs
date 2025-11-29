@@ -128,13 +128,14 @@ namespace ShareSuite
             //                | BindingFlags.Static | BindingFlags.GetField;
             //var amountOfPlayerField = typeof(GoldSiphonNearbyBodyController).GetField("tetheredPlayers", bindFlags);
             //int amountOfPlayers = (int) amountOfPlayerField.GetValue(self);
+#if DEBUG
             Debug.Log("-------");
             Debug.Log("Siphoning gold");
             Debug.Log($"Amount of Player: {self.GetFieldValue<int>("tetheredPlayers")}");
             Debug.Log($"tierTracker: {self.GetFieldValue<int>("tierTracker")}");
             Debug.Log($"goldDrainValue: {self.GetFieldValue<int>("goldDrainValue")}");
             Debug.Log($"appliedDrain: {currentDrain}");
-
+#endif
             SphereSearch sphereSearch = self.GetFieldValue<SphereSearch>("sphereSearch");
             List<GameObject> candidates = new List<GameObject>();
             List<HurtBox> hurtBoxes = new List<HurtBox>();
@@ -157,27 +158,36 @@ namespace ShareSuite
                 foreach (HurtBox obj in hurtBoxes)
                 {
                     if (obj == null)
+                    { 
                         Debug.Log("hurtBox: null hurtbox");
-                    else
+                    }
+                    else { 
                         if (obj.healthComponent.body.isPlayerControlled) players++;
+#if DEBUG
                         Debug.Log($"Players in range: {players}");
+#endif
+                    }
                 }
             }
-
+#if DEBUG
             Debug.Log($"currentDrain {currentDrain}");
             Debug.Log($"SharedMoneyValue {SharedMoneyValue}");
+#endif
             if (currentDrain == 4294967295) {
                 Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
                 orig(self);
                 return; 
             }
-            if (SharedMoneyValue >= (int) currentDrain) {
+            if (SharedMoneyValue >= (int) currentDrain)
+            {
                 SharedMoneyValue -= (int) (players * self.GetFieldValue<uint>("appliedDrain"));
                 orig(self);
                 return;
             }
             else {
+#if DEBUG
                 Debug.Log("Not Draining due to too little money");
+#endif
                 return;
             }
         }
