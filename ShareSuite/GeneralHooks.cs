@@ -165,9 +165,12 @@ namespace ShareSuite
             string line =
                 $"{originalCredit};{self.interactableCredit};" +
                 $"{interactableCredit2};{Run.instance.selectedDifficulty};" + 
-                $"{Run.instance.participatingPlayerCount};{Run.instance.stageClearCount}";
+                $"{Run.instance.participatingPlayerCount};{Run.instance.stageClearCount};" +
+                $"{ShareSuite.OverridePlayerScalingEnabled.Value};{ShareSuite.InteractablesCredit.Value};" +
+                $"{ShareSuite.InteractablesOffset.Value}";
             Debug.Log(line);
-            string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "../LocalLow/Hopoo Games, LLC/Risk of Rain 2", "DataGathering.csv");
+            string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                "../LocalLow/Hopoo Games, LLC/Risk of Rain 2", "DataGathering.csv");
             if (System.IO.File.Exists(filePath)) {
                 using (System.IO.StreamWriter outputFile = new System.IO.StreamWriter(filePath, true))
                 {
@@ -177,7 +180,8 @@ namespace ShareSuite
             {
                 using (System.IO.StreamWriter outputFile = new System.IO.StreamWriter(filePath))
                 {
-                    outputFile.WriteLine("GameProposed Credit;interactableCredit;interactableCredit2;GameDifficult;PlayerCount;Stage");
+                    outputFile.WriteLine("GameProposed Credit;interactableCredit;interactableCredit2;GameDifficult;" +
+                        "PlayerCount;Stage;OverridePlayerScalingEnabled;InteractablesCredit;InteractablesOffset");
                     outputFile.WriteLine(line);
                 }
             }
