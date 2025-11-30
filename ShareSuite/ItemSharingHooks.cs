@@ -233,7 +233,7 @@ namespace ShareSuite
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
 
-        private static void HalcyoniteShrineDropRewardsHalcyoniteShrineDropRewards(On.RoR2.HalcyoniteShrineInteractable.orig_DropRewards orig,
+        private static void HalcyoniteShrineDropRewards(On.RoR2.HalcyoniteShrineInteractable.orig_DropRewards orig,
             HalcyoniteShrineInteractable self)
         {
             Log.Debug("Sharesuite: HalcyoniteShrineDropRewards triggered");
