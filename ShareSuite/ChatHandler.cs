@@ -98,13 +98,26 @@ namespace ShareSuite
 
             if (temporary)
             {
-                var singlePickupMessage =
-                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
-                    $"<color=#{NotSharingColor}>(Item is temporary, so not shared)</color>";
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
-                return;
+                if (ShareSuite.TemporaryItemsShared.Value)
+                {
+                    var tempPickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up temporary</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for everyone</color>" +
+                        $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = tempPickupMessage });
+                    return;
+                }
+                else
+                {
+                    var singlePickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
+                        $"<color=#{NotSharingColor}>(Item is temporary, so not shared)</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
+                    return;
+                }
             }
 
             if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
