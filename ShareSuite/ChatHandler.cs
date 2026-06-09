@@ -86,12 +86,25 @@ namespace ShareSuite
 
             if (pickupDef.coinValue > 0)
             {
-                var coinMessage =
-                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
+                if (ShareSuite.CoinsIsShared.Value)
+                {
+                    var coinMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves</color>" +
+                        $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
 
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = coinMessage });
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = coinMessage });
+                }
+                else
+                {
+                    var coinMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({pickupDef.coinValue})</color> <color=#{GrayColor}>for themselves.</color>";
+
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = coinMessage });
+                }
 
                 return;
             }

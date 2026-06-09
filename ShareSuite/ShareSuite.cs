@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
@@ -46,6 +47,7 @@ namespace ShareSuite
         public static ConfigEntry<bool>
             ModIsEnabled,
             MoneyIsShared,
+            CoinsIsShared,
             WhiteItemsShared,
             GreenItemsShared,
             RedItemsShared,
@@ -139,6 +141,14 @@ namespace ShareSuite
                 true,
                 "Toggles money sharing between teammates. Every player gains money together and spends it " +
                 "from one central pool of money."
+            );
+
+            CoinsIsShared = Config.Bind(
+                "Settings",
+                "CoinsShared",
+                false,
+                "Toggles if coins (lunar coins, and the unused void coins) are shared between teammates." +
+                "Void coins are set up as a compatibility tool with BubbetsItems."
             );
 
             WhiteItemsShared = Config.Bind(
@@ -433,6 +443,27 @@ namespace ShareSuite
 
                 MoneyIsShared.Value = valid.Value;
                 Debug.Log($"Money sharing status set to {MoneyIsShared.Value}.");
+            }
+        }
+
+        // CoinsIsShared
+        [ConCommand(commandName = "ss_CoinsIsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether coins are shared or not.")]
+        private static void CcCoinsIsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(CoinsIsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                CoinsIsShared.Value = valid.Value;
+                Debug.Log($"Coin sharing status set to {CoinsIsShared.Value}.");
             }
         }
 

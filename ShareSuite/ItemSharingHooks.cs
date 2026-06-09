@@ -147,6 +147,7 @@ namespace ShareSuite
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();
+            bool RandomizeCoinCancel = false; //variable used to disable randomization on coin sharing
 
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
@@ -158,7 +159,15 @@ namespace ShareSuite
                 && GeneralHooks.IsMultiplayer()
                 && !self.pickup.isTempItem) // Don't share the item with anyone else if the item is temporary
             {
-                if (ShareSuite.RandomizeSharedPickups.Value)
+
+                PickupDef def = PickupCatalog.GetPickupDef(self.pickupIndex);
+
+                if (ShareSuite.CoinsIsShared.Value && def.coinValue != 0) //if its a coin and coin sharing is on :3
+                {
+                    RandomizeCoinCancel = true;
+                }
+
+                if (ShareSuite.RandomizeSharedPickups.Value && !RandomizeCoinCancel)
                 {
                     randomizedPlayerDict.Add(master, item);
                 }
@@ -185,7 +194,7 @@ namespace ShareSuite
                         continue;
                     }
 
-                    if (ShareSuite.RandomizeSharedPickups.Value)
+                    if (ShareSuite.RandomizeSharedPickups.Value & !RandomizeCoinCancel)
                     {
                         var pickupIndex = GetRandomItemOfTier(itemDef.tier, item.pickupIndex);
                         if (pickupIndex == null)
@@ -213,7 +222,7 @@ namespace ShareSuite
                     }
                 }
 
-                if (ShareSuite.RandomizeSharedPickups.Value)
+                if (ShareSuite.RandomizeSharedPickups.Value && !RandomizeCoinCancel)
                 {
                     orig(self, body);
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict,
@@ -271,6 +280,7 @@ namespace ShareSuite
                 //if it's not a valid drop AND the dupe fix isn't enabled
                 || self.itemTier == ItemTier.Lunar
                 || costType == CostTypeIndex.Money
+                || costType == CostTypeIndex.VoidCoin //fix for BubbetsItems, so void coins can be spent in their funky little shop in newts :3
                 || costType == CostTypeIndex.None)
             {
                 Log.Debug("Sharesuite: Origin branch 1");
@@ -403,7 +413,15 @@ namespace ShareSuite
         public static bool IsValidItemPickup(PickupIndex pickup)
         {
             var pickupDef = PickupCatalog.GetPickupDef(pickup);
-            if (pickupDef != null && pickupDef.itemIndex != ItemIndex.None)
+
+            if (pickupDef == null) return false; //just break immediately, faster than running any other checks alongside this.
+
+            if (pickupDef.coinValue != 0) //if its a coin share it. ItemIndex returns null so this check must be done first.
+            {
+                return ShareSuite.CoinsIsShared.Value;
+            }
+
+            if (pickupDef.itemIndex != ItemIndex.None)
             {
                 var itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
                 switch (itemDef.tier)
@@ -435,7 +453,7 @@ namespace ShareSuite
                 }
             }
 
-            if (pickupDef != null && pickupDef.equipmentIndex != EquipmentIndex.None)
+            if (pickupDef.equipmentIndex != EquipmentIndex.None)
             {
                 // var equipdef = EquipmentCatalog.GetEquipmentDef(pickupdef.equipmentIndex);
                 // Optional further checks ...
@@ -523,14 +541,22 @@ namespace ShareSuite
 
         private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
         {
-            characterMaster.inventory.GiveItem(pickupDef.itemIndex);
-
-            var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
-                ?.connectionId;
-
-            if (connectionId != null)
+            Log.Debug("Trying to share item with internal name: " + pickupDef.internalName); //debug tool used to tell what coins are called so I can latch onto that and actually share the coins.
+            if (pickupDef.internalName == "LunarCoin.Coin0")
             {
-                NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
+                characterMaster.playerCharacterMasterController?.networkUser.AwardLunarCoins(1); //this feels needlessly complicated.
+            }
+            else
+            { //just a normal item, share it like usual.
+                characterMaster.inventory.GiveItem(pickupDef.itemIndex);
+
+                var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
+                    ?.connectionId;
+
+                if (connectionId != null)
+                {
+                    NetworkHandler.SendItemPickupMessage(connectionId.Value, pickupDef.pickupIndex);
+                }
             }
         }
 
