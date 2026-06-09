@@ -542,11 +542,7 @@ namespace ShareSuite
         private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
         {
             Log.Debug("Trying to share item with internal name: " + pickupDef.internalName); //debug tool used to tell what coins are called so I can latch onto that and actually share the coins.
-            if (pickupDef.internalName == "MiscPickupIndex.VoidCoin")
-            {
-                characterMaster.GiveVoidCoins(1); //i hate how easy this one is compared to the lunar one.
-            }
-            else if (pickupDef.internalName == "LunarCoin.Coin0")
+            if (pickupDef.internalName == "LunarCoin.Coin0")
             {
                 characterMaster.playerCharacterMasterController?.networkUser.AwardLunarCoins(1); //this feels needlessly complicated.
             }
