@@ -10,13 +10,13 @@ namespace ShareSuite
     {
         public static void UnHook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage -= RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup -= RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage -= SendIntroMessage;
         }
 
         public static void Hook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup += RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
 
@@ -58,7 +58,7 @@ namespace ShareSuite
             timer.Start();
         }
 
-        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
+        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage_CharacterMaster_UniquePickup orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
@@ -303,6 +303,10 @@ namespace ShareSuite
         public static readonly SendPickupMessageDelegate SendPickupMessage =
             (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
                 typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.Public | BindingFlags.Static) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
+                    BindingFlags.Public | BindingFlags.Static,
+                    binder: null,
+                    types: new[] { typeof(CharacterMaster), typeof(UniquePickup) },
+                    modifiers: null
+                    ) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
     }
 }
