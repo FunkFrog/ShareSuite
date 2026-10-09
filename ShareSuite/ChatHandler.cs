@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using RoR2;
 using UnityEngine;
 
@@ -10,13 +9,13 @@ namespace ShareSuite
     {
         public static void UnHook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage -= RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup -= RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage -= SendIntroMessage;
         }
 
         public static void Hook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup += RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
 
@@ -58,7 +57,7 @@ namespace ShareSuite
             timer.Start();
         }
 
-        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
+        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage_CharacterMaster_UniquePickup orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
@@ -300,9 +299,9 @@ namespace ShareSuite
 
         public delegate void SendPickupMessageDelegate(CharacterMaster master, UniquePickup pickupIndex);
 
+        // RoR2 1.5 adds an overload with addedQuantity. Bind the two-argument
+        // overload at compile time instead of an ambiguous name-only lookup.
         public static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
-                typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.Public | BindingFlags.Static) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
+            GenericPickupController.SendPickupMessage;
     }
 }
