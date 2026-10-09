@@ -144,6 +144,14 @@ namespace ShareSuite
         private static void OnGrantItem(On.RoR2.GenericPickupController.orig_AttemptGrant orig,
             GenericPickupController self, CharacterBody body)
         {
+            // RoR2 1.5 rental items use GiveItemRented. Sharing through GiveItem
+            // would incorrectly turn them into permanent items for teammates.
+            if (self.pickup.isRental)
+            {
+                orig(self, body);
+                return;
+            }
+
             var item = PickupCatalog.GetPickupDef(self.pickupIndex);
             var itemDef = ItemCatalog.GetItemDef(item.itemIndex);
             var randomizedPlayerDict = new Dictionary<CharacterMaster, PickupDef>();

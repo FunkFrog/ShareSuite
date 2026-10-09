@@ -25,7 +25,8 @@ namespace ShareSuite
 
 
             // If equipment sharing is disabled, or we're not in multiplayer, or we're not in an server, run the original method
-            if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
+            if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active
+                || self.pickup.isRental)
             {
                 orig(self, body);
                 return;
@@ -36,9 +37,10 @@ namespace ShareSuite
             var oldEquipPickupIndex = GetPickupIndex(oldEquip);
             var newEquip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            // If the new item is not equipment, return
+            // Equipment sharing must not swallow ordinary item pickups.
             if (IsEquipment(newEquip) == false)
             {
+                orig(self, body);
                 return;
             }
 
