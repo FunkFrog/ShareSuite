@@ -18,19 +18,22 @@ namespace ShareSuite
     {
         private static bool _itemLock = false;
 
-        private static readonly List<CostTypeIndex> PrinterCosts = new List<CostTypeIndex>
-        {
-            CostTypeIndex.WhiteItem,
-            CostTypeIndex.GreenItem,
-            CostTypeIndex.RedItem,
-            CostTypeIndex.BossItem,
-            CostTypeIndex.LunarItemOrEquipment
-        };
+        // Shop terminals paid for with items or equipment (printers, cauldrons, modded printers), mapped to the
+        // players who paid. Their output is given straight to those players instead of dropped, so it can't be
+        // shared. A list, because a printer only locks itself on its next state machine tick: payments landing in
+        // the same frame each get an item, as they did when the item was given at purchase time.
+        private static readonly Dictionary<GameObject, List<CharacterMaster>> PendingTradeBuyers =
+            new Dictionary<GameObject, List<CharacterMaster>>();
+
+        // Set while a recorded trade's DropPickup runs; the next droplet created goes to these players instead.
+        private static List<CharacterMaster> _tradeDropRecipients;
 
         public static void UnHook()
         {
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
+            On.RoR2.CostTypeDef.PayCost_PayCostContext_PayCostResults -= OnPayCost;
             On.RoR2.ShopTerminalBehavior.DropPickup_bool -= OnPurchaseDrop;
+            On.RoR2.PickupDropletController.CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 -= OnCreatePickupDroplet;
             On.RoR2.GenericPickupController.AttemptGrant -= OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter -= OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
@@ -46,7 +49,9 @@ namespace ShareSuite
         {
             Log.Debug("Sharesuite: Hooking itemsharing");
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
+            On.RoR2.CostTypeDef.PayCost_PayCostContext_PayCostResults += OnPayCost;
             On.RoR2.ShopTerminalBehavior.DropPickup_bool += OnPurchaseDrop;
+            On.RoR2.PickupDropletController.CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 += OnCreatePickupDroplet;
             On.RoR2.GenericPickupController.AttemptGrant += OnGrantItem;
             On.EntityStates.ScavBackpack.Opening.OnEnter += OnScavengerDrop;
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
@@ -255,39 +260,83 @@ namespace ShareSuite
             bool isDuplicated)
         {
             Log.Debug("Sharesuite: OnPurchaseDrop triggered");
-            if (!NetworkServer.active)
+            if (!NetworkServer.active || !PendingTradeBuyers.TryGetValue(self.gameObject, out var buyers))
             {
-                Log.Debug("Sharesuite: Not server, returning");
                 orig(self, isDuplicated);
                 return;
             }
 
-            var costType = self.GetComponent<PurchaseInteraction>().costType;
-            Log.Debug("Sharesuite: CostType: " + costType);
+            PendingTradeBuyers.Remove(self.gameObject);
 
-            //If is valid drop and dupe fix not enabled, true -> we want the item to pop
-            //if is valid drop and dupe fix is enabled, false -> item IS shared, we don't want the item to pop, PrinterCauldronFix should deal with this
-            //if is not valid drop and dupe fix is not enabled, true -> item ISN'T shared, and dupe fix isn't enabled, we want to pop
-            //if is not valid drop and dupe fix is enabled, false -> item ISN'T shared, dupe fix should catch, we don't want to pop
-
-            Log.Debug("Sharesuite: Multiplayer: " + GeneralHooks.IsMultiplayer() + " | ValidItemPickup: " +
-                      IsValidItemPickup(self.CurrentPickupIndex()) + " | PrinterCauldronFixEnabled: " +
-                      ShareSuite.PrinterCauldronFixEnabled.Value);
-
-            if (!GeneralHooks.IsMultiplayer() // is not multiplayer
-                || !IsValidItemPickup(self.CurrentPickupIndex()) && !ShareSuite.PrinterCauldronFixEnabled.Value
-                //if it's not a valid drop AND the dupe fix isn't enabled
-                || self.itemTier == ItemTier.Lunar
-                || costType == CostTypeIndex.Money
-                || costType == CostTypeIndex.None)
+            // Always run the game's DropPickup, so the terminal's own state and any other mod's changes to the
+            // dropped pickup (e.g. quality upgrades) still apply. OnCreatePickupDroplet hands the final pickup
+            // to the buyers instead of spawning it.
+            Log.Debug("Sharesuite: capturing trade drop for " + buyers.Count + " buyer(s)");
+            _tradeDropRecipients = buyers;
+            try
             {
-                Log.Debug("Sharesuite: Origin branch 1");
                 orig(self, isDuplicated);
             }
-            else if (!ShareSuite.PrinterCauldronFixEnabled.Value && PrinterCosts.Contains(costType))
+            finally
             {
-                Log.Debug("Sharesuite: Origin branch 2");
-                orig(self, isDuplicated);
+                _tradeDropRecipients = null;
+            }
+        }
+
+        // PrinterCauldronFix: record shop terminals that the buyer paid for with items or equipment. Detected from
+        // what was actually paid rather than a list of cost types, so modded printers and new cost types work too.
+        private static void OnPayCost(On.RoR2.CostTypeDef.orig_PayCost_PayCostContext_PayCostResults orig,
+            CostTypeDef self, CostTypeDef.PayCostContext context, CostTypeDef.PayCostResults results)
+        {
+            orig(self, context, results);
+
+            if (!NetworkServer.active
+                || !ShareSuite.PrinterCauldronFixEnabled.Value
+                || !GeneralHooks.IsMultiplayer()
+                || !context.purchasedObject
+                || !context.purchasedObject.GetComponent<ShopTerminalBehavior>()
+                || !context.activatorMaster)
+            {
+                return;
+            }
+
+            var paidWithItems = results.itemStacksTaken.Count > 0 || results.equipmentTaken.Count > 0;
+            if (!paidWithItems) return;
+
+            Log.Debug("Sharesuite: item trade at " + context.purchasedObject.name + " (cost type " +
+                      self.costTypeIndex + ")");
+            if (!PendingTradeBuyers.TryGetValue(context.purchasedObject, out var buyers))
+            {
+                buyers = new List<CharacterMaster>();
+                PendingTradeBuyers[context.purchasedObject] = buyers;
+            }
+
+            buyers.Add(context.activatorMaster);
+        }
+
+        private static void OnCreatePickupDroplet(
+            On.RoR2.PickupDropletController.orig_CreatePickupDroplet_CreatePickupInfo_Vector3_Vector3 orig,
+            GenericPickupController.CreatePickupInfo pickupInfo, Vector3 position, Vector3 velocity)
+        {
+            var buyers = _tradeDropRecipients?.Where(b => b && b.inventory).ToList();
+            var pickup = pickupInfo.pickup;
+            var pickupDef = PickupCatalog.GetPickupDef(pickup.pickupIndex);
+
+            // Fall back to a normal drop rather than lose the item.
+            if (buyers == null || buyers.Count == 0 || pickupDef == null || pickupDef.itemIndex == ItemIndex.None
+                || pickup.isRental || pickup.isTempItem)
+            {
+                orig(pickupInfo, position, velocity);
+                return;
+            }
+
+            // Only the trade's own droplet is captured.
+            _tradeDropRecipients = null;
+
+            foreach (var buyer in buyers)
+            {
+                HandleGiveItem(buyer, pickupDef);
+                ChatHandler.SendRichCauldronMessage(buyer, pickupDef.pickupIndex);
             }
         }
 
@@ -303,38 +352,7 @@ namespace ShareSuite
                 return;
             }
 
-            var shop = self.GetComponent<ShopTerminalBehavior>();
-
-            #region PrinterCauldronfix
-
-            if (PrinterCosts.Contains(self.costType))
-            {
-                Log.Debug("Sharesuite: PrinterCauldronfix branch");
-                if (ShareSuite.PrinterCauldronFixEnabled.Value)
-                {
-                    var characterBody = activator.GetComponent<CharacterBody>();
-
-                    var inventory = characterBody.inventory;
-
-                    var item = PickupCatalog.GetPickupDef(shop.CurrentPickupIndex())?.itemIndex;
-
-                    if (item == null) Log.Debug("ShareSuite: PickupCatalog is null.");
-                    else
-                    {
-                        Log.Debug("Sharesuite: handling give item");
-                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
-                    }
-
-                    Log.Debug("Sharesuite: orig");
-                    orig(self, activator);
-                    Log.Debug("Sharesuite: rich cauldron message");
-                    ChatHandler.SendRichCauldronMessage(inventory.GetComponent<CharacterMaster>(),
-                        shop.CurrentPickupIndex());
-                    return;
-                }
-            }
-
-            #endregion Cauldronfix
+            // PrinterCauldronFix is handled by OnPayCost, OnPurchaseDrop and OnCreatePickupDroplet.
 
             #region EquipmentDronefix
 
