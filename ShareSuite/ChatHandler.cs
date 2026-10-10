@@ -301,12 +301,6 @@ namespace ShareSuite
         public delegate void SendPickupMessageDelegate(CharacterMaster master, UniquePickup pickupIndex);
 
         public static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
-                typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.Public | BindingFlags.Static,
-                    binder: null,
-                    types: new[] { typeof(CharacterMaster), typeof(UniquePickup) },
-                    modifiers: null
-                    ) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
+                    GenericPickupController.SendPickupMessage;
     }
 }
