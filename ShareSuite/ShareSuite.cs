@@ -662,6 +662,27 @@ namespace ShareSuite
             }
         }
 
+        // RentalItemsShared
+        [ConCommand(commandName = "ss_RentalItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether Ethereal (rented) items are shared or not.")]
+        private static void CcRentalItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(RentalItemsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                RentalItemsShared.Value = valid.Value;
+                Debug.Log($"Rental item sharing set to {RentalItemsShared.Value}.");
+            }
+        }
+
         // RichMessagesEnabled
         [ConCommand(commandName = "ss_RichMessagesEnabled", flags = ConVarFlags.None,
             helpText = "Modifies whether rich messages are enabled or not.")]
