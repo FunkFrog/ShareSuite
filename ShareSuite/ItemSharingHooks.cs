@@ -1,3 +1,4 @@
+using EntityStates.BrotherMonster;
 using EntityStates.Scrapper;
 using IL.RoR2.Achievements.FalseSon;
 using MonoMod.Cil;
@@ -151,6 +152,15 @@ namespace ShareSuite
 
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
+
+            if(self.pickup.isTempItem)
+            {
+                Log.Debug("I am a temp item");
+            }
+            if (self.pickup.isRental)
+            {
+                Log.Debug("I am a rent item");
+            }
 
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
