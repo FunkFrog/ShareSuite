@@ -82,7 +82,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
+            var itemCount = player.inventory.GetItemCountEffective(pickupDef.itemIndex);
 
             if (pickupDef.coinValue > 0)
             {
@@ -143,7 +143,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
+            var itemCount = player.inventory.GetItemCountEffective(pickupDef.itemIndex);
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
@@ -178,7 +178,7 @@ namespace ShareSuite
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
                 var itemCount =
-                    index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex);
+                    index.Key.playerCharacterMasterController.master.inventory.GetItemCountEffective(index.Value.itemIndex);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
@@ -301,12 +301,6 @@ namespace ShareSuite
         public delegate void SendPickupMessageDelegate(CharacterMaster master, UniquePickup pickupIndex);
 
         public static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
-                typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.Public | BindingFlags.Static,
-                    binder: null,
-                    types: new[] { typeof(CharacterMaster), typeof(UniquePickup) },
-                    modifiers: null
-                    ) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
+                    GenericPickupController.SendPickupMessage;
     }
 }
