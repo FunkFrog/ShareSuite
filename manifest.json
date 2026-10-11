@@ -1,11 +1,11 @@
 {
     "name": "ShareSuite",
     "version_number": "2.10.1",
-    "website_url": "https://github.com/FunkFrog/RoR2SharedItems",
-    "description": "Share gear between members of your party - Highly Balanced - Completely Customisable",
+    "website_url": "https://github.com/Luiz-AVcruz/ShareSuite",
+    "description": "ShareSuite with general bug fixes and compatibility fixes for RoR2 1.5.0 and DLC pickup changes.",
     "dependencies": [
         "bbepis-BepInExPack-5.4.2121",
-		"RiskofThunder-R2API_CommandHelper-1.0.2",
-		"RiskofThunder-R2API_Core-5.2.0"
+        "RiskofThunder-R2API_CommandHelper-1.0.2",
+        "RiskofThunder-R2API_Core-5.2.0"
     ]
 }

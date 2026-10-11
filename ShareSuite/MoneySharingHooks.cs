@@ -126,13 +126,20 @@ namespace ShareSuite
 
                     case CostTypeIndex.PercentHealth:
                     {
+                        // PercentHealth also applies to interactables that are not blood shrines.
+                        // Let those use the game's handler without adding a blood-shrine reward.
+                        var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
+                        if (!shrineBloodBehavior) break;
+
                         // Share the damage taken from a sacrifice
                         // as it generates shared money
                         orig(self, activator);
                         var teamMaxHealth = 0;
                         foreach (var playerCharacterMasterController in PlayerCharacterMasterController.instances)
                         {
-                            var charMaxHealth = playerCharacterMasterController.master.GetBody().maxHealth;
+                            var playerBody = playerCharacterMasterController.master?.GetBody();
+                            if (!playerBody) continue;
+                            var charMaxHealth = playerBody.maxHealth;
                             if (charMaxHealth > teamMaxHealth)
                             {
                                 teamMaxHealth = (int) charMaxHealth;
@@ -140,7 +147,6 @@ namespace ShareSuite
                         }
 
                         var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
-                        var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
                         var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
                                              shrineBloodBehavior.goldToPaidHpRatio);
 

@@ -25,6 +25,7 @@ namespace ShareSuite
         public void Awake()
         {
             Log.Init(Logger);
+            Log.Info("Local pickup compatibility patch for RoR2 1.5.0 (based on upstream PR #254).");
 
             InitConfig();
             CommandHelper.AddToConsoleWhenReady();

@@ -7,3 +7,11 @@ buildreleases
 .idea
 Deps
 *DotSettings.user
+
+# Keep workstation logs, backups and deployment records local.
+/local/*
+!/local/ShareSuite.Local.csproj
+!/local/checks/
+/local/checks/*
+!/local/checks/Checks.csproj
+!/local/checks/Program.cs

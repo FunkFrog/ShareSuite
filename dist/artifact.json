@@ -1,0 +1,8 @@
+{
+  "archive": "dist/ShareSuite-2.10.1-local-RoR2-1.5.0.zip",
+  "archive_sha256": "fae6e2e5584bef51dd34595522a1fb88235b744310b95604e90afe06768d587a",
+  "dll_sha256": "137dbf72c8cec89d70c0061b98f17d3d9eabe478627073b0ad1b7c2d75b664c3",
+  "source_files": 10,
+  "bytes": 108896,
+  "verified": true
+}

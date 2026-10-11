@@ -1,47 +1,47 @@
-# [Item Sharing](#item-sharing)
-- Any items anyone pick up are given to all living members of your party.
-    - By default, lunar items and items that provide bonuses for all members of the party are not shared.
-- Items are given directly to everyone but the one who picked the item up, but we're working on changing that. Pick-up banners for everyone are on their way.
-- Dead members don't recieve the item, but you can easily change this with the `DeadPlayersGetItems` setting.
+# ShareSuite feature guide
 
-# [3D Printer & Cauldron Compatibility](#3d-printer-cauldron-compatibility)
-- Each player may consume their own items to earn an item from the cauldron. These items are given directly to the purchaser so that it does not affect other players' items.
-- This can be disabled, though it WILL create a duplication glitch. 
-- Toggle it with the `PrinterCauldronFix` setting.
+This fork keeps the original ShareSuite features and settings, with the general fixes and DLC pickup compatibility changes described in the [README](README.md). The sections below explain how sharing is configured.
 
-# [Money Sharing](#money-sharing)
-- Easily share money to balance the mod more towards the singleplayer loot playstyle.
-    - When anyone gets money, it gets added to the group's money pool.
-    - When anyone spends money, it gets taken away from the group's money pool.
-- Adds a gained money scalar — Want more money? Turn it up!
-    - Toggle `MoneyScalarEnabled` to then change `MoneyScalar` to change the multiplier of money gained.
+## Item sharing
 
-# [Shared Equipment](#shared-equipment)
-- When you pick up equipment, everyone gets it.
-- **(TO-DO)** When someone picks up equipment, they drop the one everyone currently has.
-    - At the moment, the equipment just changes directly
-- **(TO-DO)** When someone buys an equipment drone, everyone loses their equipment.
-    - This currently completely de-sync's shared equipment
+Eligible item pickups are given to living teammates. Enable `DeadPlayersGetItems` if dead players should receive shared items too.
 
-# [Balance](#balance)
-- Technically, the game should be ever so slightly harder than vanilla this way. Either way, it should be extremely close to the original game's balance.
-    - We only spawn the amount of interactables that would be spawned for 1 player in a lobby of any size. 
-    - Boss and Lunar items are not shared, along with items that provide buffs for everyone in the party. 
-    - There are no ways to abuse this mod to dupe items. 
-    - We cut player XP gained from money at the end of rounds to combat leveling faster. 
-    - Teleporters only drop one item per boss killed. 
-    - This mod has been tediously balanced and we do everything we can to keep the experience as close to vanilla as possible. 
-    - If you have any ideas of ways to improve this, please let us know!
-    
-# [Customization](#customization)
-- Toggleable scaling of boss drops and interactables (chests, capsules, etc) for balance
-    - Tuned for highly balanced by default.
-- Easily customizable - Scalars and multipliers for everything you'd want to change
+Sharing can be configured separately for white, green, red, boss, lunar and void items. Lunar and void sharing are disabled by default. Items on the blacklist are excluded from sharing.
 
-# [Config](#config)
-- Configuration options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*).
-- Item and equipment blacklists also exist for disabling specific items.
-- Config file (*RiskOfRain2/BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg*) allows you to customize the mod down to the slightest detail.
+`RandomizeSharedPickups` gives each teammate a random eligible item of the same tier instead of the exact item picked up. Lunar, boss and void randomization have their own settings.
 
-# [Custom Chat Messages](#chat-messages)
-![Image of custom chat messages](https://funkfrog.me/hyLH2W47au.png)
+Rental pickups use the game's normal handling and are not copied to teammates as permanent items. Their lifetime remains under the game's rental system.
+
+## Printers and cauldrons
+
+The `PrinterCauldronFix` setting keeps printer and cauldron exchanges tied to the player using them. This lets each player change their own build while ordinary pickups remain shared.
+
+The fix is enabled by default. Disabling it allows those exchanges to interact with ordinary item sharing and can create duplicate rewards.
+
+## Money sharing
+
+With `MoneyShared` enabled, money is pooled across the group. Purchases draw from that pool. Enable `MoneyScalarEnabled` and adjust `MoneyScalar` to change money gain.
+
+Blood-shrine rewards are calculated using the highest maximum health among players with an active body. Other interactions that cost a percentage of health use the game's normal handling.
+
+## Equipment sharing
+
+Equipment sharing is disabled by default. Enable `EquipmentShared` to give eligible equipment to teammates when it is picked up.
+
+The equipment blacklist and `DropBlacklistedEquipmentOnShare` setting control how a player's excluded equipment is handled when shared equipment is received. Rental equipment follows the game's normal pickup path.
+
+Normal item pickups still run through the item-sharing handler when equipment sharing is enabled.
+
+## Scaling and balance
+
+ShareSuite includes settings for player scaling, interactable credits, boss drops, Void Fields and Simulacrum rewards. These let a group adjust how much loot is available alongside shared pickups.
+
+The fork retains the original defaults. If another mod also controls these systems, configure which mod should own the affected scaling settings.
+
+## Chat messages
+
+`RichMessagesEnabled` controls ShareSuite's pickup messages. They show who received an item, including results from randomized sharing. Rental pickup messages use the game's normal message handling.
+
+## Configuration
+
+Settings are stored in `BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg` within your mod profile. The [README](README.md#configuration) lists the upstream defaults and console commands.

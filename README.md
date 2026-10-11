@@ -1,100 +1,56 @@
-[//]: # ( Header imgur album: https://imgur.com/a/2uaeCao )
-![Header Image](https://i.imgur.com/4HTi92E.png "ShareSuite Header Image")
+# ShareSuite — fixes fork
 
-[![Discord](https://img.shields.io/discord/614480101647843330?color=%237289DA&label=Discord&style=flat-square)](https://discord.gg/c7QnQeb)[![GitHub](https://img.shields.io/badge/GitHub-visit-c7c7c7?style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
+This fork is the original [ShareSuite](https://github.com/FunkFrog/ShareSuite) with a few general bug fixes and compatibility fixes for newer Risk of Rain 2 and DLC updates. The main focus is keeping item sharing working with the pickup changes in RoR2 1.5.0.
 
-[![FunkFrog Donate](https://i.imgur.com/L9TfFGx.png)](https://ko-fi.com/funkfrog)[![Sipondo Donate](https://i.imgur.com/B7JuCNB.png)](https://ko-fi.com/sipondo)
+ShareSuite lets a co-op group share items, money and, optionally, equipment. This fork keeps the original settings, sharing rules and balance options, with a small set of fixes on top.
 
-Have you ever had someone swoop in and steal that item you just bought? Ever accidentally touched and picked up an item that you were saving for your friend? Aggravating, right? This mod has been developed in response to frustration caused the way items are distributed in Risk of Rain 2. With ShareSuite, we aim to fix that!
+## What this fork fixes
 
-Multiplayer RoR2 games should be fast-paced wacky fun. Often times, though, players run into problems with loot being stolen or one player dominating the game. Obviously, the best way to resolve this issue is to remove the incentive to hoard loot in the first place!
+- **Item pickups on RoR2 1.5.0.** Updates the pickup-message hook and fixes an initialization error that could stop players from collecting items.
+- **Rental pickups from DLC3.** Items and equipment marked as rentals use the game's normal pickup handling, so sharing does not turn them into permanent items for teammates. This covers the rental system introduced with [Alloyed Collective](https://store.steampowered.com/app/2781620/Risk_of_Rain_2_Alloyed_Collective/).
+- **Normal items with equipment sharing enabled.** The equipment-sharing handler passes ordinary items through to the normal pickup code.
+- **Interactions that cost a percentage of health.** Blood-shrine money calculations only run for blood shrines. Other health-cost interactions use the game's normal handling, and players without an active body are skipped in the shrine calculation.
 
-ShareSuite is a mod with a multitude of systems designed around sharing the things you gather throughout a run, be it items, money, experience, equipment, or otherwise. Check out the "Features" section for more information!
+The pickup compatibility work builds on [tyxkk2's upstream PR #254](https://github.com/FunkFrog/ShareSuite/pull/254). See the [changelog](CHANGELOG.md) for the fork changes and the preserved upstream history.
 
-|                 Most Recent Update - 2.10.1                 |
-|:-----------------------------------------------------------:|
-|                   Update to support DLC3                    |
-|                  Fixed drone item sharing                   |
-|            Fixed chat messages in single player             |
-|          Fixed scrapper not working in multiplayer          |
-| Fix simulacrum having the incorrect amount of interactables |
+## Original ShareSuite features
 
-*If you'd like more info about this update, check the changelog at the bottom of the page!*
+- Share eligible item pickups with living teammates, or enable sharing with dead players too.
+- Pool money across the group and adjust money gain through configuration.
+- Enable shared equipment, with options for handling equipment on the blacklist.
+- Keep printers and cauldrons tied to the player using them.
+- Adjust boss drops, interactable scaling, item blacklists and randomized sharing.
+- Show chat messages about who received each pickup.
 
-### ![Features](https://i.imgur.com/6jCWYtn.png "ShareSuite Features")
+The [feature guide](DetailedFeatures.md) explains these settings in more detail.
 
-**Want a more detailed look at any of our features? Click the [*Show me more*] button next to the bullet!**
+## Installing the fork
 
----
+The local ZIP is meant to replace the DLL in an existing ShareSuite installation:
 
-**On-By-Default Systems**
+[Download the fork ZIP](https://github.com/Luiz-AVcruz/ShareSuite/raw/refs/heads/local/ror2-1.5-pickups/dist/ShareSuite-2.10.1-local-RoR2-1.5.0.zip).
 
-- Item Sharing — The main goal of this mod is to split items across all players evenly. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#item-sharing)
-  - Any items that are picked up are given to all living members of your party.
-  - By default, lunar items and items that provide bonuses for all members of the party are not shared.
-  - You can also enable the option to give each member of your party a random item of the same tier you received, if that's more your style!
+1. Install and enable ShareSuite and its dependencies in your r2modman profile.
+2. Close the game and r2modman before replacing files.
+3. Extract the fork ZIP. Replace `BepInEx/plugins/FunkFrog-and-Sipondo-ShareSuite/ShareSuite/ShareSuite.dll` in the profile with `ShareSuite/ShareSuite.dll` from the ZIP.
+4. Start the game through **Start modded**.
 
-- Worried about the game becoming unbalanced? We've got you. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#balance)
-  - Tuned to be balanced by default.
-  - Built to feel like vanilla singleplayer; The mod scales to feel right with any amount of players, whether you're playing with 2 or 20.
-  - Easily customizable — Want more boss loot? Easy! Want more chests? Righty-o, turn that scalar up.
+Keep one active copy of `ShareSuite.dll` in the profile. The fork uses the original plugin ID and configuration file, so your existing settings carry over. The package and BepInEx version remain **2.10.1**; the local DLL's informational version is `2.10.1+local.ror2-1.5.pickup-fix.1`.
 
-- Compatible with 3D Printers and Cauldrons — You get to customize your build with them. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#3d-printercauldron-compatibility)
-  - Any player using a printer or cauldron only changes THEIR items, leaving others to build as they please.
+The fork writes this line to `BepInEx/LogOutput.log` when it starts:
 
-- Want to easily reference who got what item? Whether or not something's shared? Who got what when pickups are randomized? Custom chat messages are here for you! [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#chat-messages)
-  - Rich Chat Messages let you know who got an item (or who didn't!)
-  - Custom message for items that are set to not share, to remove ambiguity.
-  - Randomized pickups now display who got what - no more confusion over randomized drops.
+```text
+Local pickup compatibility patch for RoR2 1.5.0 (based on upstream PR #254).
+```
 
----
+Updating or reinstalling ShareSuite through the mod manager can replace the fork DLL. For multiplayer testing, use the same fork build on the host and clients.
 
-**Additional Systems**
+## Configuration
 
-- A robust money sharing/spending system. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#money-sharing)
-  - When anyone gets money, it gets added to the group's money pool.
-  - When anyone spends money, it gets taken away from the group's money pool.
-  - Now includes a gained money scalar — Want more money? Turn it up!
+The configuration file is `BepInEx/config/com.funkfrog_sipondo.sharesuite.cfg` inside your mod profile. It is created when ShareSuite first starts. Edit it with the game closed, or use the existing `ss_` console commands in-game.
 
-- A shared equipment system — flutter like a kaleidoscope of butterflies or rain lightning from the sky, together. (*`RECENTLY UPDATED`*) [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#shared-equipment)
-  - When you pick up equipment, everyone gets it.
-  - When someone picks up equipment, they drop the one everyone currently has.
-  - When someone buys an equipment drone, everyone loses their equipment.
-  - Handle blacklisted equipment in two ways: drop their item, or don't change it at all.
+The fork retains the upstream defaults:
 
-- Want red items to be unique? Hate the fact that everyone gets hooves? No worries, we've got a solution. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#customization)
-  - Config options for enabling/disabling sharing specific item types (*white, green, red, lunar, boss*).
-  - Item and equipment blacklists also exist for disabling specific items you don't want shared.
-
-- The config file allows you to customize the mod down to the slightest detail. [[*Show me more*]](https://github.com/FunkFrog/RoR2SharedItems/blob/master/DetailedFeatures.md#config)
-  - See the **Configuration** section for more information!
-
-
-### ![Installation Guide](https://i.imgur.com/6oHhqsV.png "ShareSuite Installation Guide")
-
-- Install the latest version of **[R2API](https://thunderstore.io/package/tristanmcpherson/R2API/)** if you haven't already.
-- Download and unzip the files with the download button above.
-- Place `ShareSuite.dll` in your BepInEx/plugins/ folder
-- Run the game and have a great time!
-
-### ![Configuration](https://i.imgur.com/XmCL1MI.png "ShareSuite Configuration")
-
-1. **Make sure you run the game with the mod installed to generate the config file!**
-2. Navigate to `\Risk of Rain 2\BepInEx\config\`
-3. Open `com.funkfrog_sipondo.sharesuite.cfg` in any text editor (*we recommend Notepad++ if you have it installed!*)
-4. Edit the values for settings as you see fit!
-
-**You can also set settings in-game with the commands listed below.**
-
-1. Open console with `~ + ctrl + alt`
-  - Note: you can easily open the console after you've opened it the first time by just pressing `~`!
-2. Type in the Command, followed by
-  - A `True/False` value for toggles
-  - An integer number Boss Loot
-  - A decimal number for Money and Interactable scaling.
-3. Press enter and you're done!
-
-### Default Config Settings
 | Setting                          | Default Value |                            Command |
 | :--------------------------------| :-----------: | ---------------------------------: |
 | Mod Enabled                      |          True |                         ss_Enabled |
@@ -129,90 +85,28 @@ ShareSuite is a mod with a multitude of systems designed around sharing the thin
 | Emulate Singleplayer Money       |          True |        ss_EmulateSingleplayerMoney |
 | Money Scalar                     |           1.0 |                     ss_MoneyScalar |
 
-**Tip: Want to reset your config?**
+## Compatibility and testing
 
-- Stop the game if it's currently running
-- Navigate to `\Risk of Rain 2\BepInEx\config\`
-- Delete `com.funkfrog_sipondo.sharesuite.cfg`
-- Start the game again. Upon boot, a fresh new config will be generated!
+This build targets **RoR2 1.5.0** and is based on **ShareSuite 2.10.1**. Compilation and assembly checks passed against the installed RoR2 1.5.0#1210 dependencies. The regression check reproduces the original pickup-message error and confirms that the patched initializer selects the correct method.
 
-### ![FAQ](https://i.imgur.com/dL9L88y.png "ShareSuite FAQ")
+In-game multiplayer checks are still pending for normal pickups, equipment sharing, rental expiry and blood-shrine purchases. The fixes listed above describe the code changes; they are not a claim that every DLC feature or combination of mods has been tested.
 
-#### How do 3d printers and cauldrons work with this mod installed?
-```3d printers and cauldrons add the item directly to your item pool. No item orb will drop, it will just appear in your inventory.```
+## Building from source
 
-#### Does this make the game easier? How do you balance it?
-```Technically, the game should be ever so slightly harder than vanilla this way. Either way, it should be extremely close to the original game's difficulty.```
+Use .NET SDK 8 and an existing mod profile containing BepInEx, R2API Core, R2API CommandHelper and the generated MMHOOK for your game version. From the repository root:
 
-```We only spawn the amount of interactables that would be spawned for 1 player in a lobby of any size. Boss and Lunar items are not shared, along with items that provide buffs for everyone in the party. There are no ways to abuse this mod to dupe items. We cut player XP gained from money at the end of rounds to combat leveling faster. Teleporters only drop one item per boss killed. This mod has been tediously balanced and we do everything we can to keep the experience as close to vanilla as possible. If you have any ideas of ways to improve this, please let us know!```
+```sh
+dotnet build local/ShareSuite.Local.csproj -c Release \
+  -p:GameManaged="/path/to/Risk of Rain 2_Data/Managed" \
+  -p:R2Profile="/path/to/r2modman/profile"
+```
 
-#### Why do I only get 1 item (plus Shrine of the Mountain extras) from the boss?
-```These items are shared, so they've been set to drop only 1 by default for balance. You can change this in the config with the Boss Loot Credit config option.```
+The DLL is written to `local/bin/Release/netstandard2.1/ShareSuite.dll`. If you are building from the ZIP, run the command from its `source/` directory. The archive includes the matching source and license; game and dependency DLLs are supplied by your own installation. See [dependencies](dependencies.md) for the assemblies used by the build.
 
-#### How do blood shrines work when share money is on?
-```The user who uses the shrine loses health, but the calculations for how much gold everyone receives is done based on the highest max health player in your party. This is to prevent calling the highest health player over to use the shrine for the maximum coin value.```
+## Issues and credits
 
-#### I want to play this with my friends. Do they also need to install this mod?
-```Everyone having the same mods installed is always a good idea for stability, but is not required. This mod should still be fully functional if your friends only have BepInEx/R2API installed, or you have a Build ID changing mod to allow you to play with unmodded clients.```
+Report fork issues in [this repository](https://github.com/Luiz-AVcruz/ShareSuite/issues), with your game version, mod list and the relevant section of `BepInEx/LogOutput.log`.
 
-#### How do I play with my friends who don't have mods installed?
-```Easy! Install a Build ID changing mod and play on!```
-**[Here's an easy link to get to the current Build ID changing mod!](https://thunderstore.io/package/frostycpu/UnmoddedVersion/)**
+ShareSuite was created by **FunkFrog and Sipondo**. This fork builds on their work and the pickup fixes contributed by **tyxkk2**. The original project is available at [FunkFrog/ShareSuite](https://github.com/FunkFrog/ShareSuite).
 
-#### I want to play this mod with more than 4 players!
-```Please combine with TooManyFriends. If you'd like to change the amount of boss drops or amount of chests, you can configure that in the config file.```
-
-#### How do I configure the mod while the game is running?
-```Open up the console window (ctrl + alt + ~ ). All commands starts with 'ss_' and will autocomplete.```
-
-```New GUI-based configuration manager coming soon!```
-
-#### Can I use this mod in quick play?
-```We DO NOT condone use of this (or any) mod in any quick play or prismatic trial games. We will refuse any support for the use of this mod in Quick Play. Please do not ruin the game experience for others.```
-
-### ![To-Do](https://i.imgur.com/hOqXT4A.png "ShareSuite To-Do")
-
-#### Known Bugs
-
-**None at the moment! :)**
-
-#### Features in Development
-
-- Everything in our 3.0.0 milestone! https://github.com/FunkFrog/RoR2SharedItems/milestone/2
-
-### ![Bug Reports & Suggestions](https://i.imgur.com/ssmfn9f.png "ShareSuite Bug Reports + Suggestions")
-
-[![Bug Reports](https://img.shields.io/github/issues/FunkFrog/RoR2SharedItems/bug?label=Bug%20Reports&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/issues)[![Feature Requests](https://img.shields.io/github/issues/FunkFrog/RoR2SharedItems/enhancement?label=Feature%20Requests&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems/issues)
-
-**We have multiple channels of contact! Feel free to use any of the following.**
-
-- Join our [Discord Server](https://discord.gg/c7QnQeb).
-- DM us on Discord at `FunkFrog#0864` or `Sipondo#5150`.
-- Make a new issue on our [GitHub Repo](https://github.com/FunkFrog/RoR2SharedItems).
-
-### ![Tested Compatibility](https://i.imgur.com/kvxSeNw.png "ShareSuite Mod Compatibility")
-
-**Mod Developers: If you've tested your mod with ShareSuite and there are no foul interactions, DM me on Discord with the mod link + version tested (as well as any required settings changes) and I'll add it to this list!**
-
-- [Multitudes](https://thunderstore.io/package/wildbook/Multitudes/) `1.5.2`
-  - *Please change the Override Player Scaling setting and Override Boss Loot Scaling to false in the config file. Multitudes will then take priority in modifying the scaling settings.*
-
-### ![Incompatible Mods](https://i.imgur.com/jDXbLYR.png "ShareSuite Incompatible Mods")
-
-**Creators of these mods: If you are open to collaborate with us, we'd love to work with you to resolve the conflict!**
-
-- *There are no incompatible updated mods we're currently aware of :)*
-
-### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
-
-[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
-
-### `2.10.1 (Current Release)`
-- Fixed drone item & money sharing
-- Fixed chat messages in single player
-- Fixed scrapper not working in multiplayer
-- Fix simulacrum having the incorrect amount of interactables
-- Expanded the blacklist with: LowerPricedChests,ItemDropChanceOnKill,BarrageOnBoss
-
-**Looking for the changelogs for versions older then the current? Check the 'Changelog' tab on our Thunderstore page!**
-
+The code and this fork are licensed under [GPL-3.0](LICENSE).

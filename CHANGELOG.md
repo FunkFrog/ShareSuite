@@ -1,6 +1,23 @@
-﻿### ![Changelog](https://i.imgur.com/5qt4b0r.png "ShareSuite Changelog")
+# Changelog
 
-[![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
+## Fork — `2.10.1+local.ror2-1.5.pickup-fix.1`
+
+Based on ShareSuite 2.10.1, with general bug fixes and pickup compatibility fixes for RoR2 1.5.0 and DLC updates.
+
+- Fix the pickup-message initialization error and update the hook for the RoR2 1.5.0 API.
+- Let rental items and equipment use the game's normal pickup handling instead of sharing them as permanent items.
+- Allow normal item pickups when equipment sharing is enabled.
+- Only apply blood-shrine money calculations to actual blood shrines.
+- Skip players without an active body when calculating blood-shrine rewards.
+- Identify the fork in the README and package description, with links to this repository for support.
+
+The pickup changes build on [tyxkk2's PR #254](https://github.com/FunkFrog/ShareSuite/pull/254). The original settings and plugin ID are retained. The package and BepInEx version remain 2.10.1.
+
+Compilation and assembly checks passed; multiplayer gameplay checks are still pending.
+
+## Upstream history
+
+The entries below are preserved from the original ShareSuite changelog.
 
 ### `2.10.0`
 - Update to support DLC3

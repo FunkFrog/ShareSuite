@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <R2Profile Condition="'$(R2Profile)' == ''">$(HOME)/.config/r2modmanPlus-local/RiskOfRain2/profiles/Default</R2Profile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(R2Profile)/BepInEx/core/Mono.Cecil.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
