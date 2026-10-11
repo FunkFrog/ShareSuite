@@ -122,75 +122,65 @@ namespace ShareSuite
                 return;
             }
 
-            uint currentDrain = self.GetFieldValue<uint>("appliedDrain");
-
-            //var bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
-            //                | BindingFlags.Static | BindingFlags.GetField;
-            //var amountOfPlayerField = typeof(GoldSiphonNearbyBodyController).GetField("tetheredPlayers", bindFlags);
-            //int amountOfPlayers = (int) amountOfPlayerField.GetValue(self);
-#if DEBUG
-            Debug.Log("-------");
-            Debug.Log("Siphoning gold");
-            Debug.Log($"Amount of Player: {self.GetFieldValue<int>("tetheredPlayers")}");
-            Debug.Log($"tierTracker: {self.GetFieldValue<int>("tierTracker")}");
-            Debug.Log($"goldDrainValue: {self.GetFieldValue<int>("goldDrainValue")}");
-            Debug.Log($"appliedDrain: {currentDrain}");
-#endif
-            SphereSearch sphereSearch = self.GetFieldValue<SphereSearch>("sphereSearch");
-            List<GameObject> candidates = new List<GameObject>();
-            List<HurtBox> hurtBoxes = new List<HurtBox>();
-            TeamMask mask = default(TeamMask);
-            mask.AddTeam(TeamIndex.Player);
-            sphereSearch.mask = LayerIndex.entityPrecise.mask;
-            sphereSearch.origin = self.gameObject.transform.position;
-            sphereSearch.radius = self.GetFieldValue<HalcyoniteShrineInteractable>("parentShrineReference").radius;
-            sphereSearch.queryTriggerInteraction = QueryTriggerInteraction.UseGlobal;
-            sphereSearch.RefreshCandidates();
-            sphereSearch.FilterCandidatesByHurtBoxTeam(mask);
-            sphereSearch.OrderCandidatesByDistance();
-            sphereSearch.FilterCandidatesByDistinctHurtBoxEntities();
-            sphereSearch.GetHurtBoxes(hurtBoxes);
-            sphereSearch.GetCandidates(candidates);
-            sphereSearch.ClearCandidates();
-            int players = 0;
-            if (hurtBoxes.Count > 0)
+            var shrine = self.GetComponentInParent<HalcyoniteShrineInteractable>();
+            if (!shrine)
             {
-                foreach (HurtBox obj in hurtBoxes)
-                {
-                    if (obj == null)
-                    { 
-                        Debug.Log("hurtBox: null hurtbox");
-                    }
-                    else { 
-                        if (obj.healthComponent.body.isPlayerControlled) players++;
-#if DEBUG
-                        Debug.Log($"Players in range: {players}");
-#endif
-                    }
-                }
-            }
-#if DEBUG
-            Debug.Log($"currentDrain {currentDrain}");
-            Debug.Log($"SharedMoneyValue {SharedMoneyValue}");
-#endif
-            if (currentDrain == 4294967295) {
-                Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
-                orig(self);
-                return; 
-            }
-            if (SharedMoneyValue >= (int) currentDrain)
-            {
-                SharedMoneyValue -= (int) (players * self.GetFieldValue<uint>("appliedDrain"));
                 orig(self);
                 return;
             }
-            else {
+
+            int totalDrain = 0;
+            Vector3 position = self.transform.position;
+            float maxDistanceSqr = shrine.radius * shrine.radius;
+
+            int amountOfPlayersInRange = 0;
+            foreach (var teamMember in TeamComponent.GetTeamMembers(self.siphonTeamIndex))
+            {
+                if (!teamMember?.body)
+                    continue;
+
+                var body = teamMember.body;
+                if ((position - body.corePosition).sqrMagnitude > maxDistanceSqr)
+                    continue;
+
+                if (!body.healthComponent.alive || !body.master || !body.isPlayerControlled)
+                    continue;
+                amountOfPlayersInRange = amountOfPlayersInRange++;
+                totalDrain += (int)Math.Min(body.master.money, (uint)shrine.goldDrainValue);
+            }
+#if DEBUG
+            Debug.Log("-------");
+            Debug.Log("Siphoning gold");
+            Debug.Log($"Amount of Player: {amountOfPlayersInRange}");
+            Debug.Log($"goldDrainValue: {(uint) shrine.goldDrainValue}");
+            Debug.Log($"appliedDrain: {totalDrain}");
+#endif
+
+            if (totalDrain == 0)
+            {
+#if DEBUG
+                Debug.Log("Drain is 0");
+#endif
+                orig(self);
+                return;
+            }
+
+            if (SharedMoneyValue < totalDrain) { 
 #if DEBUG
                 Debug.Log("Not Draining due to too little money");
 #endif
                 return;
             }
+            SharedMoneyValue -= totalDrain;
+            orig(self);
         }
+/*
+            if (currentDrain == 4294967295) {
+                Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
+                orig(self);
+                return; 
+            }
+        }*/
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
