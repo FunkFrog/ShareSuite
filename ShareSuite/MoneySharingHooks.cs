@@ -1,9 +1,14 @@
-using System;
-using System.Linq;
+using EntityStates.AffixVoid;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
 using R2API.Utils;
 using RoR2;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,6 +33,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
+            On.RoR2.GoldSiphonNearbyBodyController.DrainGold -= SiphonGold;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -46,6 +52,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
+            On.RoR2.GoldSiphonNearbyBodyController.DrainGold += SiphonGold;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -105,6 +112,75 @@ namespace ShareSuite
         {
             return ShareSuite.MoneyIsShared.Value;
         }
+
+        private static void SiphonGold(On.RoR2.GoldSiphonNearbyBodyController.orig_DrainGold orig,
+            GoldSiphonNearbyBodyController self)
+        {
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
+            {
+                orig(self);
+                return;
+            }
+
+            var shrine = self.GetComponentInParent<HalcyoniteShrineInteractable>();
+            if (!shrine)
+            {
+                orig(self);
+                return;
+            }
+
+            int totalDrain = 0;
+            Vector3 position = self.transform.position;
+            float maxDistanceSqr = shrine.radius * shrine.radius;
+
+            int amountOfPlayersInRange = 0;
+            foreach (var teamMember in TeamComponent.GetTeamMembers(self.siphonTeamIndex))
+            {
+                if (!teamMember?.body)
+                    continue;
+
+                var body = teamMember.body;
+                if ((position - body.corePosition).sqrMagnitude > maxDistanceSqr)
+                    continue;
+
+                if (!body.healthComponent.alive || !body.master || !body.isPlayerControlled)
+                    continue;
+                amountOfPlayersInRange = amountOfPlayersInRange++;
+                totalDrain += (int)Math.Min(body.master.money, (uint)shrine.goldDrainValue);
+            }
+#if DEBUG
+            Debug.Log("-------");
+            Debug.Log("Siphoning gold");
+            Debug.Log($"Amount of Player: {amountOfPlayersInRange}");
+            Debug.Log($"goldDrainValue: {(uint) shrine.goldDrainValue}");
+            Debug.Log($"appliedDrain: {totalDrain}");
+#endif
+
+            if (totalDrain == 0)
+            {
+#if DEBUG
+                Debug.Log("Drain is 0");
+#endif
+                orig(self);
+                return;
+            }
+
+            if (SharedMoneyValue < totalDrain) { 
+#if DEBUG
+                Debug.Log("Not Draining due to too little money");
+#endif
+                return;
+            }
+            SharedMoneyValue -= totalDrain;
+            orig(self);
+        }
+/*
+            if (currentDrain == 4294967295) {
+                Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
+                orig(self);
+                return; 
+            }
+        }*/
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)

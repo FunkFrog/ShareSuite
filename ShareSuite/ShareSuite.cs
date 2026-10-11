@@ -67,7 +67,8 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck;
+            OverrideMultiplayerCheck,
+            HalcyoniteShrineDropModified;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
@@ -373,6 +374,13 @@ namespace ShareSuite
                 "NetworkMessageType",
                 (short) 1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
+            );
+
+            HalcyoniteShrineDropModified = Config.Bind(
+                "Balance",
+                "HalcyoniteShrineDropModified",
+                true,
+                "Toggles whether the Halcyonite Shrine drops are modified by item sharing and randomization."
             );
         }
 
@@ -962,6 +970,26 @@ namespace ShareSuite
             {
                 DeadPlayersGetItems.Value = valid.Value;
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
+            }
+        }
+
+        // HalcyoniteShrineDropModified
+        [ConCommand(commandName = "ss_HalcyoniteShrineDropModified", flags = ConVarFlags.None,
+            helpText = "Modifies whether Halcyonite Shrine drops are modified by item sharing and randomization.")]
+        private static void CcHalcyoniteShrineDropModified(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(HalcyoniteShrineDropModified.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                HalcyoniteShrineDropModified.Value = valid.Value;
+                Debug.Log($"Halcyonite Shrine drop modification set to {HalcyoniteShrineDropModified.Value}");
             }
         }
 

@@ -36,10 +36,12 @@ namespace ShareSuite
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
             // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
             // On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards -= HalcyoniteShrineDropRewards;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.InfiniteTowerWaveController.DropRewards -= SimulacrumArenaDropEnable;
             //IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
+
         }
 
         public static void Hook()
@@ -52,6 +54,7 @@ namespace ShareSuite
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
             // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
             // On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards += HalcyoniteShrineDropRewards;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value)
             {
@@ -230,6 +233,25 @@ namespace ShareSuite
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
 
+        private static void HalcyoniteShrineDropRewards(On.RoR2.HalcyoniteShrineInteractable.orig_DropRewards orig,
+            HalcyoniteShrineInteractable self)
+        {
+            Log.Debug("Sharesuite: HalcyoniteShrineDropRewards triggered");
+            if (!NetworkServer.active)
+            {
+                Log.Debug("Sharesuite: Not server, returning");
+                orig(self);
+                return;
+            }
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.HalcyoniteShrineDropModified.Value)
+            {
+                Log.Debug("Sharesuite: Not multiplayer or HalcyoniteDropModified not enabled, returning");
+                orig(self);
+                return;
+            }
+            
+
+        }
         public static bool IsDeadAndNotADrone(CharacterMaster master)
         {
             if (master == null || master.GetBody() == null) return true;
