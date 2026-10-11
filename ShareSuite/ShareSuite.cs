@@ -54,6 +54,7 @@ namespace ShareSuite
             BossItemsShared,
             VoidItemsShared,
             TemporaryItemsShared,
+            RentalItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -196,6 +197,13 @@ namespace ShareSuite
                 "TemporaryItemsShared",
                 false,
                 "Toggles item sharing for temporary items."
+            );
+
+            RentalItemsShared = Config.Bind(
+                "Settings",
+                "RentalItemsShared",
+                false,
+                "Toggles item sharing for rental items."
             );
 
             RichMessagesEnabled = Config.Bind(
