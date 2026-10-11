@@ -1,4 +1,6 @@
+using EntityStates.BrotherMonster;
 using EntityStates.Scrapper;
+using IL.RoR2.Achievements.FalseSon;
 using MonoMod.Cil;
 using R2API.Utils;
 using RewiredConsts;
@@ -154,12 +156,22 @@ namespace ShareSuite
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
+            if(self.pickup.isTempItem)
+            {
+                Log.Debug("I am a temp item");
+            }
+            if (self.pickup.isRental)
+            {
+                Log.Debug("I am a rent item");
+            }
+
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer()
-                && !self.pickup.isTempItem) // Don't share the item with anyone else if the item is temporary
+                && (!self.pickup.isTempItem || ShareSuite.TemporaryItemsShared.Value) // Don't share the item with anyone else if the item is temporary unless TemporaryItemsShared is enabled
+                && (!self.pickup.isRental || ShareSuite.RentalItemsShared.Value)) // Don't share the item with anyone else if the item is rental unless RentalItemsShared is enabled
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -199,7 +211,7 @@ namespace ShareSuite
 
                         var giveItem = PickupCatalog.GetPickupDef(pickupIndex.Value);
 
-                        HandleGiveItem(player, giveItem);
+                        HandleGiveItem(player, giveItem, self.pickup.isTempItem, self.pickup.isRental);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
@@ -212,7 +224,7 @@ namespace ShareSuite
                     // Otherwise give everyone the same item
                     else
                     {
-                        HandleGiveItem(player, item);
+                        HandleGiveItem(player, item, self.pickup.isTempItem, self.pickup.isRental);
                     }
                 }
 
@@ -220,14 +232,14 @@ namespace ShareSuite
                 {
                     orig(self, body);
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict,
-                        self.pickup.isTempItem);
+                        self.pickup.isTempItem, self.pickup.isRental);
                     return;
                 }
             }
 
             orig(self, body);
 
-            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem);
+            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem, self.pickup.isRental);
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
@@ -336,7 +348,8 @@ namespace ShareSuite
                     else
                     {
                         Log.Debug("Sharesuite: handling give item");
-                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
+                        // Defaulting to permanent item, as the game does not have temporary or rental items for shop purchases AFAIK.
+                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()), false, false);
                     }
 
                     Log.Debug("Sharesuite: orig");
@@ -543,9 +556,20 @@ namespace ShareSuite
                 ? collection[Random.Range(0, collection.Count)]
                 : (T?) null;
 
-        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
+        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef, bool tempItem, bool rentalItem)
         {
-            characterMaster.inventory.GiveItem(pickupDef.itemIndex);
+            if (tempItem && rentalItem)
+            {
+                Log.Debug("Both tempItem and rentalItem are true. The fudge? Resorting to temp item.");
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+            }
+            else if (tempItem)
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+            else if (rentalItem)
+                characterMaster.inventory.GiveItemRented(pickupDef.itemIndex);
+            else
+                characterMaster.inventory.GiveItemPermanent(pickupDef.itemIndex);
+            
 
             var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
                 ?.connectionId;

@@ -53,6 +53,8 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
+            TemporaryItemsShared,
+            RentalItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -189,6 +191,20 @@ namespace ShareSuite
                 "VoidItemsShared",
                 false,
                 "Toggles item sharing for void (purple/corrupted) items."
+            );
+
+            TemporaryItemsShared = Config.Bind(
+                "Settings",
+                "TemporaryItemsShared",
+                false,
+                "Toggles item sharing for temporary items."
+            );
+
+            RentalItemsShared = Config.Bind(
+                "Settings",
+                "RentalItemsShared",
+                false,
+                "Toggles item sharing for rental items."
             );
 
             RichMessagesEnabled = Config.Bind(
@@ -630,6 +646,27 @@ namespace ShareSuite
             {
                 VoidItemsShared.Value = valid.Value;
                 Debug.Log($"Void item sharing set to {VoidItemsShared.Value}.");
+            }
+        }
+
+        // TemporaryItemsShared
+        [ConCommand(commandName = "ss_TemporaryItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether temporary items are shared or not.")]
+        private static void CcTemporaryItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(TemporaryItemsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                TemporaryItemsShared.Value = valid.Value;
+                Debug.Log($"Temporary item sharing set to {TemporaryItemsShared.Value}.");
             }
         }
 

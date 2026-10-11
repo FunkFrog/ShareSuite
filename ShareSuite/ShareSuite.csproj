@@ -66,9 +66,9 @@
 		<Reference Include="MonoMod.Utils">
 			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\MonoMod.Utils.dll</HintPath>
 		</Reference>
-		<Reference Include="R2API, Version=4.4.1.0, Culture=neutral, PublicKeyToken=null">
+		<!--<Reference Include="R2API, Version=4.4.1.0, Culture=neutral, PublicKeyToken=null">
 			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\tristanmcpherson-R2API\R2API.Legacy\R2API.dll</HintPath>
-		</Reference>
+		</Reference>-->
 		<Reference Include="R2API.CommandHelper">
 			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\RiskofThunder-R2API_CommandHelper\R2API.CommandHelper\R2API.CommandHelper.dll</HintPath>
 		</Reference>
