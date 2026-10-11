@@ -229,14 +229,14 @@ namespace ShareSuite
                 {
                     orig(self, body);
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict,
-                        self.pickup.isTempItem);
+                        self.pickup.isTempItem, self.pickup.isRental);
                     return;
                 }
             }
 
             orig(self, body);
 
-            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem);
+            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem, self.pickup.isRental);
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
