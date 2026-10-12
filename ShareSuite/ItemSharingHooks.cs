@@ -156,14 +156,22 @@ namespace ShareSuite
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
-            if(self.pickup.isTempItem)
+#if DEBUG
+            if (!EquipmentCatalog.allEquipment.Contains(PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex))
             {
-                Log.Debug("I am a temp item");
+                if (self.pickup.isTempItem)
+                {
+                    Log.Debug("I am a temp item");
+                }
+                if (self.pickup.isRental)
+                {
+                    Log.Debug("I am a rent item");
+                }
+                Log.Debug($"Tier: {itemDef.tier}");
+                Log.Debug($"Name Token: {itemDef.nameToken}");
+                Log.Debug($"Name: {itemDef.name}");
             }
-            if (self.pickup.isRental)
-            {
-                Log.Debug("I am a rent item");
-            }
+#endif
 
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
@@ -261,7 +269,19 @@ namespace ShareSuite
                 orig(self);
                 return;
             }
-            
+            var shrine = self.GetComponentInParent<HalcyoniteShrineInteractable>();
+            if (!shrine)
+            {
+                orig(self);
+                return;
+            }
+#if DEBUG
+            var rewardOptionCount = shrine.GetFieldValue<int>("rewardOptionCount");
+            var quantityIncreaseFromBuyIn = shrine.GetFieldValue<int>("quantityIncreaseFromBuyIn");
+            Log.Debug($"Sharesuite: rewardOptionCount: {rewardOptionCount}");
+            Log.Debug($"Sharesuite: quantityIncreaseFromBuyIn: {quantityIncreaseFromBuyIn}");
+#endif
+            orig(self);
 
         }
         public static bool IsDeadAndNotADrone(CharacterMaster master)

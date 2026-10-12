@@ -149,11 +149,13 @@ namespace ShareSuite
                 totalDrain += (int)Math.Min(body.master.money, (uint)shrine.goldDrainValue);
             }
 #if DEBUG
+            /*
             Debug.Log("-------");
             Debug.Log("Siphoning gold");
             Debug.Log($"Amount of Player: {amountOfPlayersInRange}");
             Debug.Log($"goldDrainValue: {(uint) shrine.goldDrainValue}");
             Debug.Log($"appliedDrain: {totalDrain}");
+            */
 #endif
 
             if (totalDrain == 0)
