@@ -10,6 +10,16 @@
 		<OutputPath></OutputPath>
 	</PropertyGroup>
 
+    <PropertyGroup>
+        <!-- change these to perform local builds -->
+        <MMPath>$(AppData)\r2modmanPlus-local</MMPath>
+        <!-- Gale default: $(AppData)\com.Kesomannen.GaleModManager -->
+        <MMCache>$(MMPath)\RiskOfRain2\cache</MMCache>
+        <!-- Gale: $(MMPath)\cache -->
+        <ProfileName>Default</ProfileName>
+        <MMProfile>$(MMPath)\RiskOfRain2\profiles\Default</MMProfile>
+    </PropertyGroup>
+    
 	<ItemGroup>
 		<Reference Include="0Harmony">
 			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\0Harmony.dll</HintPath>
