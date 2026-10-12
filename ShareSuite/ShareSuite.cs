@@ -54,6 +54,9 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
+            CursedItemsShared,
+            PageItemsShared,
+            HexItemsShared,
             TemporaryItemsShared,
             RentalItemsShared,
             RichMessagesEnabled,
@@ -204,6 +207,27 @@ namespace ShareSuite
                 "VoidItemsShared",
                 false,
                 "Toggles item sharing for void (purple/corrupted) items."
+            );
+
+            CursedItemsShared = Config.Bind(
+                "Settings",
+                "CursedItemsShared",
+                false,
+                "Toggles item sharing for cursed (Purple) items."
+            );
+
+            PageItemsShared = Config.Bind(
+                "Settings",
+                "PageItemsShared",
+                false,
+                "Toggles item sharing for page (Blue) items."
+            );
+
+            HexItemsShared = Config.Bind(
+                "Settings",
+                "HexItemsShared",
+                false,
+                "Toggles item sharing for hex (Yellowish) items."
             );
 
             TemporaryItemsShared = Config.Bind(
@@ -668,6 +692,66 @@ namespace ShareSuite
             {
                 VoidItemsShared.Value = valid.Value;
                 Debug.Log($"Void item sharing set to {VoidItemsShared.Value}.");
+            }
+        }
+
+        // CursedItemsShared
+        [ConCommand(commandName = "ss_CursedItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether cursed items are shared or not.")]
+        private static void CcCursedItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(CursedItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                CursedItemsShared.Value = valid.Value;
+                Debug.Log($"Cursed item sharing set to {CursedItemsShared.Value}.");
+            }
+        }
+
+        // PageItemsShared
+        [ConCommand(commandName = "ss_PageItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether page items are shared or not.")]
+        private static void CcPageItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(PageItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                PageItemsShared.Value = valid.Value;
+                Debug.Log($"Page item sharing set to {PageItemsShared.Value}.");
+            }
+        }
+
+        // HexItemsShared
+        [ConCommand(commandName = "ss_HexItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether hex items are shared or not.")]
+        private static void CcHexItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(HexItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                HexItemsShared.Value = valid.Value;
+                Debug.Log($"Hex item sharing set to {HexItemsShared.Value}.");
             }
         }
 

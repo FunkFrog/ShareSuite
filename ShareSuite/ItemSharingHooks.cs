@@ -461,6 +461,12 @@ namespace ShareSuite
                         return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidBoss:
                         return ShareSuite.VoidItemsShared.Value;
+                    case ItemTier.Cursed:
+                        return ShareSuite.CursedItemsShared.Value;
+                    case ItemTier.Page:
+                        return ShareSuite.PageItemsShared.Value;
+                    case ItemTier.Hex:
+                        return ShareSuite.HexItemsShared.Value;
                     case ItemTier.NoTier:
                         break;
                     case ItemTier.AssignedAtRuntime:
