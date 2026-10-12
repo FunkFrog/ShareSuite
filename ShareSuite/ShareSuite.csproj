@@ -17,7 +17,7 @@
         <MMCache>$(MMPath)\RiskOfRain2\cache</MMCache>
         <!-- Gale: $(MMPath)\cache -->
         <ProfileName>Default</ProfileName>
-        <MMProfile>$(MMPath)\RiskOfRain2\profiles\Default</MMProfile>
+        <MMProfile>$(MMPath)\RiskOfRain2\profiles\$(ProfileName)</MMProfile>
     </PropertyGroup>
     
 	<ItemGroup>
