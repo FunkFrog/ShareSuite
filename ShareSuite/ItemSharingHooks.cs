@@ -157,7 +157,9 @@ namespace ShareSuite
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
 
 #if DEBUG
-            if (!EquipmentCatalog.allEquipment.Contains(PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex))
+            var index = item.equipmentIndex;
+            var isEquipment = EquipmentCatalog.allEquipment.Contains(index);
+            if (!isEquipment)
             {
                 if (self.pickup.isTempItem)
                 {
@@ -167,9 +169,12 @@ namespace ShareSuite
                 {
                     Log.Debug("I am a rent item");
                 }
-                Log.Debug($"Tier: {itemDef.tier}");
-                Log.Debug($"Name Token: {itemDef.nameToken}");
-                Log.Debug($"Name: {itemDef.name}");
+                if (itemDef != null) {
+                    if (itemDef?.tier != null)
+                        Log.Debug($"Tier: {itemDef.tier}");
+                    Log.Debug($"Name Token: {itemDef.nameToken}");
+                    Log.Debug($"Name: {itemDef.name}");
+                } 
             }
 #endif
 
@@ -385,7 +390,7 @@ namespace ShareSuite
 
             #region EquipmentDronefix
 
-            if (ShareSuite.EquipmentShared.Value)
+          if (ShareSuite.EquipmentShared.Value)
             {
                 if (self.costType == CostTypeIndex.Equipment)
                 {
