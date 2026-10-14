@@ -32,7 +32,7 @@ namespace ShareSuite
         private static void OverridePopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig,
     SceneDirector self)
         {
-            Debug.Log($"Populator has Credit value: {self.interactableCredit}");
+            Log.Debug($"Populator has Credit value: {self.interactableCredit}");
             orig(self);
         }
     }

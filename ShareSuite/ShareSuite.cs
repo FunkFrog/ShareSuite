@@ -1203,23 +1203,33 @@ namespace ShareSuite
         private static void CcSetNextActiveStage(ConCommandArgs args)
         {
             List<string> scenes = SceneCatalog.allStageSceneDefs.Select(sceneDef => sceneDef.baseSceneName).ToList();
+            List<string> scenesBase = SceneCatalog.allBaseSceneNames.ToList();
             if (args.Count == 0)
             {
 
                 Debug.Log($"Next stage is {Run.instance.nextStageScene.baseSceneName}");
                 return;
             }
+            else if (args.Count == 1)
+            {
+                string arg1 = args[0];
+                if (arg1 == "next")
+                {
+                    Debug.Log($"Transporting to next stage.");
+                    Run.instance.AdvanceStage(Run.instance.nextStageScene);
+                }
+            }
             else if (args.Count > 2)
             {
-                Debug.Log("Function only takes 2 argument. Ignoring rest.");
+                Debug.Log("Function only takes 0, 1 or 2 arguments.");
             }
             else
             {
                 string stageName = (string) args[0];
-                if (!scenes.Contains(stageName))
+                if (!scenes.Contains(stageName) && !scenesBase.Contains(stageName))
                 {
                     Debug.Log("Invalid stage name.");
-                    Debug.Log($"Valid stage names are: {string.Join(',', scenes)}");
+                    Debug.Log($"Valid stage names are: {string.Join(',', scenes)}, {string.Join(',', scenesBase)}");
                     return;
                 }
                 SceneDef scene = SceneCatalog.GetSceneDefFromSceneName(stageName);
