@@ -1,10 +1,11 @@
-﻿using System;
-using System.Linq;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using R2API.Utils;
 using RoR2;
 using ShareSuite.Networking;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -53,6 +54,11 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
+            CursedItemsShared,
+            PageItemsShared,
+            HexItemsShared,
+            TemporaryItemsShared,
+            RentalItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -67,12 +73,16 @@ namespace ShareSuite
             LunarItemsRandomized,
             BossItemsRandomized,
             VoidItemsRandomized,
-            OverrideMultiplayerCheck;
+            OverrideMultiplayerCheck,
+            HalcyoniteShrineDropModified;
 
         public static ConfigEntry<int> BossLootCredit, VoidFieldLootCredit, SimulacrumLootCredit, InteractablesOffset;
         public static ConfigEntry<double> InteractablesCredit, MoneyScalar;
         public static ConfigEntry<string> ItemBlacklist, EquipmentBlacklist, LastMessageSent;
         public static ConfigEntry<short> NetworkMessageType;
+#if DEBUG
+        public static ConfigEntry<bool> GodMode;
+#endif
 
         private bool _previouslyEnabled;
 
@@ -98,6 +108,9 @@ namespace ShareSuite
         }
 
         public static int DefaultMaxScavItemDropCount = 0;
+#if DEBUG
+        public static int playerCount = PlayerCharacterMasterController.instances.Count;
+#endif
 
         private void ReloadHooks(object _ = null, EventArgs __ = null)
         {
@@ -109,6 +122,9 @@ namespace ShareSuite
                 EquipmentSharingHooks.UnHook();
                 ChatHandler.UnHook();
                 _previouslyEnabled = false;
+#if DEBUG
+                DebugTools.UnHook();
+#endif
             }
 
             if (!_previouslyEnabled && ModIsEnabled.Value)
@@ -119,6 +135,9 @@ namespace ShareSuite
                 ItemSharingHooks.Hook();
                 EquipmentSharingHooks.Hook();
                 ChatHandler.Hook();
+#if DEBUG
+                DebugTools.Hook();
+#endif
             }
         }
 
@@ -188,6 +207,41 @@ namespace ShareSuite
                 "VoidItemsShared",
                 false,
                 "Toggles item sharing for void (purple/corrupted) items."
+            );
+
+            CursedItemsShared = Config.Bind(
+                "Settings",
+                "CursedItemsShared",
+                false,
+                "Toggles item sharing for cursed (Purple) items."
+            );
+
+            PageItemsShared = Config.Bind(
+                "Settings",
+                "PageItemsShared",
+                false,
+                "Toggles item sharing for page (Blue) items."
+            );
+
+            HexItemsShared = Config.Bind(
+                "Settings",
+                "HexItemsShared",
+                false,
+                "Toggles item sharing for hex (Yellowish) items."
+            );
+
+            TemporaryItemsShared = Config.Bind(
+                "Settings",
+                "TemporaryItemsShared",
+                false,
+                "Toggles item sharing for temporary items."
+            );
+
+            RentalItemsShared = Config.Bind(
+                "Settings",
+                "RentalItemsShared",
+                false,
+                "Toggles item sharing for rental items."
             );
 
             RichMessagesEnabled = Config.Bind(
@@ -313,6 +367,15 @@ namespace ShareSuite
                 "Keeps track of the last mod version that sent you a message. Prevents spam, don't touch."
             );
 
+#if DEBUG
+            GodMode = Config.Bind(
+                "Debug",
+                "GodMode",
+                false,
+                "Toggles god mode for debugging purposes."
+                );
+#endif
+
             VoidFieldLootCredit = Config.Bind(
                 "Balance",
                 "VoidFieldLootCredit",
@@ -373,6 +436,13 @@ namespace ShareSuite
                 "NetworkMessageType",
                 (short) 1021,
                 "The identifier for network message for this mod. Must be unique across all mods."
+            );
+
+            HalcyoniteShrineDropModified = Config.Bind(
+                "Balance",
+                "HalcyoniteShrineDropModified",
+                true,
+                "Toggles whether the Halcyonite Shrine drops are modified by item sharing and randomization."
             );
         }
 
@@ -622,6 +692,108 @@ namespace ShareSuite
             {
                 VoidItemsShared.Value = valid.Value;
                 Debug.Log($"Void item sharing set to {VoidItemsShared.Value}.");
+            }
+        }
+
+        // CursedItemsShared
+        [ConCommand(commandName = "ss_CursedItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether cursed items are shared or not.")]
+        private static void CcCursedItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(CursedItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                CursedItemsShared.Value = valid.Value;
+                Debug.Log($"Cursed item sharing set to {CursedItemsShared.Value}.");
+            }
+        }
+
+        // PageItemsShared
+        [ConCommand(commandName = "ss_PageItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether page items are shared or not.")]
+        private static void CcPageItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(PageItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                PageItemsShared.Value = valid.Value;
+                Debug.Log($"Page item sharing set to {PageItemsShared.Value}.");
+            }
+        }
+
+        // HexItemsShared
+        [ConCommand(commandName = "ss_HexItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether hex items are shared or not.")]
+        private static void CcHexItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(HexItemsShared.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                HexItemsShared.Value = valid.Value;
+                Debug.Log($"Hex item sharing set to {HexItemsShared.Value}.");
+            }
+        }
+
+        // TemporaryItemsShared
+        [ConCommand(commandName = "ss_TemporaryItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether temporary items are shared or not.")]
+        private static void CcTemporaryItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(TemporaryItemsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                TemporaryItemsShared.Value = valid.Value;
+                Debug.Log($"Temporary item sharing set to {TemporaryItemsShared.Value}.");
+            }
+        }
+
+        // RentalItemsShared
+        [ConCommand(commandName = "ss_RentalItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether Ethereal (rented) items are shared or not.")]
+        private static void CcRentalItemsShared(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(RentalItemsShared.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                RentalItemsShared.Value = valid.Value;
+                Debug.Log($"Rental item sharing set to {RentalItemsShared.Value}.");
             }
         }
 
@@ -964,6 +1136,208 @@ namespace ShareSuite
                 Debug.Log($"Dead player getting shared items set to {DeadPlayersGetItems.Value}");
             }
         }
+
+        // HalcyoniteShrineDropModified
+        [ConCommand(commandName = "ss_HalcyoniteShrineDropModified", flags = ConVarFlags.None,
+            helpText = "Modifies whether Halcyonite Shrine drops are modified by item sharing and randomization.")]
+        private static void CcHalcyoniteShrineDropModified(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(HalcyoniteShrineDropModified.Value);
+                return;
+            }
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                HalcyoniteShrineDropModified.Value = valid.Value;
+                Debug.Log($"Halcyonite Shrine drop modification set to {HalcyoniteShrineDropModified.Value}");
+            }
+        }
+
+#if DEBUG
+        // Debug Command: Set MoneyValue for all players
+        [ConCommand(commandName = "ss_SetMoneyValue", flags = ConVarFlags.None,
+            helpText = "Sets money value for all players.")]
+        private static void CcSetMoneyValue(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log("Need 1 argument.");
+                return;
+            }
+            else if (args.Count > 1)
+            {
+                Debug.Log("Function only takes 1 argument. Ignoring rest.");
+            }
+            if (int.TryParse(args[0], out int moneyValue))
+            {
+                if (!MoneyIsShared.Value)
+                {
+                    foreach (var player in PlayerCharacterMasterController.instances)
+                    {
+                        if (player && player.master)
+                        {
+                            player.master.money = (uint) moneyValue;
+                        }
+                    }
+                    return;
+                }
+                else
+                {
+                    MoneySharingHooks.SharedMoneyValue = moneyValue;
+                }
+                Debug.Log($"Set money value to {moneyValue} for all players.");
+            }
+            else
+            {
+                Debug.Log("Couldn't parse to integer.");
+            }
+        }
+
+        // Debug Command: Set Next Active Stage
+        [ConCommand(commandName = "ss_SetNextActiveStage", flags = ConVarFlags.None,
+            helpText = "Sets the next active stage. Takes max 2 arguments stagename and a boolean to go now. Defaults to setting next.")]
+        private static void CcSetNextActiveStage(ConCommandArgs args)
+        {
+            List<string> scenes = SceneCatalog.allStageSceneDefs.Select(sceneDef => sceneDef.baseSceneName).ToList();
+            List<string> scenesBase = SceneCatalog.allBaseSceneNames.ToList();
+            if (args.Count == 0)
+            {
+
+                Debug.Log($"Next stage is {Run.instance.nextStageScene.baseSceneName}");
+                return;
+            }
+            else if (args.Count == 1)
+            {
+                string arg1 = args[0];
+                if (arg1 == "next")
+                {
+                    Debug.Log($"Transporting to next stage.");
+                    Run.instance.AdvanceStage(Run.instance.nextStageScene);
+                }
+            }
+            else if (args.Count > 2)
+            {
+                Debug.Log("Function only takes 0, 1 or 2 arguments.");
+            }
+            else
+            {
+                string stageName = (string) args[0];
+                if (!scenes.Contains(stageName) && !scenesBase.Contains(stageName))
+                {
+                    Debug.Log("Invalid stage name.");
+                    Debug.Log($"Valid stage names are: {string.Join(',', scenes)}, {string.Join(',', scenesBase)}");
+                    return;
+                }
+                SceneDef scene = SceneCatalog.GetSceneDefFromSceneName(stageName);
+                Run.instance.nextStageScene = scene;
+                Debug.Log($"Set next active stage to {Run.instance.nextStageScene.baseSceneName}.");
+                if (args.Count == 2)
+                {
+                    var valid = TryGetBool(args[1]);
+                    if (valid.HasValue && valid.Value)
+                    {
+                        Debug.Log("Advancing stage now.");
+                        Run.instance.AdvanceStage(Run.instance.nextStageScene);
+                    }
+                    if (valid.HasValue)
+                    {
+                        Debug.Log("Going to the next stage on normal stage change.");
+                    }
+                    else
+                    {
+                        Debug.Log("Couldn't parse to boolean.");
+                    }
+                }
+            }
+        }
+
+        // Debug Command: End Game by killing all players.
+        [ConCommand(commandName = "ss_EndGame", flags = ConVarFlags.None,
+            helpText = "Ends the current game.")]
+        private static void CcEndGame(ConCommandArgs args)
+        {
+            var characters = new List<CharacterBody>(CharacterBody.readOnlyInstancesList);
+            foreach (var body in characters)
+            {
+                if (!body || !body.healthComponent) continue;
+
+                // Skip players
+                if (!body.isPlayerControlled) continue;
+
+                // Kill enemy
+                body.healthComponent.Suicide(body.gameObject, body.gameObject, DamageType.Generic);
+            }
+            Debug.Log("Killed all players in the stage.");
+        }
+
+        // Debug Command: Kill all enemies
+        [ConCommand(commandName = "ss_KillAllEnemies", flags = ConVarFlags.None,
+            helpText = "Kills all enemies in the stage.")]
+        private static void CcKillAllEnemies(ConCommandArgs args)
+        {
+            var characters = new List<CharacterBody>(CharacterBody.readOnlyInstancesList);
+            foreach (var body in characters)
+            {
+                if (!body || !body.healthComponent) continue;
+
+                // Skip players
+                if (body.isPlayerControlled) continue;
+
+                // Kill enemy
+                body.healthComponent.Suicide(body.gameObject, body.gameObject, DamageType.Generic);
+            }
+            Debug.Log("Killed all enemies in the stage.");
+        }
+
+        // Debug Command: Set Amount of Players.
+        [ConCommand(commandName = "ss_SetPlayers", flags = ConVarFlags.None,
+            helpText = "Sets amount of players in the game.")]
+        private static void CcSetPlayers(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log($"CurrentPlayers: {playerCount}");
+                return;
+            }
+            else if (args.Count > 1)
+            {
+                Debug.Log("Function only takes 1 argument. Ignoring rest.");
+            }
+            if (int.TryParse(args[0], out int pcCount))
+            {
+                playerCount = pcCount;
+                Debug.Log($"Set CurrentPlayers to {pcCount}.");
+            }
+            else
+            {
+                Debug.Log("Couldn't parse to integer.");
+            }
+        }
+        // Debug Command: Toggle Godmode
+        [ConCommand(commandName = "ss_GodMode", flags = ConVarFlags.None,
+            helpText = "Toggles godmode. Takes boolean.")]
+        private static void CcGodMode(ConCommandArgs args)
+        {
+            if (args.Count == 0)
+            {
+                Debug.Log(GodMode.Value);
+                return;
+            }
+
+            var valid = TryGetBool(args[0]);
+            if (!valid.HasValue)
+                Debug.Log("Couldn't parse to boolean.");
+            else
+            {
+                GodMode.Value = valid.Value;
+                Debug.Log($"Godmode set to {GodMode.Value}.");
+            }
+        }
+#endif
 
         //TODO re-introduce these as add/remove commands
         //        // ItemBlacklist

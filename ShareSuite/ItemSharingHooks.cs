@@ -1,4 +1,6 @@
+using EntityStates.BrotherMonster;
 using EntityStates.Scrapper;
+using IL.RoR2.Achievements.FalseSon;
 using MonoMod.Cil;
 using R2API.Utils;
 using RewiredConsts;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace ShareSuite
@@ -36,10 +39,12 @@ namespace ShareSuite
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString -= FixZeroItemCount;
             // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter -= ScrappingToIdle_OnEnter;
             // On.RoR2.PickupCatalog.FindPickupIndex_string -= ItemLock;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards -= HalcyoniteShrineDropRewards;
 
             IL.RoR2.ArenaMissionController.EndRound -= ArenaDropEnable;
             IL.RoR2.InfiniteTowerWaveController.DropRewards -= SimulacrumArenaDropEnable;
             //IL.RoR2.GenericPickupController.AttemptGrant -= RemoveDefaultPickupMessage;
+
         }
 
         public static void Hook()
@@ -52,6 +57,7 @@ namespace ShareSuite
             On.RoR2.Chat.PlayerPickupChatMessage.ConstructChatString += FixZeroItemCount;
             // On.EntityStates.Scrapper.ScrappingToIdle.OnEnter += ScrappingToIdle_OnEnter;
             // On.RoR2.PickupCatalog.FindPickupIndex_string += ItemLock;
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards += HalcyoniteShrineDropRewards;
 
             if (ShareSuite.OverrideVoidFieldLootScalingEnabled.Value)
             {
@@ -150,13 +156,51 @@ namespace ShareSuite
 
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
+            
+            var activeScene = SceneManager.GetActiveScene();
+            if (activeScene != null)
+            {
+                Log.Debug($"ActiveScene: {activeScene.name}");
+            }
+            else
+            {
+                Log.Debug($"ActiveScene is null?");
+            }
+            if (activeScene.name == "computationalexchange")
+            {
+                Log.Debug("Sharesuite: Computational Exchange detected, skipping item sharing.");
+                orig(self, body);
+                return;
+            }
+#if DEBUG
+            var index = item.equipmentIndex;
+            var isEquipment = EquipmentCatalog.allEquipment.Contains(index);
+            if (!isEquipment)
+            {
+                if (self.pickup.isTempItem)
+                {
+                    Log.Debug("I am a temp item");
+                }
+                if (self.pickup.isRental)
+                {
+                    Log.Debug("I am a rent item");
+                }
+                if (itemDef != null) {
+                    if (itemDef?.tier != null)
+                        Log.Debug($"Tier: {itemDef.tier}");
+                    Log.Debug($"Name Token: {itemDef.nameToken}");
+                    Log.Debug($"Name: {itemDef.name}");
+                } 
+            }
+#endif
 
             if (!Blacklist.HasItem(item.itemIndex)
                 && NetworkServer.active
                 && IsValidItemPickup(self.pickupIndex)
                 && IsValidPickupObject(self, body)
                 && GeneralHooks.IsMultiplayer()
-                && !self.pickup.isTempItem) // Don't share the item with anyone else if the item is temporary
+                && (!self.pickup.isTempItem || ShareSuite.TemporaryItemsShared.Value) // Don't share the item with anyone else if the item is temporary unless TemporaryItemsShared is enabled
+                && (!self.pickup.isRental || ShareSuite.RentalItemsShared.Value)) // Don't share the item with anyone else if the item is rental unless RentalItemsShared is enabled
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -196,7 +240,7 @@ namespace ShareSuite
 
                         var giveItem = PickupCatalog.GetPickupDef(pickupIndex.Value);
 
-                        HandleGiveItem(player, giveItem);
+                        HandleGiveItem(player, giveItem, self.pickup.isTempItem, self.pickup.isRental);
                         // Alternative: Only show pickup text for yourself
                         // var givePickupDef = PickupCatalog.GetPickupDef(givePickupIndex);
                         // Chat.AddPickupMessage(body, givePickupDef.nameToken, givePickupDef.baseColor, 1);
@@ -209,7 +253,7 @@ namespace ShareSuite
                     // Otherwise give everyone the same item
                     else
                     {
-                        HandleGiveItem(player, item);
+                        HandleGiveItem(player, item, self.pickup.isTempItem, self.pickup.isRental);
                     }
                 }
 
@@ -217,19 +261,50 @@ namespace ShareSuite
                 {
                     orig(self, body);
                     ChatHandler.SendRichRandomizedPickupMessage(master, item, randomizedPlayerDict,
-                        self.pickup.isTempItem);
+                        self.pickup.isTempItem, self.pickup.isRental);
                     return;
                 }
             }
 
             orig(self, body);
 
-            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem);
+            ChatHandler.SendRichPickupMessage(master, item, self.pickup.isTempItem, self.pickup.isRental);
 
             // ReSharper disable once PossibleNullReferenceException
             HandleRichMessageUnlockAndNotification(master, item.pickupIndex);
         }
 
+        private static void HalcyoniteShrineDropRewards(On.RoR2.HalcyoniteShrineInteractable.orig_DropRewards orig,
+            HalcyoniteShrineInteractable self)
+        {
+            Log.Debug("Sharesuite: HalcyoniteShrineDropRewards triggered");
+            if (!NetworkServer.active)
+            {
+                Log.Debug("Sharesuite: Not server, returning");
+                orig(self);
+                return;
+            }
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.HalcyoniteShrineDropModified.Value)
+            {
+                Log.Debug("Sharesuite: Not multiplayer or HalcyoniteDropModified not enabled, returning");
+                orig(self);
+                return;
+            }
+            var shrine = self.GetComponentInParent<HalcyoniteShrineInteractable>();
+            if (!shrine)
+            {
+                orig(self);
+                return;
+            }
+#if DEBUG
+            var rewardOptionCount = shrine.GetFieldValue<int>("rewardOptionCount");
+            var quantityIncreaseFromBuyIn = shrine.GetFieldValue<int>("quantityIncreaseFromBuyIn");
+            Log.Debug($"Sharesuite: rewardOptionCount: {rewardOptionCount}");
+            Log.Debug($"Sharesuite: quantityIncreaseFromBuyIn: {quantityIncreaseFromBuyIn}");
+#endif
+            orig(self);
+
+        }
         public static bool IsDeadAndNotADrone(CharacterMaster master)
         {
             if (master == null || master.GetBody() == null) return true;
@@ -314,7 +389,8 @@ namespace ShareSuite
                     else
                     {
                         Log.Debug("Sharesuite: handling give item");
-                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()));
+                        // Defaulting to permanent item, as the game does not have temporary or rental items for shop purchases AFAIK.
+                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()), false, false);
                     }
 
                     Log.Debug("Sharesuite: orig");
@@ -330,7 +406,7 @@ namespace ShareSuite
 
             #region EquipmentDronefix
 
-            if (ShareSuite.EquipmentShared.Value)
+          if (ShareSuite.EquipmentShared.Value)
             {
                 if (self.costType == CostTypeIndex.Equipment)
                 {
@@ -426,6 +502,12 @@ namespace ShareSuite
                         return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidBoss:
                         return ShareSuite.VoidItemsShared.Value;
+                    case ItemTier.Cursed:
+                        return ShareSuite.CursedItemsShared.Value;
+                    case ItemTier.Page:
+                        return ShareSuite.PageItemsShared.Value;
+                    case ItemTier.Hex:
+                        return ShareSuite.HexItemsShared.Value;
                     case ItemTier.NoTier:
                         break;
                     case ItemTier.AssignedAtRuntime:
@@ -521,9 +603,20 @@ namespace ShareSuite
                 ? collection[Random.Range(0, collection.Count)]
                 : (T?) null;
 
-        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef)
+        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef, bool tempItem, bool rentalItem)
         {
-            characterMaster.inventory.GiveItem(pickupDef.itemIndex);
+            if (tempItem && rentalItem)
+            {
+                Log.Debug("Both tempItem and rentalItem are true. The fudge? Resorting to temp item.");
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+            }
+            else if (tempItem)
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+            else if (rentalItem)
+                characterMaster.inventory.GiveItemRented(pickupDef.itemIndex);
+            else
+                characterMaster.inventory.GiveItemPermanent(pickupDef.itemIndex);
+            
 
             var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient
                 ?.connectionId;

@@ -10,13 +10,13 @@ namespace ShareSuite
     {
         public static void UnHook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage -= RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup -= RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage -= SendIntroMessage;
         }
 
         public static void Hook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage += RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup += RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
 
@@ -58,13 +58,13 @@ namespace ShareSuite
             timer.Start();
         }
 
-        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage orig,
+        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage_CharacterMaster_UniquePickup orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
 
-        public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary)
+        public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary, bool rental)
         {
             if (!GeneralHooks.IsMultiplayer())
             {
@@ -82,7 +82,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
+            var itemCount = player.inventory.GetItemCountEffective(pickupDef.itemIndex);
 
             if (pickupDef.coinValue > 0)
             {
@@ -98,19 +98,55 @@ namespace ShareSuite
 
             if (temporary)
             {
-                var singlePickupMessage =
-                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
-                    $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
-                    $"<color=#{NotSharingColor}>(Item is temporary, so not shared)</color>";
-                Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
-                return;
+                if (ShareSuite.TemporaryItemsShared.Value)
+                {
+                    var tempPickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up temporary</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for everyone</color>" +
+                        $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = tempPickupMessage });
+                    return;
+                }
+                else
+                {
+                    var singlePickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
+                        $"<color=#{NotSharingColor}>(Item is temporary, so not shared)</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
+                    return;
+                }
+            }
+            if (rental)
+            {
+                if (ShareSuite.RentalItemsShared.Value)
+                {
+                    var tempPickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up Ethereal</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for everyone</color>" +
+                        $"{ItemPickupFormatter(body)}<color=#{GrayColor}>.</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = tempPickupMessage });
+                    return;
+                }
+                else
+                {
+                    var singlePickupMessage =
+                        $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
+                        $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
+                        $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)} ({itemCount})</color> <color=#{GrayColor}>for themselves. </color>" +
+                        $"<color=#{NotSharingColor}>(Item is ethereal, so not shared)</color>";
+                    Chat.SendBroadcastChat(new Chat.SimpleChatMessage { baseToken = singlePickupMessage });
+                    return;
+                }
             }
 
             if (Blacklist.HasItem(pickupDef.itemIndex) || !ItemSharingHooks.IsValidItemPickup(pickupDef.pickupIndex))
             {
                 var singlePickupMessage =
-                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up temporary</color> " +
+                    $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up</color> " +
                     $"<color=#{ColorUtility.ToHtmlStringRGB(pickupColor)}>" +
                     $"{(string.IsNullOrEmpty(pickupName) ? "???" : pickupName)}</color> <color=#{GrayColor}>for themselves. </color>" +
                     $"<color=#{NotSharingColor}>(Item Set to NOT be Shared)</color>";
@@ -143,7 +179,7 @@ namespace ShareSuite
             var pickupColor = pickupDef.baseColor;
             var pickupName = Language.GetString(pickupDef.nameToken);
             var playerColor = GetPlayerColor(player.playerCharacterMasterController);
-            var itemCount = player.inventory.GetItemCount(pickupDef.itemIndex);
+            var itemCount = player.inventory.GetItemCountEffective(pickupDef.itemIndex);
 
             var pickupMessage =
                 $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>traded for</color> " +
@@ -153,7 +189,7 @@ namespace ShareSuite
         }
 
         public static void SendRichRandomizedPickupMessage(CharacterMaster origPlayer, PickupDef origPickup,
-            Dictionary<CharacterMaster, PickupDef> pickupIndices, bool temporary)
+            Dictionary<CharacterMaster, PickupDef> pickupIndices, bool temporary, bool rental)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
@@ -165,7 +201,7 @@ namespace ShareSuite
             // If nobody got a randomized item
             if (pickupIndices.Count == 1)
             {
-                SendRichPickupMessage(origPlayer, origPickup, temporary); //todo handle this correctly with randomized items
+                SendRichPickupMessage(origPlayer, origPickup, temporary, rental); //todo handle this correctly with randomized items
                 return;
             }
 
@@ -178,7 +214,7 @@ namespace ShareSuite
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
                 var itemCount =
-                    index.Key.playerCharacterMasterController.master.inventory.GetItemCount(index.Value.itemIndex);
+                    index.Key.playerCharacterMasterController.master.inventory.GetItemCountEffective(index.Value.itemIndex);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
@@ -301,8 +337,6 @@ namespace ShareSuite
         public delegate void SendPickupMessageDelegate(CharacterMaster master, UniquePickup pickupIndex);
 
         public static readonly SendPickupMessageDelegate SendPickupMessage =
-            (SendPickupMessageDelegate) Delegate.CreateDelegate(typeof(SendPickupMessageDelegate),
-                typeof(GenericPickupController).GetMethod("SendPickupMessage",
-                    BindingFlags.Public | BindingFlags.Static) ?? throw new MissingMethodException("Unable to find SendPickupMessage"));
+                    GenericPickupController.SendPickupMessage;
     }
 }
