@@ -194,16 +194,12 @@ namespace ShareSuite
                 switch (self.costType)
                 {
                     case CostTypeIndex.Money:
-                    {
                         if (self.cost > SharedMoneyValue) return;
                         // Remove money from shared money pool
                         orig(self, activator);
                         SharedMoneyValue -= self.cost;
                         return;
-                    }
-
                     case CostTypeIndex.PercentHealth:
-                    {
                         // Share the damage taken from a sacrifice
                         // as it generates shared money
                         orig(self, activator);
@@ -224,9 +220,7 @@ namespace ShareSuite
                             var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * shrineBloodBehavior.goldToPaidHpRatio);
                             if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint) (amount * ShareSuite.MoneyScalar.Value);
 
-                        if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint)(amount * ShareSuite.MoneyScalar.Value);
-
-                        SharedMoneyValue += (int) amount;
+                            SharedMoneyValue += (int) amount;
                         }
                         else if (purchaseInteraction != null)
                         {
