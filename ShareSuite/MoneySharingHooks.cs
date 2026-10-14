@@ -219,14 +219,27 @@ namespace ShareSuite
 
                         var purchaseInteraction = self.GetComponent<PurchaseInteraction>();
                         var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
-                        var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
-                                             shrineBloodBehavior.goldToPaidHpRatio);
+                        if (purchaseInteraction != null && shrineBloodBehavior != null)
+                        {
+                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * shrineBloodBehavior.goldToPaidHpRatio);
+                            if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint) (amount * ShareSuite.MoneyScalar.Value);
 
                         if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint)(amount * ShareSuite.MoneyScalar.Value);
 
                         SharedMoneyValue += (int) amount;
+                        }
+                        else if (purchaseInteraction != null)
+                        {
+                            Log.Debug("PurchaseInteraction is not null, but ShrineBloodBehavior is null. What is happening?");
+                        }
+                        else if (shrineBloodBehavior != null)
+                        {
+                            Log.Debug("ShrineBloodBehavior is not null, but PurchaseInteraction is null. What is happening?");
+                        }
                         return;
-                    }
+                    default:
+                        Debug.LogWarning($"Unhandled cost type: {self.costType}.");
+                        break;
                 }
             }
 
