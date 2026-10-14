@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace ShareSuite
@@ -155,7 +156,22 @@ namespace ShareSuite
 
             // If the player is dead, they might not have a body. The game uses inventory.GetComponent, avoiding the issue entirely.
             var master = body?.master ?? body.inventory?.GetComponent<CharacterMaster>();
-
+            
+            var activeScene = SceneManager.GetActiveScene();
+            if (activeScene != null)
+            {
+                Log.Debug($"ActiveScene: {activeScene.name}");
+            }
+            else
+            {
+                Log.Debug($"ActiveScene is null?");
+            }
+            if (activeScene.name == "computationalexchange")
+            {
+                Log.Debug("Sharesuite: Computational Exchange detected, skipping item sharing.");
+                orig(self, body);
+                return;
+            }
 #if DEBUG
             var index = item.equipmentIndex;
             var isEquipment = EquipmentCatalog.allEquipment.Contains(index);
