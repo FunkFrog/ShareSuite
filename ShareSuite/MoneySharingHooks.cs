@@ -1,14 +1,9 @@
-using EntityStates.AffixVoid;
 using EntityStates.GoldGat;
 using MonoMod.Cil;
 using R2API.Utils;
 using RoR2;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -146,7 +141,7 @@ namespace ShareSuite
                 if (!body.healthComponent.alive || !body.master || !body.isPlayerControlled)
                     continue;
                 amountOfPlayersInRange = amountOfPlayersInRange++;
-                totalDrain += (int)Math.Min(body.master.money, (uint)shrine.goldDrainValue);
+                totalDrain += (int) Math.Min(body.master.money, (uint) shrine.goldDrainValue);
             }
 #if DEBUG
             /*
@@ -167,12 +162,14 @@ namespace ShareSuite
                 return;
             }
 
-            if (SharedMoneyValue < totalDrain) { 
+            if (SharedMoneyValue < totalDrain)
+            {
 #if DEBUG
                 Debug.Log("Not Draining due to too little money");
 #endif
                 return;
             }
+
             SharedMoneyValue -= totalDrain;
             orig(self);
         }
@@ -180,7 +177,7 @@ namespace ShareSuite
             if (currentDrain == 4294967295) {
                 Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
                 orig(self);
-                return; 
+                return;
             }
         }*/
 
@@ -217,19 +214,24 @@ namespace ShareSuite
                         var shrineBloodBehavior = self.GetComponent<ShrineBloodBehavior>();
                         if (purchaseInteraction != null && shrineBloodBehavior != null)
                         {
-                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 * shrineBloodBehavior.goldToPaidHpRatio);
-                            if (ShareSuite.MoneyScalarEnabled.Value) amount = (uint) (amount * ShareSuite.MoneyScalar.Value);
+                            var amount = (uint) (teamMaxHealth * purchaseInteraction.cost / 100.0 *
+                                                 shrineBloodBehavior.goldToPaidHpRatio);
+                            if (ShareSuite.MoneyScalarEnabled.Value)
+                                amount = (uint) (amount * ShareSuite.MoneyScalar.Value);
 
                             SharedMoneyValue += (int) amount;
                         }
                         else if (purchaseInteraction != null)
                         {
-                            Log.Debug("PurchaseInteraction is not null, but ShrineBloodBehavior is null. What is happening?");
+                            Log.Debug(
+                                "PurchaseInteraction is not null, but ShrineBloodBehavior is null. What is happening?");
                         }
                         else if (shrineBloodBehavior != null)
                         {
-                            Log.Debug("ShrineBloodBehavior is not null, but PurchaseInteraction is null. What is happening?");
+                            Log.Debug(
+                                "ShrineBloodBehavior is not null, but PurchaseInteraction is null. What is happening?");
                         }
+
                         return;
                     default:
                         Debug.LogWarning($"Unhandled cost type: {self.costType}.");
@@ -249,7 +251,7 @@ namespace ShareSuite
             {
                 orig(self);
                 return;
-            } 
+            }
 
             var players = PlayerCharacterMasterController.instances.Count;
             foreach (var player in PlayerCharacterMasterController.instances)
@@ -266,7 +268,7 @@ namespace ShareSuite
             BarrelInteraction self, Interactor activator)
         {
             orig(self, activator);
-            
+
             if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
@@ -286,7 +288,7 @@ namespace ShareSuite
             DamageReport damageReport)
         {
             orig(self, damageReport);
-            
+
             if (!GeneralHooks.IsMultiplayer()) return;
 
             #region Sharedmoney
@@ -389,9 +391,9 @@ namespace ShareSuite
             }
 
             if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
-                || !(bool) self.body
-                || !(bool) self.body.inventory
-            )
+                                                || !(bool) self.body
+                                                || !(bool) self.body.inventory
+               )
             {
                 orig(self, info);
                 return;
@@ -493,10 +495,10 @@ namespace ShareSuite
             GlobalEventManager self, DamageInfo info, GameObject victim)
         {
             if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer()
-                || !(bool) info.attacker
-                || !(bool) info.attacker.GetComponent<CharacterBody>()
-                || !(bool) info.attacker.GetComponent<CharacterBody>().master
-            )
+                                                || !(bool) info.attacker
+                                                || !(bool) info.attacker.GetComponent<CharacterBody>()
+                                                || !(bool) info.attacker.GetComponent<CharacterBody>().master
+               )
             {
                 orig(self, info, victim);
                 return;

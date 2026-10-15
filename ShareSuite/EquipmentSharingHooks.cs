@@ -23,7 +23,6 @@ namespace ShareSuite
         {
             #region Sharedequipment
 
-
             // If equipment sharing is disabled, or we're not in multiplayer, or we're not in an server, run the original method
             if (!ShareSuite.EquipmentShared.Value || !GeneralHooks.IsMultiplayer() || !NetworkServer.active)
             {
@@ -66,7 +65,7 @@ namespace ShareSuite
             {
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
                 return;
-            }    
+            }
             // If the new equip is shared, create a droplet of the old one.
             else if (EquipmentShared(newEquip))
                 CreateDropletIfExists(oldEquipPickupIndex, self.transform.position);
@@ -76,7 +75,7 @@ namespace ShareSuite
 
             // Loop over everyone who has an inventory and isn't the picker
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                .Where(p => p.inventory && p != body.master))
+                         .Where(p => p.inventory && p != body.master))
             {
                 var playerInventory = player.inventory;
                 var playerOrigEquipment = playerInventory.currentEquipmentIndex;
@@ -112,7 +111,7 @@ namespace ShareSuite
         {
             var droppedEquipment = new List<EquipmentIndex>();
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                .Where(p => p.inventory && p != body.master))
+                         .Where(p => p.inventory && p != body.master))
             {
                 var playerEquipment = player.inventory.GetEquipmentIndex();
                 if (!EquipmentShared(playerEquipment) || droppedEquipment.Contains(playerEquipment) ||
@@ -132,7 +131,7 @@ namespace ShareSuite
         public static void RemoveAllUnBlacklistedEquipment()
         {
             foreach (var player in PlayerCharacterMasterController.instances.Select(p => p.master)
-                .Where(p => p.inventory))
+                         .Where(p => p.inventory))
             {
                 if (!Blacklist.HasEquipment(player.inventory.currentEquipmentIndex))
                 {

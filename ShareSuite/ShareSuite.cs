@@ -4,7 +4,6 @@ using R2API.Utils;
 using RoR2;
 using ShareSuite.Networking;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -703,6 +702,7 @@ namespace ShareSuite
                 Debug.Log(CursedItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -723,6 +723,7 @@ namespace ShareSuite
                 Debug.Log(PageItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -743,6 +744,7 @@ namespace ShareSuite
                 Debug.Log(HexItemsShared.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -1145,6 +1147,7 @@ namespace ShareSuite
                 Debug.Log(HalcyoniteShrineDropModified.Value);
                 return;
             }
+
             var valid = TryGetBool(args[0]);
             if (!valid.HasValue)
                 Debug.Log("Couldn't parse to boolean.");
@@ -1197,7 +1200,8 @@ namespace ShareSuite
 
         // Debug Command: Set Next Active Stage
         [ConCommand(commandName = "ss_SetNextActiveStage", flags = ConVarFlags.None,
-            helpText = "Sets the next active stage. Takes max 2 arguments stagename and a boolean to go now. Defaults to setting next.")]
+            helpText =
+ "Sets the next active stage. Takes max 2 arguments stagename and a boolean to go now. Defaults to setting next.")]
         private static void CcSetNextActiveStage(ConCommandArgs args)
         {
             List<string> scenes = SceneCatalog.allStageSceneDefs.Select(sceneDef => sceneDef.baseSceneName).ToList();

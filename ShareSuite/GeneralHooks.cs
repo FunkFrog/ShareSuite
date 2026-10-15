@@ -101,7 +101,7 @@ namespace ShareSuite
                     // Overwrite our base value with the actual amount of director credits.
                     interactableCredit = stageInfo.sceneDirectorInteractibleCredits;
                 }
-                
+
                 // We require playercount for several of the following computations. We don't want this to break with
                 // those crazy 'mega party mods', thus we clamp this value.
                 var clampPlayerCount = Math.Min(Run.instance.participatingPlayerCount, 8);

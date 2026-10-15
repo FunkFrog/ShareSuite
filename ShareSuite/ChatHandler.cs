@@ -46,7 +46,7 @@ namespace ShareSuite
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
                           + $"<color=#{RedColor}>ShareSuite 2.12.0</color><color=#{GrayColor}>!"
-                          + $" <color=#{GrayColor}>This release contains</color> <color=#{RedColor}>SEVERE</color> " 
+                          + $" <color=#{GrayColor}>This release contains</color> <color=#{RedColor}>SEVERE</color> "
                           + $"<color=#{GrayColor}>KNOWN ISSUES. Check our Discord for up-to-date info!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
