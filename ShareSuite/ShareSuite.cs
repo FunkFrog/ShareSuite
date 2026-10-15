@@ -52,7 +52,7 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
-            CursedItemsShared,
+            HallowedItemsShared,
             PageItemsShared,
             HexItemsShared,
             TemporaryItemsShared,
@@ -207,11 +207,11 @@ namespace ShareSuite
                 "Toggles item sharing for void (purple/corrupted) items."
             );
 
-            CursedItemsShared = Config.Bind(
+            HallowedItemsShared = Config.Bind( // Called internally "ItemTier.Cursed"
                 "Settings",
-                "CursedItemsShared",
+                "HallowedItemsShared",
                 false,
-                "Toggles item sharing for cursed (Purple) items."
+                "Toggles item sharing for hallowed (Purple) items."
             );
 
             PageItemsShared = Config.Bind(
@@ -693,14 +693,14 @@ namespace ShareSuite
             }
         }
 
-        // CursedItemsShared
-        [ConCommand(commandName = "ss_CursedItemsShared", flags = ConVarFlags.None,
-            helpText = "Modifies whether cursed items are shared or not.")]
-        private static void CcCursedItemsShared(ConCommandArgs args)
+        // HallowedItemsShared
+        [ConCommand(commandName = "ss_HallowedItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether hallowed items are shared or not.")]
+        private static void CcHallowedItemsShared(ConCommandArgs args)
         {
             if (args.Count == 0)
             {
-                Debug.Log(CursedItemsShared.Value);
+                Debug.Log(HallowedItemsShared.Value);
                 return;
             }
 
@@ -709,8 +709,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
-                CursedItemsShared.Value = valid.Value;
-                Debug.Log($"Cursed item sharing set to {CursedItemsShared.Value}.");
+                HallowedItemsShared.Value = valid.Value;
+                Debug.Log($"Hallowed item sharing set to {HallowedItemsShared.Value}.");
             }
         }
 

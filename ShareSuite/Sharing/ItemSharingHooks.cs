@@ -515,8 +515,8 @@ namespace ShareSuite
                         return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidBoss:
                         return ShareSuite.VoidItemsShared.Value;
-                    case ItemTier.Cursed:
-                        return ShareSuite.CursedItemsShared.Value;
+                    case ItemTier.Cursed: // Purple / Hallowed
+                        return ShareSuite.HallowedItemsShared.Value;
                     case ItemTier.Page:
                         return ShareSuite.PageItemsShared.Value;
                     case ItemTier.Hex:
