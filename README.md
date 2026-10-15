@@ -244,7 +244,7 @@ the mod link + version tested (as well as any required settings changes) and I'l
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
-### `2.12.0 + 2.12.1 (Current Release)`
+### `2.12.0 (Current Release)`
 - Halycon shrine now drops items again. Too many for the amount of players (Work in progress)
   - Halycon shrine properly drains money
 - Hex items can be shared; defaults to not shared
