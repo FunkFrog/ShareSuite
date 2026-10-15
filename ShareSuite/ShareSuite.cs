@@ -16,7 +16,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.12.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", ShareSuite.PluginVersion)]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -40,7 +40,7 @@ namespace ShareSuite
         }
 
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.10.1";
+        public const string PluginVersion = "2.12.0";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
