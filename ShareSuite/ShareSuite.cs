@@ -5,6 +5,7 @@ using RoR2;
 using ShareSuite.Networking;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
