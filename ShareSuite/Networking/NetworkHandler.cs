@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using RoR2;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ShareSuite.Networking
@@ -29,7 +28,7 @@ namespace ShareSuite.Networking
             var itemPickupMessage = networkMessage.ReadMessage<ItemPickupMessage>();
             var localPlayer = PlayerCharacterMasterController.instances.FirstOrDefault(x => x.networkUser.isLocalPlayer);
 
-            if (localPlayer == null || !itemPickupMessage.PickupIndex.isValid)
+            if (!localPlayer || !itemPickupMessage.PickupIndex.isValid)
             {
                 return;
             }
