@@ -2,6 +2,13 @@
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
+### `2.10.1/2.11.0`
+- Fixed drone item & money sharing
+- Fixed chat messages in single player
+- Fixed scrapper not working in multiplayer
+- Fix simulacrum having the incorrect amount of interactables
+- Expanded the blacklist with: LowerPricedChests,ItemDropChanceOnKill,BarrageOnBoss
+
 ### `2.10.0`
 - Update to support DLC3
 - Add the following DLC3 items to the default blacklist

@@ -307,7 +307,7 @@ namespace ShareSuite
         }
         public static bool IsDeadAndNotADrone(CharacterMaster master)
         {
-            if (master == null || master.GetBody() == null) return true;
+            if (!master || !master.GetBody()) return true;
             return master.IsDeadAndOutOfLivesServer() && !master.GetBody().IsDrone;
         }
 
@@ -388,9 +388,19 @@ namespace ShareSuite
                     if (item == null) Log.Debug("ShareSuite: PickupCatalog is null.");
                     else
                     {
-                        Log.Debug("Sharesuite: handling give item");
-                        // Defaulting to permanent item, as the game does not have temporary or rental items for shop purchases AFAIK.
-                        HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()), false, false);
+                        if (shop.gameObject.name.Contains("Duplicator"))
+                        {
+                            // 3D printers multiprint based on cost
+                            HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()), false, false, self.cost);
+                        }
+                        else
+                        {
+                            Log.Debug("Sharesuite: handling give item");
+                            // Defaulting to permanent item, as the game does not have temporary or rental items for shop purchases AFAIK.
+                            // Cauldrons only give 1 item
+                            HandleGiveItem(characterBody.master, PickupCatalog.GetPickupDef(shop.CurrentPickupIndex()),
+                                false, false);
+                        }
                     }
 
                     Log.Debug("Sharesuite: orig");
@@ -603,19 +613,19 @@ namespace ShareSuite
                 ? collection[Random.Range(0, collection.Count)]
                 : (T?) null;
 
-        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef, bool tempItem, bool rentalItem)
+        private static void HandleGiveItem(CharacterMaster characterMaster, PickupDef pickupDef, bool tempItem, bool rentalItem, int amount = 1)
         {
             if (tempItem && rentalItem)
             {
                 Log.Debug("Both tempItem and rentalItem are true. The fudge? Resorting to temp item.");
-                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex, amount);
             }
             else if (tempItem)
-                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex);
+                characterMaster.inventory.GiveItemTemp(pickupDef.itemIndex, amount);
             else if (rentalItem)
-                characterMaster.inventory.GiveItemRented(pickupDef.itemIndex);
+                characterMaster.inventory.GiveItemRented(pickupDef.itemIndex, amount);
             else
-                characterMaster.inventory.GiveItemPermanent(pickupDef.itemIndex);
+                characterMaster.inventory.GiveItemPermanent(pickupDef.itemIndex, amount);
             
 
             var connectionId = characterMaster.playerCharacterMasterController.networkUser?.connectionToClient

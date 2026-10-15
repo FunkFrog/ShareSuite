@@ -10,13 +10,15 @@ namespace ShareSuite
     {
         public static void UnHook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup -= RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup -=
+                RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage -= SendIntroMessage;
         }
 
         public static void Hook()
         {
-            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup += RemoveDefaultPickupMessage;
+            On.RoR2.GenericPickupController.SendPickupMessage_CharacterMaster_UniquePickup +=
+                RemoveDefaultPickupMessage;
             On.RoR2.Chat.SendPlayerConnectedMessage += SendIntroMessage;
         }
 
@@ -30,7 +32,7 @@ namespace ShareSuite
 
         // Red (previously bc2525) / Blue / Yellow / Green / Orange / Cyan / Pink / Deep Purple
         private static readonly string[] PlayerColors =
-            {"f23030", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea"};
+            { "f23030", "2083fc", "f1f41a", "4dc344", "f27b0c", "3cdede", "db46bd", "9400ea" };
 
         public static void SendIntroMessage(On.RoR2.Chat.orig_SendPlayerConnectedMessage orig, NetworkUser user)
         {
@@ -43,8 +45,9 @@ namespace ShareSuite
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
             var message = $"<color=#{GrayColor}>Hey there! Thanks for installing </color>"
-                          + $"<color=#{RedColor}>ShareSuite 2.11.0 DLC3</color><color=#{GrayColor}>!"
-                          + " This release contains KNOWN ISSUES. Check our Discord for up-to-date info!</color>";
+                          + $"<color=#{RedColor}>ShareSuite 2.12.0</color><color=#{GrayColor}>!"
+                          + $" <color=#{GrayColor}>This release contains</color> <color=#{RedColor}>SEVERE</color> " 
+                          + $"<color=#{GrayColor}>KNOWN ISSUES. Check our Discord for up-to-date info!</color>";
             var clickChatBox = $"<color=#{RedColor}>(Click the chat box to view the full message)</color>";
 
             var timer = new System.Timers.Timer(5000); // Send messages after 5 seconds
@@ -58,13 +61,15 @@ namespace ShareSuite
             timer.Start();
         }
 
-        public static void RemoveDefaultPickupMessage(On.RoR2.GenericPickupController.orig_SendPickupMessage_CharacterMaster_UniquePickup orig,
+        public static void RemoveDefaultPickupMessage(
+            On.RoR2.GenericPickupController.orig_SendPickupMessage_CharacterMaster_UniquePickup orig,
             CharacterMaster master, UniquePickup pickupIndex)
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value) orig(master, pickupIndex);
         }
 
-        public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary, bool rental)
+        public static void SendRichPickupMessage(CharacterMaster player, PickupDef pickupDef, bool temporary,
+            bool rental)
         {
             if (!GeneralHooks.IsMultiplayer())
             {
@@ -74,7 +79,8 @@ namespace ShareSuite
             var body = player.hasBody ? player.GetBody() : null;
             if (body == null || !ShareSuite.RichMessagesEnabled.Value)
             {
-                if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(player, new UniquePickup(pickupDef.pickupIndex));
+                if (ShareSuite.RichMessagesEnabled.Value)
+                    SendPickupMessage(player, new UniquePickup(pickupDef.pickupIndex));
 
                 return;
             }
@@ -119,6 +125,7 @@ namespace ShareSuite
                     return;
                 }
             }
+
             if (rental)
             {
                 if (ShareSuite.RentalItemsShared.Value)
@@ -193,7 +200,8 @@ namespace ShareSuite
         {
             if (!GeneralHooks.IsMultiplayer() || !ShareSuite.RichMessagesEnabled.Value)
             {
-                if (ShareSuite.RichMessagesEnabled.Value) SendPickupMessage(origPlayer, new UniquePickup(origPickup.pickupIndex));
+                if (ShareSuite.RichMessagesEnabled.Value)
+                    SendPickupMessage(origPlayer, new UniquePickup(origPickup.pickupIndex));
 
                 return;
             }
@@ -201,7 +209,8 @@ namespace ShareSuite
             // If nobody got a randomized item
             if (pickupIndices.Count == 1)
             {
-                SendRichPickupMessage(origPlayer, origPickup, temporary, rental); //todo handle this correctly with randomized items
+                SendRichPickupMessage(origPlayer, origPickup, temporary,
+                    rental); //todo handle this correctly with randomized items
                 return;
             }
 
@@ -214,7 +223,8 @@ namespace ShareSuite
                 var pickupName = Language.GetString(index.Value.nameToken);
                 var playerColor = GetPlayerColor(index.Key.playerCharacterMasterController);
                 var itemCount =
-                    index.Key.playerCharacterMasterController.master.inventory.GetItemCountEffective(index.Value.itemIndex);
+                    index.Key.playerCharacterMasterController.master.inventory.GetItemCountEffective(index.Value
+                        .itemIndex);
 
                 if (remainingPlayers != pickupIndices.Count)
                 {
@@ -337,6 +347,6 @@ namespace ShareSuite
         public delegate void SendPickupMessageDelegate(CharacterMaster master, UniquePickup pickupIndex);
 
         public static readonly SendPickupMessageDelegate SendPickupMessage =
-                    GenericPickupController.SendPickupMessage;
+            GenericPickupController.SendPickupMessage;
     }
 }
