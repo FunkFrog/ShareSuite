@@ -10,80 +10,70 @@
 		<OutputPath></OutputPath>
 	</PropertyGroup>
 
-    <PropertyGroup>
-        <!-- change these to perform local builds -->
-        <MMPath>$(AppData)\r2modmanPlus-local</MMPath>
-        <!-- Gale default: $(AppData)\com.Kesomannen.GaleModManager -->
-        <MMCache>$(MMPath)\RiskOfRain2\cache</MMCache>
-        <!-- Gale: $(MMPath)\cache -->
-        <ProfileName>Default</ProfileName>
-        <MMProfile>$(MMPath)\RiskOfRain2\profiles\$(ProfileName)</MMProfile>
-    </PropertyGroup>
-    
 	<ItemGroup>
 		<Reference Include="0Harmony">
-			<HintPath>$(MMCache)\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\0Harmony.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="0Harmony20">
-			<HintPath>$(MMCache)\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\0Harmony20.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\0Harmony20.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx">
-			<HintPath>$(MMCache)\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Bootstrap">
-			<HintPath>$(MMCache)\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.Bootstrap.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.Bootstrap.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Harmony">
-			<HintPath>$(MMCache)\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.Harmony.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\cache\bbepis-BepInExPack\5.4.2122\BepInExPack\BepInEx\core\BepInEx.Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.MonoMod.HookGenPatcher">
-			<HintPath>$(MMProfile)\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\BepInEx.MonoMod.HookGenPatcher.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\BepInEx.MonoMod.HookGenPatcher.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Preloader">
-			<HintPath>$(MMProfile)\BepInEx\core\BepInEx.Preloader.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\BepInEx.Preloader.dll</HintPath>
 		</Reference>
 		<Reference Include="HarmonyXInterop">
-			<HintPath>$(MMProfile)\BepInEx\core\HarmonyXInterop.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\HarmonyXInterop.dll</HintPath>
 		</Reference>
 		<Reference Include="MMHOOK_RoR2">
-			<HintPath>$(MMProfile)\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
 		</Reference>
 		<Reference Include="Mono.Cecil">
-			<HintPath>$(MMProfile)\BepInEx\core\Mono.Cecil.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\Mono.Cecil.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 		</Reference>
 		<Reference Include="Mono.Cecil.Mdb">
-			<HintPath>$(MMProfile)\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\Mono.Cecil.Mdb.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 		</Reference>
 		<Reference Include="Mono.Cecil.Pdb">
-			<HintPath>$(MMProfile)\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 		</Reference>
 		<Reference Include="Mono.Cecil.Rocks">
-			<HintPath>$(MMProfile)\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
 			<SpecificVersion>False</SpecificVersion>
 		</Reference>
 		<Reference Include="MonoMod">
-			<HintPath>$(MMProfile)\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\MonoMod.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\MonoMod.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.RuntimeDetour">
-			<HintPath>$(MMProfile)\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.RuntimeDetour.HookGen">
-			<HintPath>$(MMProfile)\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\MonoMod.RuntimeDetour.HookGen.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\patchers\RiskofThunder-HookGenPatcher\Bepinex.MonoMod.HookGenPatcher\MonoMod.RuntimeDetour.HookGen.dll</HintPath>
 		</Reference>
 		<Reference Include="MonoMod.Utils">
-			<HintPath>$(MMProfile)\BepInEx\core\MonoMod.Utils.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\core\MonoMod.Utils.dll</HintPath>
 		</Reference>
 		<!--<Reference Include="R2API, Version=4.4.1.0, Culture=neutral, PublicKeyToken=null">
-			<HintPath>$(MMProfile)\BepInEx\plugins\tristanmcpherson-R2API\R2API.Legacy\R2API.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\tristanmcpherson-R2API\R2API.Legacy\R2API.dll</HintPath>
 		</Reference>-->
 		<Reference Include="R2API.CommandHelper">
-			<HintPath>$(MMProfile)\BepInEx\plugins\RiskofThunder-R2API_CommandHelper\R2API.CommandHelper\R2API.CommandHelper.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\RiskofThunder-R2API_CommandHelper\R2API.CommandHelper\R2API.CommandHelper.dll</HintPath>
 		</Reference>
 		<Reference Include="R2API.Core">
-			<HintPath>$(MMProfile)\BepInEx\plugins\RiskofThunder-R2API_Core\R2API.Core\R2API.Core.dll</HintPath>
+			<HintPath>$(AppData)\r2modmanPlus-local\RiskOfRain2\profiles\Default\BepInEx\plugins\RiskofThunder-R2API_Core\R2API.Core\R2API.Core.dll</HintPath>
 		</Reference>
 		<!-- Add RoR2InstallPath to your user environment variables 
 	  powershell: [System.Environment]::SetEnvironmentVariable("RoR2InstallPath", "C:\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2", "User")
