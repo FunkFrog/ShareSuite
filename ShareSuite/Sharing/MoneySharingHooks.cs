@@ -4,7 +4,9 @@ using R2API.Utils;
 using RoR2;
 using System;
 using System.Linq;
+using RoR2.UI;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 namespace ShareSuite
@@ -29,6 +31,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold -= SiphonGold;
+            On.RoR2.CharacterMaster.SpawnRemoteOperationDrone -= OnDeadDroneSpawn;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -48,6 +51,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold += SiphonGold;
+            On.RoR2.CharacterMaster.SpawnRemoteOperationDrone += OnDeadDroneSpawn;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -523,6 +527,19 @@ namespace ShareSuite
             SharedMoneyValue += (int) postDamageMoney - (int) preDamageMoney;
 
             #endregion
+        }
+
+        private static void OnDeadDroneSpawn(On.RoR2.CharacterMaster.orig_SpawnRemoteOperationDrone orig,
+            CharacterMaster self, string name, uint cost)
+        {
+            if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer())
+            {
+                orig(self, name, cost);
+                return;
+            }
+
+            SharedMoneyValue -= (int) cost;
+            orig(self, name, cost);
         }
 
         private static void AddToSharedMoneyValue(float goldReward)
