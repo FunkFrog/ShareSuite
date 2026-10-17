@@ -198,8 +198,8 @@ namespace ShareSuite
                     ShareSuite.TemporaryItemsShared
                         .Value) // Don't share the item with anyone else if the item is temporary unless TemporaryItemsShared is enabled
                 && (!self.pickup.isRental ||
-                    ShareSuite.RentalItemsShared
-                        .Value)) // Don't share the item with anyone else if the item is rental unless RentalItemsShared is enabled
+                    ShareSuite.EtherealItemsShared
+                        .Value)) // Don't share the item with anyone else if the item is rental unless EtherealItemsShared is enabled
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {

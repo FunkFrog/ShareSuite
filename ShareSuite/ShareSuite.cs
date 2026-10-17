@@ -56,7 +56,7 @@ namespace ShareSuite
             PageItemsShared,
             HexItemsShared,
             TemporaryItemsShared,
-            RentalItemsShared,
+            EtherealItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -235,9 +235,10 @@ namespace ShareSuite
                 "Toggles item sharing for temporary items."
             );
 
-            RentalItemsShared = Config.Bind(
+            // Internal name is RentalItems, but the user-facing name is EtherealItems
+            EtherealItemsShared = Config.Bind(
                 "Settings",
-                "RentalItemsShared",
+                "EtherealItemsShared",
                 false,
                 "Toggles item sharing for rental items."
             );
@@ -784,7 +785,7 @@ namespace ShareSuite
         {
             if (args.Count == 0)
             {
-                Debug.Log(RentalItemsShared.Value);
+                Debug.Log(EtherealItemsShared.Value);
                 return;
             }
 
@@ -793,8 +794,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
-                RentalItemsShared.Value = valid.Value;
-                Debug.Log($"Rental item sharing set to {RentalItemsShared.Value}.");
+                EtherealItemsShared.Value = valid.Value;
+                Debug.Log($"Rental item sharing set to {EtherealItemsShared.Value}.");
             }
         }
 

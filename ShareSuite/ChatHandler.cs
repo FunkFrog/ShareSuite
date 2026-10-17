@@ -128,7 +128,7 @@ namespace ShareSuite
 
             if (rental)
             {
-                if (ShareSuite.RentalItemsShared.Value)
+                if (ShareSuite.EtherealItemsShared.Value)
                 {
                     var tempPickupMessage =
                         $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up Ethereal</color> " +
