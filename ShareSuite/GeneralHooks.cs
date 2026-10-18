@@ -149,9 +149,10 @@ namespace ShareSuite
             #endregion
 
             _sacrificeOffset = 1;
-            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "../LocalLow/Hopoo Games, LLC/Risk of Rain 2", "DataGathering.csv");
+            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "../LocalLow/Hopoo Games, LLC/Risk of Rain 2", "DataGathering.csv");
 
-            string message = 
+            string message =
                 $"{origSelfInteractableCredit};" + // GameProposed Credit
                 $"{self.interactableCredit};" + // interactableCredit
                 $"{interactableCredit};" +  // interactableCredit2
@@ -162,20 +163,28 @@ namespace ShareSuite
                 $"{ShareSuite.OverridePlayerScalingEnabled.Value};" + // OverridePlayerScalingEnabled
                 $"{ShareSuite.InteractablesCredit.Value};" + // InteractablesCredit
                 $"{ShareSuite.InteractablesOffset.Value}"; // InteractablesOffset
-            Debug.Log((object) message);
-            
-            if (File.Exists(path))
+            Debug.Log($"ShareSuite: DataGathering: {message}");
+            try
             {
-                using (StreamWriter streamWriter = new StreamWriter(path, true))
-                    streamWriter.WriteLine(message);
-            }
-            else
-            {
-                using (StreamWriter streamWriter = new StreamWriter(path))
+                if (File.Exists(path))
                 {
-                    streamWriter.WriteLine("GameProposed Credit;interactableCredit;interactableCredit2;GameDifficulty;PlayerCount;Stage;SceneName;OverridePlayerScalingEnabled;InteractablesCredit;InteractablesOffset");
-                    streamWriter.WriteLine(message);
+                    using (StreamWriter streamWriter = new StreamWriter(path, true))
+                        streamWriter.WriteLine(message);
                 }
+                else
+                {
+                    using (StreamWriter streamWriter = new StreamWriter(path))
+                    {
+                        streamWriter.WriteLine("GameProposed Credit;interactableCredit;interactableCredit2;" +
+                            "GameDifficulty;PlayerCount;Stage;SceneName;" +
+                            "OverridePlayerScalingEnabled;InteractablesCredit;InteractablesOffset");
+                        streamWriter.WriteLine(message);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to write to DataGathering.csv: {e.Message}");
             }
         }
 
