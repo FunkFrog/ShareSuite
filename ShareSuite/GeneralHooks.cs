@@ -1,6 +1,7 @@
-using System;
 using RoR2;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace ShareSuite
@@ -84,6 +85,7 @@ namespace ShareSuite
             // This is the standard amount of interactablesCredit we work with.
             // Prior to the interactablesCredit overhaul this was the standard value for all runs.
             var interactableCredit = 200;
+            var origSelfInteractableCredit = self.interactableCredit;
 
             var stageInfo = SceneInfo.instance.GetComponent<ClassicStageInfo>();
 
@@ -147,6 +149,34 @@ namespace ShareSuite
             #endregion
 
             _sacrificeOffset = 1;
+            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "../LocalLow/Hopoo Games, LLC/Risk of Rain 2", "DataGathering.csv");
+
+            string message = 
+                $"{origSelfInteractableCredit};" + // GameProposed Credit
+                $"{self.interactableCredit};" + // interactableCredit
+                $"{interactableCredit};" +  // interactableCredit2
+                $"{Run.instance.selectedDifficulty};" + // GameDifficulty
+                $"{Run.instance.participatingPlayerCount};" + // PlayerCount
+                $"{Run.instance.stageClearCount};" + // Stage
+                $"{SceneCatalog.mostRecentSceneDef.baseSceneName};" + // SceneName
+                $"{ShareSuite.OverridePlayerScalingEnabled.Value};" + // OverridePlayerScalingEnabled
+                $"{ShareSuite.InteractablesCredit.Value};" + // InteractablesCredit
+                $"{ShareSuite.InteractablesOffset.Value}"; // InteractablesOffset
+            Debug.Log((object) message);
+            
+            if (File.Exists(path))
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path, true))
+                    streamWriter.WriteLine(message);
+            }
+            else
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path))
+                {
+                    streamWriter.WriteLine("GameProposed Credit;interactableCredit;interactableCredit2;GameDifficulty;PlayerCount;Stage;SceneName;OverridePlayerScalingEnabled;InteractablesCredit;InteractablesOffset");
+                    streamWriter.WriteLine(message);
+                }
+            }
         }
 
         private static float GetExpAdjustedDropChancePercent(On.RoR2.Util.orig_GetExpAdjustedDropChancePercent orig,
