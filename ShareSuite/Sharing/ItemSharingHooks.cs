@@ -198,8 +198,8 @@ namespace ShareSuite
                     ShareSuite.TemporaryItemsShared
                         .Value) // Don't share the item with anyone else if the item is temporary unless TemporaryItemsShared is enabled
                 && (!self.pickup.isRental ||
-                    ShareSuite.RentalItemsShared
-                        .Value)) // Don't share the item with anyone else if the item is rental unless RentalItemsShared is enabled
+                    ShareSuite.EtherealItemsShared
+                        .Value)) // Don't share the item with anyone else if the item is rental unless EtherealItemsShared is enabled
             {
                 if (ShareSuite.RandomizeSharedPickups.Value)
                 {
@@ -515,8 +515,8 @@ namespace ShareSuite
                         return ShareSuite.VoidItemsShared.Value;
                     case ItemTier.VoidBoss:
                         return ShareSuite.VoidItemsShared.Value;
-                    case ItemTier.Cursed:
-                        return ShareSuite.CursedItemsShared.Value;
+                    case ItemTier.Cursed: // Purple / Hallowed
+                        return ShareSuite.HallowedItemsShared.Value;
                     case ItemTier.Page:
                         return ShareSuite.PageItemsShared.Value;
                     case ItemTier.Hex:

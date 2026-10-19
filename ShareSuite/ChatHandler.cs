@@ -38,9 +38,9 @@ namespace ShareSuite
         {
             orig(user);
 
-            if (ShareSuite.LastMessageSent.Value.Equals(ShareSuite.MessageSendVer)) return;
+            if (ShareSuite.LastMessageSent.Value.Equals(ShareSuite.PluginVersion)) return;
 
-            ShareSuite.LastMessageSent.Value = ShareSuite.MessageSendVer;
+            ShareSuite.LastMessageSent.Value = ShareSuite.PluginVersion;
 
             var notRepeatedMessage = $"<color=#{GrayColor}>(This message will </color><color=#{RedColor}>NOT</color>"
                                      + $"<color=#{GrayColor}> display again!) </color>";
@@ -128,7 +128,7 @@ namespace ShareSuite
 
             if (rental)
             {
-                if (ShareSuite.RentalItemsShared.Value)
+                if (ShareSuite.EtherealItemsShared.Value)
                 {
                     var tempPickupMessage =
                         $"<color=#{playerColor}>{body.GetUserName()}</color> <color=#{GrayColor}>picked up Ethereal</color> " +

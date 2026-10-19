@@ -5,6 +5,7 @@ using RoR2;
 using ShareSuite.Networking;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -15,7 +16,7 @@ using UnityEngine.Networking;
 namespace ShareSuite
 {
     [BepInDependency("com.bepis.r2api")]
-    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", "2.12.0")]
+    [BepInPlugin("com.funkfrog_sipondo.sharesuite", "ShareSuite", ShareSuite.PluginVersion)]
     //[R2APISubmoduleDependency("CommandHelper")]
     [NetworkCompatibility(CompatibilityLevel.NoNeedForSync, VersionStrictness.DifferentModVersionsAreOk)]
     public class ShareSuite : BaseUnityPlugin
@@ -39,7 +40,7 @@ namespace ShareSuite
         }
 
         // Update this when we want to send a new message
-        public static string MessageSendVer = "2.10.1";
+        public const string PluginVersion = "2.12.0";
 
         public static ConfigEntry<bool>
             ModIsEnabled,
@@ -51,11 +52,11 @@ namespace ShareSuite
             LunarItemsShared,
             BossItemsShared,
             VoidItemsShared,
-            CursedItemsShared,
+            HallowedItemsShared,
             PageItemsShared,
             HexItemsShared,
             TemporaryItemsShared,
-            RentalItemsShared,
+            EtherealItemsShared,
             RichMessagesEnabled,
             DropBlacklistedEquipmentOnShare,
             PrinterCauldronFixEnabled,
@@ -206,11 +207,11 @@ namespace ShareSuite
                 "Toggles item sharing for void (purple/corrupted) items."
             );
 
-            CursedItemsShared = Config.Bind(
+            HallowedItemsShared = Config.Bind( // Called internally "ItemTier.Cursed"
                 "Settings",
-                "CursedItemsShared",
+                "HallowedItemsShared",
                 false,
-                "Toggles item sharing for cursed (Purple) items."
+                "Toggles item sharing for hallowed (Purple) items."
             );
 
             PageItemsShared = Config.Bind(
@@ -234,9 +235,10 @@ namespace ShareSuite
                 "Toggles item sharing for temporary items."
             );
 
-            RentalItemsShared = Config.Bind(
+            // Internal name is RentalItems, but the user-facing name is EtherealItems
+            EtherealItemsShared = Config.Bind(
                 "Settings",
-                "RentalItemsShared",
+                "EtherealItemsShared",
                 false,
                 "Toggles item sharing for rental items."
             );
@@ -692,14 +694,14 @@ namespace ShareSuite
             }
         }
 
-        // CursedItemsShared
-        [ConCommand(commandName = "ss_CursedItemsShared", flags = ConVarFlags.None,
-            helpText = "Modifies whether cursed items are shared or not.")]
-        private static void CcCursedItemsShared(ConCommandArgs args)
+        // HallowedItemsShared
+        [ConCommand(commandName = "ss_HallowedItemsShared", flags = ConVarFlags.None,
+            helpText = "Modifies whether hallowed items are shared or not.")]
+        private static void CcHallowedItemsShared(ConCommandArgs args)
         {
             if (args.Count == 0)
             {
-                Debug.Log(CursedItemsShared.Value);
+                Debug.Log(HallowedItemsShared.Value);
                 return;
             }
 
@@ -708,8 +710,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
-                CursedItemsShared.Value = valid.Value;
-                Debug.Log($"Cursed item sharing set to {CursedItemsShared.Value}.");
+                HallowedItemsShared.Value = valid.Value;
+                Debug.Log($"Hallowed item sharing set to {HallowedItemsShared.Value}.");
             }
         }
 
@@ -783,7 +785,7 @@ namespace ShareSuite
         {
             if (args.Count == 0)
             {
-                Debug.Log(RentalItemsShared.Value);
+                Debug.Log(EtherealItemsShared.Value);
                 return;
             }
 
@@ -792,8 +794,8 @@ namespace ShareSuite
                 Debug.Log("Couldn't parse to boolean.");
             else
             {
-                RentalItemsShared.Value = valid.Value;
-                Debug.Log($"Rental item sharing set to {RentalItemsShared.Value}.");
+                EtherealItemsShared.Value = valid.Value;
+                Debug.Log($"Rental item sharing set to {EtherealItemsShared.Value}.");
             }
         }
 
