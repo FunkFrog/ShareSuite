@@ -29,6 +29,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold -= SiphonGold;
+            On.RoR2.Quests.TrialQuests.TrialQuestSadismOpenChests.OnEnter -= ShareScavengersDreamMoney;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -48,6 +49,7 @@ namespace ShareSuite
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold += SiphonGold;
+            On.RoR2.Quests.TrialQuests.TrialQuestSadismOpenChests.OnEnter += ShareScavengersDreamMoney;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -86,6 +88,24 @@ namespace ShareSuite
             AddToSharedMoneyValue(amount);
 
             #endregion
+        }
+
+        private static void ShareScavengersDreamMoney(
+            On.RoR2.Quests.TrialQuests.TrialQuestSadismOpenChests.orig_OnEnter orig,
+            RoR2.Quests.TrialQuests.TrialQuestSadismOpenChests self)
+        {
+            if (!NetworkServer.active || !ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer())
+            {
+                orig(self);
+                return;
+            }
+
+            // The trial gives the team gold to open its chests. We track the players' money pre and post, and
+            // apply the difference to the shared pool unscaled, as it has to match the chest prices.
+            var preTrialMoney = PlayerCharacterMasterController.instances.Sum(p => (long) p.master.money);
+            orig(self);
+            var postTrialMoney = PlayerCharacterMasterController.instances.Sum(p => (long) p.master.money);
+            SharedMoneyValue += (int) (postTrialMoney - preTrialMoney);
         }
 
         public static void AddMoneyExternal(int amount)
