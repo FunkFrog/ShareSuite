@@ -35,9 +35,10 @@ namespace ShareSuite
             var oldEquipPickupIndex = GetPickupIndex(oldEquip);
             var newEquip = PickupCatalog.GetPickupDef(self.pickupIndex).equipmentIndex;
 
-            // If the new item is not equipment, return
+            // If the new item is not equipment, pass it on so item pickups (and item sharing) still happen
             if (IsEquipment(newEquip) == false)
             {
+                orig(self, body);
                 return;
             }
 
