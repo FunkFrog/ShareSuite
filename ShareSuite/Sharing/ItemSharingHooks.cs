@@ -440,11 +440,14 @@ namespace ShareSuite
         private static void OnScavengerDrop(On.EntityStates.ScavBackpack.Opening.orig_OnEnter orig,
             EntityStates.ScavBackpack.Opening self)
         {
-            orig(self);
+            // Set the drop count before orig, which spaces the drops over a fixed duration based on it
             ShareSuite.DefaultMaxScavItemDropCount = Math.Max(EntityStates.ScavBackpack.Opening.maxItemDropCount,
                 ShareSuite.DefaultMaxScavItemDropCount);
-            var chest = self.GetFieldValue<ChestBehavior>("chestBehavior");
-            if (chest.tier1Chance > 0.0f)
+            var chest = self.outer.GetComponent<ChestBehavior>();
+            // Only reduce the drops when they will actually be shared.
+            if (chest && chest.tier1Chance > 0.0f
+                && (ShareSuite.WhiteItemsShared.Value || ShareSuite.GreenItemsShared.Value
+                                                      || ShareSuite.RedItemsShared.Value))
             {
                 var adjustedDrops =
                     Math.Max(
@@ -457,6 +460,8 @@ namespace ShareSuite
             {
                 EntityStates.ScavBackpack.Opening.maxItemDropCount = ShareSuite.DefaultMaxScavItemDropCount;
             }
+
+            orig(self);
         }
 
         //Void Fields item fix
