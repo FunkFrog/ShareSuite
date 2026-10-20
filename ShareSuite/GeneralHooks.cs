@@ -9,7 +9,6 @@ namespace ShareSuite
     public static class GeneralHooks
     {
         private static int _sacrificeOffset = 1;
-        private static int _bossItems = 1;
 
         private static List<string> NoInteractibleOverrideScenes = new List<string>
         {
@@ -21,7 +20,6 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards += BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter += InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin += OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer += SetSacrificeOffset;
             On.RoR2.Util.GetExpAdjustedDropChancePercent += GetExpAdjustedDropChancePercent;
         }
@@ -30,15 +28,21 @@ namespace ShareSuite
         {
             On.RoR2.BossGroup.DropRewards -= BossGroup_DropRewards;
             On.RoR2.SceneDirector.PlaceTeleporter -= InteractibleCreditOverride;
-            On.RoR2.TeleporterInteraction.OnInteractionBegin -= OverrideBossLootScaling;
             On.RoR2.Artifacts.SacrificeArtifactManager.OnPrePopulateSceneServer -= SetSacrificeOffset;
             On.RoR2.Util.GetExpAdjustedDropChancePercent -= GetExpAdjustedDropChancePercent;
         }
 
         private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup group)
         {
-            group.scaleRewardsByPlayerCount = false;
-            group.bonusRewardCount += _bossItems - 1; // Rewards are 1 + bonusRewardCount, so we subtract one
+            // Swap the player count the rewards are multiplied by for our credit, so mountain shrines still multiply
+            if (ShareSuite.OverrideBossLootScalingEnabled.Value && group.scaleRewardsByPlayerCount)
+            {
+                group.scaleRewardsByPlayerCount = false;
+                // Rewards are 1 + bonusRewardCount, so we subtract one
+                group.bonusRewardCount =
+                    (1 + group.bonusRewardCount) * Math.Max(ShareSuite.BossLootCredit.Value, 0) - 1;
+            }
+
             orig(group);
         }
 
@@ -47,24 +51,6 @@ namespace ShareSuite
         {
             _sacrificeOffset = 2;
             orig(sceneDirector);
-        }
-
-        //private static void BossGroup_DropRewards(On.RoR2.BossGroup.orig_DropRewards orig, BossGroup self)
-        //{
-        //    ItemDropAPI.BossDropParticipatingPlayerCount = _bossItems;
-        //    orig(self);
-        //}
-
-        /// <summary>
-        /// // Helper function for Bossloot
-        /// </summary>
-        private static void OverrideBossLootScaling(On.RoR2.TeleporterInteraction.orig_OnInteractionBegin orig,
-            TeleporterInteraction self, Interactor activator)
-        {
-            _bossItems = ShareSuite.OverrideBossLootScalingEnabled.Value
-                ? ShareSuite.BossLootCredit.Value
-                : Run.instance.participatingPlayerCount;
-            orig(self, activator);
         }
 
         public static bool IsMultiplayer()
