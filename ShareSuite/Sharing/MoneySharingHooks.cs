@@ -191,10 +191,13 @@ namespace ShareSuite
                 switch (self.costType)
                 {
                     case CostTypeIndex.Money:
-                        if (self.cost > SharedMoneyValue) return;
+                        // Longstanding Solitude raises the price or makes it free, read it before orig uses that up
+                        var cost = TeamManager.AdjustCostForLongstandingSolitude(self.costType, self.cost,
+                            activator.GetComponent<CharacterBody>());
+                        if (cost > SharedMoneyValue) return;
                         // Remove money from shared money pool
                         orig(self, activator);
-                        SharedMoneyValue -= self.cost;
+                        SharedMoneyValue -= cost;
                         return;
                     case CostTypeIndex.PercentHealth:
                         // Share the damage taken from a sacrifice

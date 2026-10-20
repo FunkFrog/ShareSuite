@@ -101,6 +101,9 @@ namespace ShareSuite
                 if (ItemSharingHooks.IsDeadAndNotADrone(playerCharacterMasterController.master)) continue;
                 if (playerCharacterMasterController.master.money == MoneySharingHooks.SharedMoneyValue) continue;
                 playerCharacterMasterController.master.money = (uint) MoneySharingHooks.SharedMoneyValue;
+
+                // Longstanding Solitude converts received gold into experience, so spend the pool along with it
+                if (playerCharacterMasterController.master.money == 0) MoneySharingHooks.SharedMoneyValue = 0;
             }
         }
 
