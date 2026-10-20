@@ -22,7 +22,7 @@ namespace ShareSuite
             On.RoR2.DeathRewards.OnKilledServer -= ShareKillMoney;
             On.RoR2.BarrelInteraction.OnInteractionBegin -= ShareBarrelMoney;
             On.RoR2.MoneyPickup.OnTriggerStay -= ShareTomeMoney;
-            On.RoR2.SceneExitController.Begin -= SplitExitMoney;
+            On.RoR2.SceneExitController.SetState -= SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
@@ -41,7 +41,7 @@ namespace ShareSuite
             On.RoR2.DeathRewards.OnKilledServer += ShareKillMoney;
             On.RoR2.BarrelInteraction.OnInteractionBegin += ShareBarrelMoney;
             On.RoR2.MoneyPickup.OnTriggerStay += ShareTomeMoney;
-            On.RoR2.SceneExitController.Begin += SplitExitMoney;
+            On.RoR2.SceneExitController.SetState += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
@@ -244,12 +244,20 @@ namespace ShareSuite
             #endregion
         }
 
-        private static void SplitExitMoney(On.RoR2.SceneExitController.orig_Begin orig, SceneExitController self)
+        private static void SplitExitMoney(On.RoR2.SceneExitController.orig_SetState orig, SceneExitController self,
+            SceneExitController.ExitState newState)
         {
+            // Not every exit goes through Begin (e.g. the Cursed Book), so act on the first exit state of the stage
+            if (MapTransitionActive || newState == SceneExitController.ExitState.Idle)
+            {
+                orig(self, newState);
+                return;
+            }
+
             MapTransitionActive = true;
             if (!ShareSuite.MoneyIsShared.Value || !GeneralHooks.IsMultiplayer())
             {
-                orig(self);
+                orig(self, newState);
                 return;
             }
 
@@ -261,7 +269,7 @@ namespace ShareSuite
                     Mathf.FloorToInt(player.master.money / players);
             }
 
-            orig(self);
+            orig(self, newState);
         }
 
         private static void ShareBarrelMoney(On.RoR2.BarrelInteraction.orig_OnInteractionBegin orig,
