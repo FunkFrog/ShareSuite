@@ -38,6 +38,7 @@ namespace ShareSuite
             // If the new item is not equipment, return
             if (IsEquipment(newEquip) == false)
             {
+                orig(self, body);
                 return;
             }
 
