@@ -779,9 +779,9 @@ namespace ShareSuite
         }
 
         // RentalItemsShared
-        [ConCommand(commandName = "ss_RentalItemsShared", flags = ConVarFlags.None,
+        [ConCommand(commandName = "ss_EtherealItemsShared", flags = ConVarFlags.None,
             helpText = "Modifies whether Ethereal (rented) items are shared or not.")]
-        private static void CcRentalItemsShared(ConCommandArgs args)
+        private static void CcEtherealItemsShared(ConCommandArgs args)
         {
             if (args.Count == 0)
             {
@@ -795,7 +795,7 @@ namespace ShareSuite
             else
             {
                 EtherealItemsShared.Value = valid.Value;
-                Debug.Log($"Rental item sharing set to {EtherealItemsShared.Value}.");
+                Debug.Log($"Ethereal item sharing set to {EtherealItemsShared.Value}.");
             }
         }
 
