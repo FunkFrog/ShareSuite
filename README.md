@@ -132,6 +132,11 @@ items, money, experience, equipment, or otherwise. Check out the "Features" sect
 | Lunar Items are Shared           |     False     |                ss_LunarItemsShared |
 | Boss Items are Shared            |     True      |                 ss_BossItemsShared |
 | Void Items are Shared            |     False     |                 ss_VoidItemsShared |
+| Hallowed Items are Shared        |     False     |             ss_HallowedItemsShared |
+| Page Items are Shared            |     False     |                 ss_PageItemsShared |
+| Hex Items are Shared             |     False     |                  ss_HexItemsShared |
+| Temporary Items are Shared       |     False     |            ss_TemporaryItemsShared |
+| Ethereal Items are Shared        |     False     |             ss_EtherealItemsShared |
 | Rich Messages Enabled            |     True      |             ss_RichMessagesEnabled |
 | Drop BL Equip Mode               |     True      | ss_DropBlacklistedEquipmentOnShare |
 | Randomized Item Sharing          |     False     |          ss_RandomizeSharedPickups |

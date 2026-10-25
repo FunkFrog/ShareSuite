@@ -2,6 +2,26 @@
 
 [![Latest commit to Master](https://img.shields.io/github/last-commit/FunkFrog/RoR2SharedItems/master?label=Latest%20Commit%20%28master%29&style=flat-square)](https://github.com/FunkFrog/RoR2SharedItems)
 
+### 2.12.1.Beta
+- Fix config naming:
+    - RentalItems are now called EthearalItems
+    - Cursed Items are now called HallowedItems
+- Create logging for interactable scaling to help with debugging
+- Fix bug where when using EquipmentSharing players were unable to pickup items.
+- 
+
+
+### 2.12.0
+- **Update to support DLC4**
+- Halcyon Shrine Preliminary Fix (WIP)
+- Hex Item support - default not shared
+- Hallowed Item support - default not shared
+- Temp Items support - default not shared
+- Ethereal Item support - default not shared
+- Computational Exchange preliminary fix
+- Config updates for all above
+
+
 ### `2.10.1/2.11.0`
 - Fixed drone item & money sharing
 - Fixed chat messages in single player
