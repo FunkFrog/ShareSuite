@@ -177,12 +177,6 @@ namespace ShareSuite
             SharedMoneyValue -= totalDrain;
             orig(self);
         }
-        /*
-                    if (currentDrain == 4294967295)                        Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
-                        orig(self);
-                        return;
-                    }
-                }*/
 
         private static void SpawnAsDrone(On.RoR2.CharacterMaster.orig_SpawnRemoteOperationDrone orig, CharacterMaster self, string droneBodyToSpawn, uint moneyToUse)
         {
@@ -192,6 +186,9 @@ namespace ShareSuite
                 orig(self, droneBodyToSpawn, moneyToUse);
                 return;
             }
+            // Set players money to the shared money value. It might not have been updated yet, so we need to do this before the orig call.
+            self.money = (uint) SharedMoneyValue;
+
             Log.Debug($"moneyToUse: {moneyToUse}");
             if (SharedMoneyValue < moneyToUse)
             {
@@ -202,18 +199,6 @@ namespace ShareSuite
             {
                 SharedMoneyValue -= (int) moneyToUse;
             }
-
-            //var droneCost = 0;
-            //var droneCostItem = ItemCatalog.GetItemDef(ItemCatalog.FindItemIndex("RemoteDroneCostReduction"));
-            //if (droneCostItem != null)
-            //{
-            //    droneCost = droneCostItem;
-            //}
-            //if (SharedMoneyValue < droneCost)
-            //{
-            //    return;
-            //}
-            //SharedMoneyValue -= droneCost;
             orig(self, droneBodyToSpawn, moneyToUse);
             #endregion
         }
