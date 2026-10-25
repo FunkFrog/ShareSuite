@@ -8,7 +8,7 @@
     - Cursed Items are now called HallowedItems
 - Create logging for interactable scaling to help with debugging
 - Fix bug where when using EquipmentSharing players were unable to pickup items.
-- 
+- Fix players not using the sharedmoney pool when becoming a drone after they died.
 
 
 ### 2.12.0

@@ -24,11 +24,13 @@ namespace ShareSuite
             On.RoR2.MoneyPickup.OnTriggerStay -= ShareTomeMoney;
             On.RoR2.SceneExitController.Begin -= SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin -= OnShopPurchase;
+            On.RoR2.PurchaseInteraction.CanBeAffordedByInteractor -= AffordCheck;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet -= GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect -= GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect -= GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage -= RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold -= SiphonGold;
+            On.RoR2.CharacterMaster.SpawnRemoteOperationDrone -= SpawnAsDrone;
 
             IL.EntityStates.GoldGat.GoldGatFire.FireBullet -= RemoveGoldGatMoneyLine;
         }
@@ -43,11 +45,13 @@ namespace ShareSuite
             On.RoR2.MoneyPickup.OnTriggerStay += ShareTomeMoney;
             On.RoR2.SceneExitController.Begin += SplitExitMoney;
             On.RoR2.PurchaseInteraction.OnInteractionBegin += OnShopPurchase;
+            On.RoR2.PurchaseInteraction.CanBeAffordedByInteractor += AffordCheck;
             On.EntityStates.GoldGat.GoldGatFire.FireBullet += GoldGatFireHook;
             On.RoR2.Networking.NetworkManagerSystem.OnClientConnect += GoldGatConnect;
             On.RoR2.Networking.NetworkManagerSystem.OnClientDisconnect += GoldGatDisconnect;
             On.RoR2.HealthComponent.TakeDamage += RollOfPenniesDamageHook;
             On.RoR2.GoldSiphonNearbyBodyController.DrainGold += SiphonGold;
+            On.RoR2.CharacterMaster.SpawnRemoteOperationDrone += SpawnAsDrone;
 
             if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer())
                 IL.EntityStates.GoldGat.GoldGatFire.FireBullet += RemoveGoldGatMoneyLine;
@@ -173,13 +177,31 @@ namespace ShareSuite
             SharedMoneyValue -= totalDrain;
             orig(self);
         }
-/*
-            if (currentDrain == 4294967295) {
-                Debug.Log("We're at the stupid value again, are we not initialized?... Calling orig.");
-                orig(self);
+
+        private static void SpawnAsDrone(On.RoR2.CharacterMaster.orig_SpawnRemoteOperationDrone orig, CharacterMaster self, string droneBodyToSpawn, uint moneyToUse)
+        {
+            #region sharedmoney
+            if (!GeneralHooks.IsMultiplayer() || !ShareSuite.MoneyIsShared.Value)
+            {
+                orig(self, droneBodyToSpawn, moneyToUse);
                 return;
             }
-        }*/
+            // Set players money to the shared money value. It might not have been updated yet, so we need to do this before the orig call.
+            self.money = (uint) SharedMoneyValue;
+
+            Log.Debug($"moneyToUse: {moneyToUse}");
+            if (SharedMoneyValue < moneyToUse)
+            {
+                Log.Debug($"Not enough shared money to spawn drone. SharedMoneyValue: {SharedMoneyValue}, moneyToUse: {moneyToUse}");
+                return;
+            }
+            if (moneyToUse > 0)
+            {
+                SharedMoneyValue -= (int) moneyToUse;
+            }
+            orig(self, droneBodyToSpawn, moneyToUse);
+            #endregion
+        }
 
         private static void OnShopPurchase(On.RoR2.PurchaseInteraction.orig_OnInteractionBegin orig,
             PurchaseInteraction self, Interactor activator)
@@ -242,6 +264,25 @@ namespace ShareSuite
             orig(self, activator);
 
             #endregion
+        }
+
+        private static bool AffordCheck(On.RoR2.PurchaseInteraction.orig_CanBeAffordedByInteractor orig,
+            PurchaseInteraction self, Interactor activator)
+        {
+            if (ShareSuite.MoneyIsShared.Value && GeneralHooks.IsMultiplayer() && self)
+            {
+                switch (self.costType)
+                {
+                    case CostTypeIndex.Money:
+                        return self.cost <= SharedMoneyValue;
+                    case CostTypeIndex.PercentHealth:
+                        break; // We're not handling this case, as it doesn't affect shared money directly.
+                    default:
+                        Debug.LogWarning($"Unhandled cost type: {self.costType}.");
+                        break;
+                }
+            }
+            return orig(self, activator);
         }
 
         private static void SplitExitMoney(On.RoR2.SceneExitController.orig_Begin orig, SceneExitController self)
