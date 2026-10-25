@@ -147,30 +147,14 @@ namespace ShareSuite
                 amountOfPlayersInRange = amountOfPlayersInRange++;
                 totalDrain += (int) Math.Min(body.master.money, (uint) shrine.goldDrainValue);
             }
-#if DEBUG
-            /*
-            Debug.Log("-------");
-            Debug.Log("Siphoning gold");
-            Debug.Log($"Amount of Player: {amountOfPlayersInRange}");
-            Debug.Log($"goldDrainValue: {(uint) shrine.goldDrainValue}");
-            Debug.Log($"appliedDrain: {totalDrain}");
-            */
-#endif
-
             if (totalDrain == 0)
             {
-#if DEBUG
-                Debug.Log("Drain is 0");
-#endif
                 orig(self);
                 return;
             }
 
             if (SharedMoneyValue < totalDrain)
             {
-#if DEBUG
-                Debug.Log("Not Draining due to too little money");
-#endif
                 return;
             }
 
@@ -189,7 +173,6 @@ namespace ShareSuite
             // Set players money to the shared money value. It might not have been updated yet, so we need to do this before the orig call.
             self.money = (uint) SharedMoneyValue;
 
-            Log.Debug($"moneyToUse: {moneyToUse}");
             if (SharedMoneyValue < moneyToUse)
             {
                 Log.Debug($"Not enough shared money to spawn drone. SharedMoneyValue: {SharedMoneyValue}, moneyToUse: {moneyToUse}");
@@ -256,7 +239,7 @@ namespace ShareSuite
 
                         return;
                     default:
-                        Debug.LogWarning($"Unhandled cost type: {self.costType}.");
+                        Log.Warning($"Unhandled cost type: {self.costType}.");
                         break;
                 }
             }
@@ -278,7 +261,7 @@ namespace ShareSuite
                     case CostTypeIndex.PercentHealth:
                         break; // We're not handling this case, as it doesn't affect shared money directly.
                     default:
-                        Debug.LogWarning($"Unhandled cost type: {self.costType}.");
+                        // Log.Warning($"Unhandled cost type: {self.costType}.");
                         break;
                 }
             }

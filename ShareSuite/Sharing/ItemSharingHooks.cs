@@ -168,7 +168,7 @@ namespace ShareSuite
                 return;
             }
 #if DEBUG
-            var index = item.equipmentIndex;
+            /*var index = item.equipmentIndex;
             var isEquipment = EquipmentCatalog.allEquipment.Contains(index);
             if (!isEquipment)
             {
@@ -186,7 +186,7 @@ namespace ShareSuite
                     Log.Debug($"Name Token: {itemDef.nameToken}");
                     Log.Debug($"Name: {itemDef.name}");
                 } 
-            }
+            }*/
 #endif
 
             if (!Blacklist.HasItem(item.itemIndex)

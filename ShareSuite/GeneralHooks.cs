@@ -78,7 +78,7 @@ namespace ShareSuite
         {
             orig(self);
 
-            Debug.Log(SceneInfo.instance.sceneDef.nameToken);
+            Log.Debug(SceneInfo.instance.sceneDef.nameToken);
 
             #region InteractablesCredit
 
@@ -163,7 +163,7 @@ namespace ShareSuite
                 $"{ShareSuite.OverridePlayerScalingEnabled.Value};" + // OverridePlayerScalingEnabled
                 $"{ShareSuite.InteractablesCredit.Value};" + // InteractablesCredit
                 $"{ShareSuite.InteractablesOffset.Value}"; // InteractablesOffset
-            Debug.Log($"ShareSuite: DataGathering: {message}");
+            Log.Debug($"ShareSuite: DataGathering: {message}");
             try
             {
                 if (File.Exists(path))
@@ -184,7 +184,7 @@ namespace ShareSuite
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to write to DataGathering.csv: {e.Message}");
+                Log.Error($"Failed to write to DataGathering.csv: {e.Message}");
             }
         }
 
