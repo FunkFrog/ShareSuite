@@ -144,7 +144,7 @@ namespace ShareSuite
 
                 if (!body.healthComponent.alive || !body.master || !body.isPlayerControlled)
                     continue;
-                amountOfPlayersInRange = amountOfPlayersInRange++;
+                amountOfPlayersInRange = amountOfPlayersInRange + 1;
                 totalDrain += (int) Math.Min(body.master.money, (uint) shrine.goldDrainValue);
             }
             if (totalDrain == 0)
